@@ -9,9 +9,9 @@ public class MazeTileSet{
 	public BufferedImage finish;
 
 	public MazeTileSet(BufferedImage space, BufferedImage wall, BufferedImage start, BufferedImage finish){
-		this.space = space;
-		this.wall = wall;
-		this.start = start;
+		this.space  = space;
+		this.wall   = wall;
+		this.start  = start;
 		this.finish = finish;
 	}
 

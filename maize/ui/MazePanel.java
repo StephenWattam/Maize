@@ -21,7 +21,11 @@ public class MazePanel extends Canvas{
 	private MazeTileSet mazeTiles;
 	private BotTileSet[] botTileSets;
 
-	private Image buffer = null;
+    // Caching
+    private Dimension currentSize = null;
+	private Image bgBuffer = null;
+	private MazeTileSet mazeTileCache = null;
+	private BotTileSet[] botTileSetCache = null;
 
 	// if everything is dirty also erase background
 	private boolean blankBeforePaint = false;
@@ -32,8 +36,11 @@ public class MazePanel extends Canvas{
 		this.maze = maze;
 
 		// Populate images	
-		this.mazeTiles = mazeTiles;
-		this.botTileSets = botTileSets;
+		this.mazeTiles      = mazeTiles;
+		this.botTileSets    = botTileSets;
+
+        // Get original size
+        currentSize = getSize();
 
 		// Ensure the first render refreshes everything
 		dirtyEverything();
@@ -62,6 +69,46 @@ public class MazePanel extends Canvas{
 
 		this.blankBeforePaint = true;
 	}
+
+    public void resizeCache(){
+        // Simply return if the size is the same
+        if( currentSize == getSize() && bgBuffer != null && mazeTileCache != null && botTileSetCache != null)
+            return;
+
+        // Load the size.
+        currentSize = getSize();
+
+        // Rescale tiles from original to avoid lossiness
+        mazeTileCache = new MazeTileSet( 
+                rescaleImage(currentSize, mazeTiles.space),
+                rescaleImage(currentSize, mazeTiles.wall),
+                rescaleImage(currentSize, mazeTiles.start),
+                rescaleImage(currentSize, mazeTiles.finish));
+
+        // Scale bots from original to avoid lossiness.
+        botTileSetCache = new BotTileSet[botTileSets.length];
+        for(int i=0; i<botTileSets.length; i++)
+            botTileSetCache[i] = new BotTileSet( rescaleImage(currentSize, botTileSets[i].botN) );
+        
+
+
+        /* // Reconstruct the background to that size */
+        bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
+        /* renderBackground( bgBuffer.getGraphics() ); */
+    }
+
+    private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
+
+        //rescale the image to be done
+        float tilex = (float)(targetSize.width / maze.getWidth());
+        float tiley = (float)(targetSize.height / maze.getHeight());
+
+        AffineTransform transform = AffineTransform.getScaleInstance(
+                (float)tilex / (float)img.getWidth(),  
+                (float)tiley / (float)img.getWidth());
+        AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
+        return op.filter(img, null);
+    }
 
 	// Add an agent to the list to render
 	public boolean addAgent(Agent a){
@@ -99,7 +146,7 @@ public class MazePanel extends Canvas{
 	}
 
 	// Renders only the dirty bits, keeps rendering quick
-	private void renderDirtyAreas( Graphics g){
+	private void renderDirtyAreas( Graphics g ){
 		synchronized(dirty_tiles){
 			for(Iterator<Point> ip = dirty_tiles.iterator(); ip.hasNext(); )
 				drawTile( ip.next(), g);
@@ -128,15 +175,15 @@ public class MazePanel extends Canvas{
 
 		// Check for maze background section
 		if(maze.getEntX() == p.x && maze.getEntY() == p.y)
-			img = mazeTiles.start;
+			img = mazeTileCache.start;
 		//renderTile(start, p.x, p.y, bg);
 		else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
-			img = mazeTiles.finish;
+			img = mazeTileCache.finish;
 		//renderTile(finish, p.x, p.y, bg);
-		else if( mdata[p.x][p.y])
-			img = mazeTiles.wall;
+		else if( mdata[p.x][p.y] )
+			img = mazeTileCache.wall;
 		else
-			img = mazeTiles.space;
+			img = mazeTileCache.space;
 
 
 		// Check each agent
@@ -153,46 +200,41 @@ public class MazePanel extends Canvas{
 				switch(current.getOrientation())
 				{
 					case Orientation.NORTH:
-						img = botTileSets[set].botN;
+						img = botTileSetCache[set].botN;
 						break;
 
 					case Orientation.EAST:
-						img = botTileSets[set].botE;
+						img = botTileSetCache[set].botE;
 						break;
 
 					case Orientation.WEST:
-						img = botTileSets[set].botW;
+						img = botTileSetCache[set].botW;
 						break;
+
 					default:
-						img = botTileSets[set].botS;
+						img = botTileSetCache[set].botS;
 				}
 			}
 		}
 
 		// If we found something, scale and render the tile
 		if(img != null)
-		{
-			//rescale the image to be done
-			float tilex = (float)(this.getWidth() / maze.getWidth());
-			float tiley = (float)(this.getHeight() / maze.getHeight());
-
-			AffineTransform transform = AffineTransform.getScaleInstance((float)tilex / (float)img.getWidth(),  
-					(float)tiley / (float)img.getWidth());
-			AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
-			img = op.filter(img, null);
-
 			renderTile(img, p.x, p.y, bg);
-		}
 	}
 
 	// Renders a tile with a given buffered image
 	private void renderTile(BufferedImage tile, int x, int y, Graphics g){
-		g.drawImage(tile, (int)(x*((float)this.getWidth() / (float)maze.getWidth())), 
-				(int)(y*((float)this.getHeight() / (float)maze.getHeight())), this);
+		g.drawImage(tile, 
+                (int)(x*((float)this.getWidth()     / (float)maze.getWidth())), 
+				(int)(y*((float)this.getHeight()    / (float)maze.getHeight())), 
+                this);
 	}
 
 	// Update the render surface, dirties the agent's moved tiles automatically.
 	public void update(Graphics g){
+        // rebuild the cache if the window has resized
+        resizeCache();
+
 		// Blank if we have been asked to do so
 		if(blankBeforePaint){
 			g.setColor(Color.WHITE);
@@ -202,10 +244,11 @@ public class MazePanel extends Canvas{
 
 		// Else update the dirty areas
 		if(maze != null){
-			dirtyAgentAreas();
-			renderDirtyAreas(g);
-			dirtyAgentAreas();
+			dirtyAgentAreas();  // render agent
+			renderDirtyAreas(this.bgBuffer.getGraphics());
+			dirtyAgentAreas();  // render trails
 		}
+        g.drawImage(this.bgBuffer, 0, 0, this);
 	}
 
 	// Sets a given maze
