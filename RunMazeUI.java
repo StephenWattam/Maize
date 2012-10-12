@@ -71,7 +71,7 @@ public class RunMazeUI{
 			for(int i=1;i<100;i++){
 				botTiles = loadBotTiles(BOT_IMG_DIRECTORY, BOT_IMG_EXT, i+"");
 				if(botTiles == null) break;
-				System.out.println("Loaded images for bot " + i );
+				System.out.println("Loaded image for bot " + i );
 				bts.add(botTiles);
 			}
 			botTileSets = (BotTileSet[])bts.toArray(new BotTileSet[bts.size()]);

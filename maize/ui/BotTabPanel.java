@@ -19,8 +19,8 @@ public class BotTabPanel extends JPanel implements ActionListener, ListSelection
 	private static final String BOT_NAME_PLACEHOLDER	= "Name";
 	private static final String BOT_DESC_PLACEHOLDER	= "Description";
 	private static final String REFRESH_BUTTON_LABEL	= "Refresh";
-	private static final String DELETE_BUTTON_LABEL	= "Delete";
-	private static final String SAVE_BUTTON_LABEL	= "Save...";
+	private static final String DELETE_BUTTON_LABEL	    = "Delete";
+	private static final String SAVE_BUTTON_LABEL	    = "Save...";
 
 	// The maze test object to populate
 	private MazeTest mazeTest;

@@ -16,6 +16,7 @@ public class MazeUISettingsManager{
 	public static BotTileSet[] botTileSets;
 
 
+    // Ensures this remains as a singleton
 	public static MazeUISettingsManager getInstance(){
 		if(instance == null)
 			instance = new MazeUISettingsManager();
