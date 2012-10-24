@@ -58,6 +58,7 @@ public class MazePanel extends Canvas{
 
 	// Set everything to be rendered next time swing gets around to it.
 	public void dirtyEverything(){
+        System.out.println("dirtyEverything()");
 
 		if(maze != null)
 			for(int j=0; j<maze.getHeight(); j++){
@@ -72,33 +73,37 @@ public class MazePanel extends Canvas{
 
     public void resizeCache(){
         // Simply return if the size is the same
-        if( currentSize == getSize() && bgBuffer != null && mazeTileCache != null && botTileSetCache != null)
+        if( getSize().equals(currentSize) && 
+                this.bgBuffer != null && 
+                this.mazeTileCache != null && 
+                this.botTileSetCache != null &&
+                this.maze != null)
             return;
 
         // Load the size.
         currentSize = getSize();
 
         // Rescale tiles from original to avoid lossiness
-        mazeTileCache = new MazeTileSet( 
+        this.mazeTileCache = new MazeTileSet( 
                 rescaleImage(currentSize, mazeTiles.space),
                 rescaleImage(currentSize, mazeTiles.wall),
                 rescaleImage(currentSize, mazeTiles.start),
                 rescaleImage(currentSize, mazeTiles.finish));
 
         // Scale bots from original to avoid lossiness.
-        botTileSetCache = new BotTileSet[botTileSets.length];
+        this.botTileSetCache = new BotTileSet[botTileSets.length];
         for(int i=0; i<botTileSets.length; i++)
-            botTileSetCache[i] = new BotTileSet( rescaleImage(currentSize, botTileSets[i].botN) );
+            this.botTileSetCache[i] = new BotTileSet( rescaleImage(currentSize, botTileSets[i].botN) );
         
 
 
         /* // Reconstruct the background to that size */
-        bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
-        /* renderBackground( bgBuffer.getGraphics() ); */
+        this.bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
+        renderBackground( this.bgBuffer.getGraphics() );
     }
 
-    private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
 
+    private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
         //rescale the image to be done
         float tilex = (float)(targetSize.width / maze.getWidth());
         float tiley = (float)(targetSize.height / maze.getHeight());
@@ -130,20 +135,40 @@ public class MazePanel extends Canvas{
 	// Render what is dirty
 	public void paint(Graphics g)
 	{
-
 		// One-off filling in of the background
 		if(blankBeforePaint){
-			g.setColor(Color.WHITE);
-			g.fillRect(0,0, this.getWidth(), this.getHeight());
+            // FIXME
+            g.setColor(Color.WHITE);
+            g.fillRect(0,0, this.getWidth(), this.getHeight());
 			this.blankBeforePaint = false;
-		}
+        }
 
 		// If no maze then make sure we render everything when the maze is added
-		if(maze != null){
-			dirtyEverything();
-			update(g);
-		}
+		if(maze == null){
+            g.setColor(Color.WHITE);
+            g.fillRect(0,0, this.getWidth(), this.getHeight());
+		}else{
+            resizeCache();
+            g.drawImage(this.bgBuffer, 0, 0, this);
+        }
 	}
+
+
+    // Draws the whole of the background, equivalent to dirtying everything
+    // then rendering without any bots added
+    private void renderBackground(Graphics g){
+        // Set bg to white
+        g.setColor(Color.WHITE);
+		g.fillRect(0,0, this.getWidth(), this.getHeight());
+
+        // and then render all the tiles
+        // TODO: prevent things from rendering the bots onto the background!
+        for(int i=0; i < maze.getWidth(); i++){
+            for(int j=0; j < maze.getHeight(); j++){
+                drawTile(new Point(i, j), g);
+            }
+        }	
+    }
 
 	// Renders only the dirty bits, keeps rendering quick
 	private void renderDirtyAreas( Graphics g ){
@@ -233,14 +258,15 @@ public class MazePanel extends Canvas{
 	// Update the render surface, dirties the agent's moved tiles automatically.
 	public void update(Graphics g){
         // rebuild the cache if the window has resized
+        // FIXME: this shouldn't really be done here...
         resizeCache();
 
-		// Blank if we have been asked to do so
-		if(blankBeforePaint){
-			g.setColor(Color.WHITE);
-			g.fillRect(0,0, this.getWidth(), this.getHeight());
-			this.blankBeforePaint = false;
-		}
+		/* // Blank if we have been asked to do so */
+		/* if(blankBeforePaint){ */
+		/* 	g.setColor(Color.WHITE); */
+		/* 	g.fillRect(0,0, this.getWidth(), this.getHeight()); */
+		/* 	this.blankBeforePaint = false; */
+		/* } */
 
 		// Else update the dirty areas
 		if(maze != null){
@@ -248,13 +274,15 @@ public class MazePanel extends Canvas{
 			renderDirtyAreas(this.bgBuffer.getGraphics());
 			dirtyAgentAreas();  // render trails
 		}
-        g.drawImage(this.bgBuffer, 0, 0, this);
+
+        /* g.drawImage(this.bgBuffer, 0, 0, this); */
+        paint(g);
 	}
 
 	// Sets a given maze
 	public void setMaze(Maze m){
 		this.maze = m;
-		dirtyEverything();
+        this.bgBuffer = null;
 	}
 
 }
