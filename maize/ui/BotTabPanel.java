@@ -151,8 +151,8 @@ public class BotTabPanel extends JPanel implements ActionListener, ListSelection
 			try{
 				ClassSerializer.save( fileChooser.getSelectedFile(), b);	
 			}catch(Exception e){
-				System.err.println("Error saving bot in bot tab panel, saveBot(Bot):\n");
-				e.printStackTrace();
+				Log.log("Error saving bot in bot tab panel, saveBot(Bot):\n");
+				Log.logException(e);
 				JOptionPane.showMessageDialog(this, "Error saving bot.");
 			}
 		}

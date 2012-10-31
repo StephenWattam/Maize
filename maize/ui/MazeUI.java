@@ -26,6 +26,7 @@ public class MazeUI extends JFrame implements ActionListener{
 
 	private MazeTabPanel mazeTab;
 	private BotTabPanel botTab;
+    private LogTabPanel logTab;
 
 	private MultiTestTabPanel multiTestTab;
 
@@ -91,15 +92,20 @@ public class MazeUI extends JFrame implements ActionListener{
 		multiTestTab = new MultiTestTabPanel(mazeTest);
 		tabs.add("Run Tests", multiTestTab);
 
+        logTab  =   new LogTabPanel(mazeTest);
+        Log.addLogListener(logTab);
+        tabs.add("Log", logTab);
+
 		setContentPane(tabs);
 		setVisible(true);
 
 		updatePanes();
-
+        Log.log("Started Maize main UI");
 	}
 
 	// Create a set of default mazes, one for each factory
 	private void constructDefaultMazes(){
+        Log.log("Constructing default mazes");
 		for(MazeFactory mf : this.mazeTest.factories){
 			Maze m = mf.getMaze(DEFAULT_MAZE_WIDTH, DEFAULT_MAZE_HEIGHT);
 			m.setName("Default " + mf.getClass().getName());
@@ -177,11 +183,14 @@ public class MazeUI extends JFrame implements ActionListener{
 		//fileChooser.setFileFilter(new ImageFileFilter());
 		if(fileChooser.showOpenDialog(this) == 0){
 			try{
+                Log.log("Loading maze from " + fileChooser.getSelectedFile());
 				Maze m = (Maze)ClassSerializer.load(fileChooser.getSelectedFile());
 				mazeTest.mazes.add(m);
 				updatePanes();
 			}catch(Exception e){
 				JOptionPane.showMessageDialog(this, "Error loading maze.");
+                Log.log("Error loading maze.");
+                Log.logException(e);
 			}
 		}
 	}
@@ -193,11 +202,14 @@ public class MazeUI extends JFrame implements ActionListener{
 		//fileChooser.setFileFilter(new ImageFileFilter());
 		if(fileChooser.showOpenDialog(this) == 0){
 			try{
+                Log.log("Loading bot from " + fileChooser.getSelectedFile());
 				Bot b = (Bot)ClassSerializer.load(fileChooser.getSelectedFile());
 				mazeTest.bots.add(b);
 				updatePanes();
 			}catch(Exception e){
 				JOptionPane.showMessageDialog(this, "Error loading bot.");
+                Log.log("Error loading bot.");
+                Log.logException(e);
 			}
 		}
 	}
@@ -224,6 +236,7 @@ public class MazeUI extends JFrame implements ActionListener{
 			try{
 				String filename = fileChooser.getSelectedFile().getName();
 				//System.out.println("DEBUG: " + filename);
+                Log.log("Compiling bot from file: " + filename);
 				if(BotCompilerHelper.compile(MazeUISettingsManager.botDirectory + java.io.File.separator + filename)){
 					mazeTest.bots.add(BotCompilerHelper.loadBot( MazeUISettingsManager.botPackageName + "." + 
 								BotCompilerHelper.classNameFromBaseName(filename)));
@@ -231,6 +244,8 @@ public class MazeUI extends JFrame implements ActionListener{
 				}
 			}catch(Exception e){
 				JOptionPane.showMessageDialog(this, "Error loading bot.");
+                Log.log("Error loading bot.");
+                Log.logException(e);
 			}
 		}
 

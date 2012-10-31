@@ -8,14 +8,14 @@ public abstract class BotCompilerHelper{
 
 	// Compileas and loads bots into a given mazeTest 
 	public static void compileAndLoadBots(MazeTest mazeTest, String packageName, String dirname){
-		System.out.println("Compiling bots...");
+		Log.log("Compiling bots...");
 		Vector<String> bot_classes = compileAllBots(dirname); // compile
 		for(String s: bot_classes){ // and load
 			try{ 
 				mazeTest.bots.add(loadBot(packageName + "." + s));
 			}catch(Exception e){
-				System.err.println("Error loading bot " + s + ".");
-				e.printStackTrace();
+                Log.log("Error loading bot " + s);
+                Log.logException(e);
 			}
 		}
 	}
@@ -43,12 +43,14 @@ public abstract class BotCompilerHelper{
 			System.err.println("No bots found!");
 		}else{
 			for(int i=0; i<children.length; i++){
+                Log.log("Compiling bot " + children[i]);
 				if(compile(dirname + java.io.File.separator + children[i])){
-					System.out.println(children[i] + " compiled successfully!");
+                    Log.log(children[i] + " compiled successfully!");
 					compiled_bots.add(classNameFromBaseName(children[i]));
 					//compiled_bots.add(children[i].replaceAll(".java$", ".class"));
 				}else{
 					System.err.println("Failed to compile " + children[i]);
+                    Log.log("Failed to compile " + children[i]);
 				}
 			}
 		}
