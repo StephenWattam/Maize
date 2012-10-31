@@ -33,9 +33,11 @@ public class MazeUI extends JFrame implements ActionListener{
 	public MazeUI(MazeTest mazeTest)throws IOException{
 		super("Maize UI");
 
-		// Initialize our security manager nice and early
-/*		System.setSecurityManager(new SecurityManager () {
-			public void checkPermission(Permission perm) {
+/*		// Initialize our security manager nice and early
+		System.setSecurityManager(new SecurityManager ()
+		{
+			public void checkPermission(Permission perm)
+			{
 				boolean deny = false;
 				Class[] classContext = getClassContext();
 				Class botClass = null;
@@ -48,18 +50,20 @@ public class MazeUI extends JFrame implements ActionListener{
 				} catch (ClassNotFoundException e) {
 					return;
 				}
-				for (int i = 0; i < classContext.length; i++) {
-					if (classContext[i].isAssignableFrom(botClass)) {
+				for (int i = 0; i < classContext.length; i++)
+				{
+					if (classContext[i].isAssignableFrom(botClass))
+					{
 						deny = true;
 						break;
 					}
 				}
-				if (deny) {
+				if (deny)
+				{
 					throw new SecurityException("Stop it.");
 				}
 			}
-		});
-*/
+		});*/
 
 		//super.setIconImage(new ImageIcon(ICON_PATH).getImage());
 		setSize(900, 630);
