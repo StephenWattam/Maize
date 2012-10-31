@@ -283,6 +283,8 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 			JOptionPane.showMessageDialog(this, "No test is running.");
 			return;
 		}
+
+        Log.log("Stopping test.");
 		test.quit();
 		this.test = null;
 		mazePanel.repaint();
@@ -293,6 +295,8 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 			JOptionPane.showMessageDialog(this, "No test is running.");
 			return;
 		}
+
+        Log.log("Pausing test.");
 		this.test.toggle_pause();
 	}
 
@@ -311,6 +315,7 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 		}
 
 		//this.test = new TestThread(maze, bot, mazePanel, MAX_DELAY - speedSlider.getValue());
+        Log.log("Starting maze test: maze: " + maze + ", bots: " + this.selectedBots.size());
 		this.test.start();
 	}
 
@@ -334,7 +339,7 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 			this.test.quit();
 		}
 
-		System.out.println("Maze selected: " + this.mazeList.getSelectedValue());
+		/* ("Maze selected: " + this.mazeList.getSelectedValue()); */
 		this.maze = (Maze)this.mazeList.getSelectedValue();
 		if(this.maze == null){
 			setMazeName(MAZE_NAME_PLACEHOLDER);
@@ -350,6 +355,7 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 		if(this.selectedBots.size() == 0)
 			return;
 			
+        Log.log("Creating new test.");
 		// Create a test thread
 		Bot[] bots = (Bot[])this.selectedBots.toArray(new Bot[this.selectedBots.size()]);
 		this.test = new TestThread(this.maze, bots, mazePanel, MAX_DELAY - speedSlider.getValue(), this.testList);

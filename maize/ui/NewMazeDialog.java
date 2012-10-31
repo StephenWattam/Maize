@@ -126,8 +126,12 @@ public class NewMazeDialog extends JDialog implements ActionListener{
 			int mw = ((SpinnerNumberModel)widthSpinner.getModel()).getNumber().intValue();
 			int mh = ((SpinnerNumberModel)heightSpinner.getModel()).getNumber().intValue();
 
+
 			Maze m = ((MazeFactory)factoryCombo.getSelectedItem()).getMaze(mw, mh);
 			m.setName(nameField.getText());
+
+            Log.log("Creating new " + m.getWidth() + "x" + m.getHeight() + " maze ('" + nameField.getText() + "') using " + ((MazeFactory)factoryCombo.getSelectedItem()));
+
 
 			mazeTest.mazes.add( m );
 			this.parent.updatePanes();

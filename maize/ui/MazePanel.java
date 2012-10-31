@@ -108,6 +108,7 @@ public class MazePanel extends Canvas{
 	// Add an agent to the list to render
 	public boolean addAgent(Agent a){
 		if( agents.indexOf(a) == -1){
+            Log.log("Adding agent " + a + " to maze panel "+ this);
 			agents.add(a);
 			return true;
 		}
@@ -116,8 +117,10 @@ public class MazePanel extends Canvas{
 
 	// Removes an agent from the list to simulate
 	public boolean remAgent(Agent a){
-		if(agents.indexOf(a) == -1)
+		if(agents.indexOf(a) == -1){
+            Log.log("Removing agent " + a + " from maze panel "+ this);
 			return false;
+        }
 		agents.remove(a);
 		return true;
 	}
@@ -273,6 +276,7 @@ public class MazePanel extends Canvas{
 
 	// Sets a given maze
 	public void setMaze(Maze m){
+        Log.log("Setting Maze " + m + " to render on panel " + this);
 		this.maze = m;
         this.bgBuffer = null;
 	}

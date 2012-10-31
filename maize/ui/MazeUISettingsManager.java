@@ -38,24 +38,22 @@ public class MazeUISettingsManager{
         try{
             config = (JSONObject) parser.parse(new FileReader(filename));
         }catch(FileNotFoundException FNFe){
-            System.err.println("Could not find config file: " + filename);
+            Log.log("Could not find config file: " + filename);
+            Log.logException(FNFe);
             return false;
         }catch(IOException IOe){
-            System.err.println("There was an error reading the config file.");
+            Log.log("There was an error reading the config file.");
+            Log.logException(IOe);
             return false;
         }catch(ParseException pe){
-            System.err.println("Failed to read config file at position: " + pe.getPosition());
-            System.err.println(pe);
+            Log.log("Failed to read config file at position: " + pe.getPosition());
+            Log.logException(pe);
             return false;
         }
 
         // Check we loaded something
         if(config == null)
             return false;
-
-        // Check everything exists
-        System.out.println("READ: " + ((JSONObject)config.get("ui")).get("icon"));
-
 
         // constuct things 
 		MazeTileSet mazeTiles;
@@ -84,7 +82,7 @@ public class MazeUISettingsManager{
                                         i+"");
 				if(botTiles != null) {
                     count ++; 
-                    System.out.println("Loaded image for bot " + count );
+                    Log.log("Successfully loaded image for bot " + count );
 				    bts.add(botTiles);
                 }
 			}
@@ -92,7 +90,7 @@ public class MazeUISettingsManager{
 
             // Ensure we have loaded some bots
             if( count == 0 ){
-                System.err.println("No bot images found!");
+                Log.log("No bot images found!");
                 return false;
             }
 
@@ -105,10 +103,12 @@ public class MazeUISettingsManager{
             MazeUISettingsManager.icon              = icon;
 
         }catch(NullPointerException NPe){
-            System.err.println("Missing config key.");
+            Log.log("Missing config key.");
+            Log.logException(NPe);
             return false;
 		}catch(IOException IOe){
-			System.err.println("Cannot load image resources!");
+			Log.log("Cannot load image resources!");
+            Log.logException(IOe);
             return false;
 		}
 

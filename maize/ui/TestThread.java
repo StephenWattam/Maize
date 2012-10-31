@@ -45,7 +45,7 @@ public class TestThread extends Thread{
 		this.panel = mp;
 		// Add each bot
 		for(int i=0; i<bs.length; i++){
-			System.out.println("Building runtime for bot " + (i+1) + "/" + bs.length);
+            Log.log("Building runtime environment for bot " + (i+1) + "/" + bs.length);
 			agents[i] = new BotTest();
 			agents[i].bot = bs[i];
 

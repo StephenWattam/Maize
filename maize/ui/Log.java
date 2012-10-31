@@ -30,7 +30,7 @@ public class Log{
         StackTraceElement[] trace = e.getStackTrace();
         log("Exception -> " + e.toString());
         for(StackTraceElement ste : e.getStackTrace()){
-            log(ste.toString());
+            log("             " + ste.toString());
         }
     }
 

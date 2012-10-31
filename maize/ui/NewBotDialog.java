@@ -79,15 +79,17 @@ public class NewBotDialog extends JDialog implements ActionListener{
 			dispose();
 		}else if(Ae.getSource() == createButton){
 			try{ 
+                Log.log("Instantiating bot '" + nameField.getText() + "' from existing scope by name.");
+
 				Class theClass  = Class.forName( nameField.getText() );
 				Bot b = (Bot)theClass.newInstance();
 				mazeTest.bots.add(b);
 
-
 				this.parent.updatePanes();
 			}catch(Exception e){
 				JOptionPane.showMessageDialog(this, "Error loading bot, check path and case.");
-				e.printStackTrace();
+                Log.log("Error loading bot.");
+				Log.logException(e);
 			}
 			dispose();
 

@@ -72,6 +72,15 @@ public abstract class BotCompilerHelper{
 	// Compiles a filename
 	public static boolean compile(String fname){
 		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if(compiler == null){
+            Log.log("");
+            Log.log("IMPORTANT: No compiler is available on this platform.");
+            Log.log("           Maize requires the java compiler to run bots, meaning you must");
+            Log.log("           install the JDK, rather than the JRE.");
+            Log.log("           If you already have both installed, check your classpath.");
+            Log.log("");
+            System.exit(1);
+        }
 		int compilationResult =	compiler.run(null, null, null, fname);
 
 		return compilationResult == 0;

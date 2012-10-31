@@ -36,7 +36,7 @@ public class RunMazeUI{
 		//mt.factories.add( new ());
 
         if(!MazeUISettingsManager.loadConfig(CONFIG_LOCATION)){
-            System.err.println("Error loading resources.  Please attend to your config file, to be found at " + CONFIG_LOCATION);
+            Log.log("Error loading resources.  Please attend to your config file, to be found at " + CONFIG_LOCATION);
             System.exit(1);
         }
 
@@ -45,7 +45,8 @@ public class RunMazeUI{
 		try{
 			new MazeUI(mt);
 		}catch(IOException IOe){
-			System.err.println("Could not load some resources!");
+			Log.log("Unknown Error in Maize!");
+            Log.logException(IOe);
 		}
 	}	
 }
