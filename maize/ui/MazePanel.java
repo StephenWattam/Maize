@@ -58,16 +58,6 @@ public class MazePanel extends Canvas{
 
 	// Set everything to be rendered next time swing gets around to it.
 	public void dirtyEverything(){
-        System.out.println("dirtyEverything()");
-
-		if(maze != null)
-			for(int j=0; j<maze.getHeight(); j++){
-				synchronized(dirty_tiles){
-					for(int i=0; i<maze.getWidth(); i++)
-						dirty_tiles.add(new Point(i, j));
-				}
-			}
-
 		this.blankBeforePaint = true;
 	}
 
