@@ -13,7 +13,8 @@ import javax.imageio.*;
 
 
 import maize.*;
-public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeListener, ListSelectionListener{
+public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeListener, ListSelectionListener, MouseWheelListener{
+    private static final int SPEED_SCROLL_AMOUNT = 1;
 	private static final int MAX_DELAY = 500;
 	private static final int MAZE_DISPLAY_MAX_NAME_LENGTH = 25;
 	private static final String BOT_NAME_PLACEHOLDER	= "No bot";
@@ -59,6 +60,7 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 		// speed slider
 		speedSlider.setSize(new Dimension(200, 10));
 		speedSlider.addChangeListener(this);
+        speedSlider.addMouseWheelListener(this);
 
 
 		mazeNameLabel.setMaximumSize(new Dimension(80, 20));
@@ -257,6 +259,23 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 			}
 		}
 	}
+
+    public void mouseWheelMoved(MouseWheelEvent e){
+        int notches = e.getWheelRotation();
+        int speed = this.speedSlider.getValue();
+        BoundedRangeModel model = this.speedSlider.getModel();
+            
+        if(notches < 0){
+            // up, decrease speed
+            speed = speed - SPEED_SCROLL_AMOUNT;
+            model.setValue( Math.max( speed, model.getMinimum() ) );
+        }else{
+            //down, increase speed
+            speed = speed + SPEED_SCROLL_AMOUNT;
+            model.setValue( Math.min( speed, model.getMaximum() ) );
+        }
+
+    }
 
 
 	private void stop(){

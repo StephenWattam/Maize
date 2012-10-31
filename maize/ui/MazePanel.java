@@ -147,6 +147,8 @@ public class MazePanel extends Canvas{
 		if(maze == null){
             g.setColor(Color.WHITE);
             g.fillRect(0,0, this.getWidth(), this.getHeight());
+            g.setColor(Color.BLACK);
+            g.drawString("No Maze.", (this.getWidth()/2 - 15), (this.getHeight()/2 - 5));
 		}else{
             resizeCache();
             g.drawImage(this.bgBuffer, 0, 0, this);
