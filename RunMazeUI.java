@@ -10,10 +10,13 @@ import java.util.*;
 public class RunMazeUI{
 
 
-	private static String BOT_DIRECTORY = "./bots";
-	private static String BOT_PACKAGE_NAME = "bots";
-	private static String BOT_IMG_DIRECTORY = "imgres/bots/";
-	private static String BOT_IMG_EXT = ".png";
+	private static String BOT_DIRECTORY         = "./bots";
+	private static String BOT_PACKAGE_NAME      = "bots";
+	private static String BOT_IMG_DIRECTORY     = "imgres/bots/";
+	private static String BOT_IMG_EXT           = ".png";
+
+    // PRogram icon
+    private static String ICON                  = "imgres/icorn.gif";
 
 	private static final String SPACE	= "imgres/space.png";
 	private static final String WALL	= "imgres/wall.png";
@@ -60,10 +63,15 @@ public class RunMazeUI{
 		BotTileSet[] botTileSets;
 		try{
 			// Load the maze tile set
-			BufferedImage space	= ImageIO.read(new File(SPACE));
-			BufferedImage wall	= ImageIO.read(new File(WALL));
-			BufferedImage start	= ImageIO.read(new File(START));
+			BufferedImage space	    = ImageIO.read(new File(SPACE));
+			BufferedImage wall	    = ImageIO.read(new File(WALL));
+			BufferedImage start	    = ImageIO.read(new File(START));
 			BufferedImage finish	= ImageIO.read(new File(FINISH));
+
+            // and the icon
+            BufferedImage icon      = ImageIO.read(new File(ICON));
+
+            // then the maze tilesets
 			mazeTiles = new MazeTileSet(space, wall, start, finish);
 
 
@@ -82,6 +90,7 @@ public class RunMazeUI{
 			MazeUISettingsManager.botPackageName	= BOT_PACKAGE_NAME;
 			MazeUISettingsManager.mazeTiles			= mazeTiles;
 			MazeUISettingsManager.botTileSets		= botTileSets;
+            MazeUISettingsManager.icon              = icon;
 
 		}catch(IOException IOe){
 			System.err.println("Cannot load image resources!");

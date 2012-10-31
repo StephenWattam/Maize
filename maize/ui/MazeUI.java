@@ -65,6 +65,7 @@ public class MazeUI extends JFrame implements ActionListener{
 		setSize(900, 630);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
+        this.setIconImage(MazeUISettingsManager.icon);
 
 
 		this.mazeTest = mazeTest;

@@ -15,6 +15,9 @@ public class MazeUISettingsManager{
 	public static MazeTileSet mazeTiles;
 	public static BotTileSet[] botTileSets;
 
+    // Program icon
+    public static BufferedImage icon;
+
 
     // Ensures this remains as a singleton
 	public static MazeUISettingsManager getInstance(){
