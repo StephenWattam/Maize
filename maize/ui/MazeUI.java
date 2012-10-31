@@ -255,6 +255,7 @@ public class MazeUI extends JFrame implements ActionListener{
 
 	// Quit
 	private void quit(){
+        Log.removeLogListener(logTab);
         Log.log("Goodbye.");
 		System.exit(0);
 	}

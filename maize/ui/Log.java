@@ -10,20 +10,25 @@ public class Log{
     private static Vector<LogListener> listeners = new Vector<LogListener>(); 
 
     public static void addLogListener(LogListener ll){
+        if(listeners.size() == 0)
+            log("Logging has been assumed by a dedicated log subscriber, and will no longer be placed on STDOUT.");
         listeners.add(ll);
     }
 
     public static void removeLogListener(LogListener ll){
         listeners.remove(ll);
+        if(listeners.size() == 0)
+            log("The final subscribers left me, defaulting to STDOUT.");
     }
 
     public static void log(String str){
         str = formatMessage(str);
 
-        for(LogListener ll:listeners)
-            ll.logEvent(str);
-
-        System.out.println(str);
+        if(listeners.size() > 0)
+            for(LogListener ll:listeners)
+                ll.logEvent(str);
+        else
+            System.out.println(str);
     }
 
     public static void logException(Exception e){
