@@ -20,7 +20,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 	/**The menu bar*/
 	private JMenuBar            menuBar;
 	/**The tab handler which holds all of the panels*/
-	private JTabbedPane         tabs            = new JTabbedPane();
+	private JTabbedPane         tabs            = new DnDTabbedPane();
 
 
     // Panels, and a list of them
@@ -336,5 +336,13 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
     public void windowDeactivated(WindowEvent e) {/* displayMessage("Window deactivated", e); */ }
 
 
+
+
 }
+
+
+
+
+
+
 
