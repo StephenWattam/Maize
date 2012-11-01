@@ -82,8 +82,15 @@ public class MazePanel extends Canvas{
 
         // Scale bots from original to avoid lossiness.
         this.botTileSetCache = new BotTileSet[botTileSets.length];
-        for(int i=0; i<botTileSets.length; i++)
-            this.botTileSetCache[i] = new BotTileSet( rescaleImage(currentSize, botTileSets[i].botN) );
+        for(int i=0; i<botTileSets.length; i++){
+            // set, get it to map and rotate 
+            this.botTileSetCache[i] = new BotTileSet( botTileSets[i].botN );
+            //then adjust for size
+            this.botTileSetCache[i].botN = rescaleImage(currentSize, botTileSetCache[i].botN);
+            this.botTileSetCache[i].botE = rescaleImage(currentSize, botTileSetCache[i].botE);
+            this.botTileSetCache[i].botS = rescaleImage(currentSize, botTileSetCache[i].botS);
+            this.botTileSetCache[i].botW = rescaleImage(currentSize, botTileSetCache[i].botW);
+        }
         
 
 

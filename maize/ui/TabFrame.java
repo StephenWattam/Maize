@@ -34,7 +34,6 @@ public class TabFrame extends JFrame implements WindowListener{
 		setVisible(true);
 
         this.addWindowListener(this);
-        Log.log("Started Log Window");
 	}
 
     public void dispose(){
