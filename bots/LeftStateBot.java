@@ -7,9 +7,9 @@ import java.io.Serializable;
 public class LeftStateBot extends StateBot implements Serializable{
 
     /** Default constructor.
-     */
+    */
     public LeftStateBot(){
-	super();
+        super();
     }
 
     /** This function should contain control logic for the bot.
@@ -26,13 +26,13 @@ public class LeftStateBot extends StateBot implements Serializable{
      */
     public void makeMove(boolean[][] view, int x, int y, int o, int fx, int fy){
 
-	if(isLeftTurn(view)){
-	    turnLeft();
-	} else if(!isForward(view)){
-	    rotateRight();
-	} else {
-	    forward();
-	}
+        if(isLeftTurn(view)){
+            turnLeft();
+        } else if(!isForward(view)){
+            rotateRight();
+        } else {
+            forward();
+        }
     }
 
     /** Left turn ahead?
@@ -43,7 +43,7 @@ public class LeftStateBot extends StateBot implements Serializable{
      * @return						If a left turn is ahead.
      */
     public boolean isLeftTurn(boolean[][] view){
-	return !view[0][0]; 
+        return !view[0][0]; 
     }
 
     /** Forward ahead?
@@ -54,7 +54,7 @@ public class LeftStateBot extends StateBot implements Serializable{
      * @return						.
      */
     public boolean isForward(boolean[][] view){
-	return !view[1][0]; 
+        return !view[1][0]; 
     }
 
     /** A nice fluffy name for the bot, like 'Bob' or 'John'. 
@@ -62,7 +62,7 @@ public class LeftStateBot extends StateBot implements Serializable{
      * @return           Bot name.
      */
     public String getName(){
-	return "LeftStateBot";
+        return "LeftStateBot";
     }
 
     /** Implementation of the Bot interface.
@@ -70,6 +70,6 @@ public class LeftStateBot extends StateBot implements Serializable{
      * @return           Bot Description.
      */
     public String getDescription(){
-	return "Left wall follower using StateBot.";
+        return "Left wall follower using StateBot.";
     }
 }

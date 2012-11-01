@@ -5,8 +5,11 @@ import java.io.Serializable;
 /** Interface for logic and stuffs */
 public class RightBot implements Bot, Serializable {
 
-    private boolean cross = false;
-    private boolean tee = false;
+    // True if we have hit a crossroads
+    private boolean cross   = false;
+
+    // True if we have hit a t-junction
+    private boolean tee     = false;
 
     /** Implementation of the Bot interface.
      * @see Bot
@@ -24,39 +27,43 @@ public class RightBot implements Bot, Serializable {
      */
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
 
-	int move = 0;
+        int move = 0;
 
-	/* For managing crossroads */
-	if(!view[1][0] && !view[2][1] && !view[1][2] && !view[0][1]){
-	    if (!cross){
-		cross = true;
-		move = Direction.RIGHT;
-	    } else {
-		cross = false;
-		move = Direction.FORWARD;
-	    }
-	}
-	/* For managing blind corners */
-	else if(!view[2][1] && !view[1][0] && view[1][2])	{	
-	    move = Direction.FORWARD;
-	    /* For managing T junction */
-	} else if(!view[2][1] && !view[0][1] && !view[1][2])	{	
-	    move = Direction.RIGHT;
-	    tee = true;
-	} else if(!view[2][1]) {
-	    if(!tee){
-		move = Direction.RIGHT;
-	    } else {
-		move = Direction.FORWARD;
-		tee = false;
-	    }
-	} else if(view[1][0]){
-	    move = Direction.LEFT;
-	} else {
-	    move = Direction.FORWARD;
-	} 
+        /* For managing crossroads */
+        if(!view[1][0] && !view[2][1] && !view[1][2] && !view[0][1]){
 
-	return move;
+            // If crossroad marker is not set
+            if (!cross){
+                // set it, and move right.
+                cross = true;
+                move = Direction.RIGHT;
+            } else {
+                // else unset it, and move forwards.
+                cross = false;
+                move = Direction.FORWARD;
+            }
+        }/* For managing blind corners */
+        else if(!view[2][1] && !view[1][0] && view[1][2])	{	
+            move = Direction.FORWARD;
+            
+        }    /* For managing T junction */
+        else if(!view[2][1] && !view[0][1] && !view[1][2])	{	
+            move = Direction.RIGHT;
+            tee = true;
+        } else if(!view[2][1]) {
+            if(!tee){
+                move = Direction.RIGHT;
+            } else {
+                move = Direction.FORWARD;
+                tee = false;
+            }
+        } else if(view[1][0]){
+            move = Direction.LEFT;
+        } else {
+            move = Direction.FORWARD;
+        } 
+
+        return move;
     }
 
     /** Implementation of the Bot interface.
@@ -64,7 +71,7 @@ public class RightBot implements Bot, Serializable {
      * @return           Bot name.
      */
     public String getName(){
-	return "RightBot";
+        return "RightBot";
     }
 
     /** Implementation of the Bot interface.
@@ -72,7 +79,7 @@ public class RightBot implements Bot, Serializable {
      * @return           Bot Description.
      */
     public String getDescription(){
-	return "Follows right walls.";
+        return "Follows right walls.";
     }
 }
 
