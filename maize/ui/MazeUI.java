@@ -11,6 +11,7 @@ import javax.imageio.*;
 import javax.swing.filechooser.*;
 import java.security.Permission;
 import java.util.*;
+import java.lang.reflect.ReflectPermission;
 
 import maize.*;
 public class MazeUI extends JFrame implements ActionListener, WindowListener{
@@ -36,34 +37,27 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         Log.log("Starting Maize UI...");
 
 /*		// Initialize our security manager nice and early
-		System.setSecurityManager(new SecurityManager ()
-		{
-			public void checkPermission(Permission perm)
-			{
-				boolean deny = false;
-				Class[] classContext = getClassContext();
-				Class botClass = null;
-				try {
-					botClass = Class.forName("Maize.Bot");
-				} catch (ClassCircularityError e) {
-					return;
-				} catch (NoClassDefFoundError e) {
-					return;
-				} catch (ClassNotFoundException e) {
-					return;
-				}
-				for (int i = 0; i < classContext.length; i++)
+		System.setSecurityManager( new SecurityManager () {
+			public void checkPermission( Permission perm ) {
+			//	Class[] classContext = getClassContext();
+
+				if( perm instanceof ReflectPermission )
 				{
-					if (classContext[i].isAssignableFrom(botClass))
+					ReflectPermission reflectPermission = (ReflectPermission)perm;
+
+					for( Class c : getClassContext() )
 					{
-						deny = true;
-						break;
+						if( c.isAssignableFrom( Bot.class ) )
+							throw new SecurityException("Stop it.");
+							
+						// Skip if it's us, we're in a loop!
+						if( c == getClass() )
+							return;
 					}
-				}
-				if (deny)
-				{
+
+					System.out.println( "Security Violation: Reflection!" );
 					throw new SecurityException("Stop it.");
-				}
+//				}
 			}
 		});*/
 
