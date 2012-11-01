@@ -75,24 +75,20 @@ public class MazeUISettingsManager{
 		BotTileSet[] botTileSets;
 		try{
 			// Load the maze tile set
-			BufferedImage space	    = ImageIO.read(new File(((JSONObject)config.get("maze")).get("space").toString()));
-			BufferedImage wall	    = ImageIO.read(new File(((JSONObject)config.get("maze")).get("wall").toString()));
-			BufferedImage start	    = ImageIO.read(new File(((JSONObject)config.get("maze")).get("start").toString()));
-			BufferedImage finish	= ImageIO.read(new File(((JSONObject)config.get("maze")).get("finish").toString()));
-
-            // and the icon
-            BufferedImage icon      = ImageIO.read(new File(((JSONObject)config.get("ui")).get("icon").toString()));
-
+            String mazeTilePrefix   = ((JSONObject)config.get("maze")).get("tileSet").toString();
+			BufferedImage space	    = ImageIO.read(new File(mazeTilePrefix + "/" + "space.png"));
+			BufferedImage wall	    = ImageIO.read(new File(mazeTilePrefix + "/" + "wall.png"));
+			BufferedImage start	    = ImageIO.read(new File(mazeTilePrefix + "/" + "start.png"));
+			BufferedImage finish	= ImageIO.read(new File(mazeTilePrefix + "/" + "finish.png"));
+			BufferedImage bg        = ImageIO.read(new File(mazeTilePrefix + "/" + "bg.png"));
             // then the maze tilesets
-			mazeTiles = new MazeTileSet(space, wall, start, finish);
+			mazeTiles = new MazeTileSet(bg, space, wall, start, finish);
 
 
 			// Load a series of bot tile-sets, up to 99
             int count = 0;
 			for(int i=1;i<100;i++){
-				botTiles = loadBotTiles(((JSONObject)config.get("bot")).get("botImages").toString(), 
-                                        ((JSONObject)config.get("bot")).get("botImageExtension").toString(), 
-                                        i+"");
+				botTiles = loadBotTiles(mazeTilePrefix + "/" + "bots/", ".png", i+"");
 				if(botTiles != null) {
                     count ++; 
                     Log.log("Successfully loaded image for bot " + count );
@@ -113,7 +109,7 @@ public class MazeUISettingsManager{
 			MazeUISettingsManager.botPackageName	= ((JSONObject)config.get("bot")).get("botPackage").toString();
 			MazeUISettingsManager.mazeTiles			= mazeTiles;
 			MazeUISettingsManager.botTileSets		= botTileSets;
-            MazeUISettingsManager.icon              = icon;
+            MazeUISettingsManager.icon              = ImageIO.read(new File(((JSONObject)config.get("ui")).get("icon").toString()));
 
 	        MazeUISettingsManager.defaultMazeWidth  = Integer.parseInt(((JSONObject)config.get("ui")).get("defaultMazeWidth").toString());
 	        MazeUISettingsManager.defaultMazeHeight  = Integer.parseInt(((JSONObject)config.get("ui")).get("defaultMazeHeight").toString());

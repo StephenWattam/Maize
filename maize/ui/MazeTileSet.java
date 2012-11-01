@@ -7,8 +7,10 @@ public class MazeTileSet{
 	public BufferedImage wall;
 	public BufferedImage start;
 	public BufferedImage finish;
+    public BufferedImage bg;
 
-	public MazeTileSet(BufferedImage space, BufferedImage wall, BufferedImage start, BufferedImage finish){
+	public MazeTileSet(BufferedImage bg, BufferedImage space, BufferedImage wall, BufferedImage start, BufferedImage finish){
+        this.bg     = bg;
 		this.space  = space;
 		this.wall   = wall;
 		this.start  = start;

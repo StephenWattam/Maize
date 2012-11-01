@@ -301,6 +301,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
         dispose();
         Log.log("Goodbye.");
+        System.exit(0);
 	}
 
 	// Update all of the panes
