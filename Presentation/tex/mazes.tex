@@ -1,10 +1,49 @@
 
-\documentclass{beamer}
+\documentclass[xcolor=x11names,compress]{beamer}
 
-\usetheme{Malmoe}
-%\usetheme{Luebeck}
-%\usetheme{Antibes}
-\usecolortheme{rose}
+% Many thanks to http://cameron.bracken.bz/beamer-template
+%% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{graphicx}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Beamer Layout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\useoutertheme[subsection=false,shadow]{miniframes}
+\useinnertheme{default}
+\usefonttheme{serif}
+\usepackage{palatino}
+
+\setbeamerfont{title like}{shape=\scshape}
+\setbeamerfont{frametitle}{shape=\scshape}
+
+\setbeamercolor*{lower separation line head}{bg=DeepSkyBlue4} 
+\setbeamercolor*{normal text}{fg=black,bg=white} 
+\setbeamercolor*{alerted text}{fg=red} 
+\setbeamercolor*{example text}{fg=black} 
+\setbeamercolor*{structure}{fg=black} 
+ 
+\setbeamercolor*{palette tertiary}{fg=black,bg=black!10} 
+\setbeamercolor*{palette quaternary}{fg=black,bg=black!10} 
+
+\renewcommand{\(}{\begin{columns}}
+\renewcommand{\)}{\end{columns}}
+\newcommand{\<}[1]{\begin{column}{#1}}
+\renewcommand{\>}{\end{column}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
+
+
+
+
+% \usetheme{Malmoe}
+% \usetheme{Luebeck}
+% \usetheme{Antibes}
+% \usecolortheme{rose}
 \usepackage{graphicx}
 \DeclareGraphicsExtensions{.pdf,.png,.jpg}
 \graphicspath{{./images/}}
@@ -13,8 +52,8 @@
 
 \title{Mazes: An Introduction}
 \author{Stephen Wattam}
-\date{November 1st, 2012}
-\institute[2010]{Computing Society of Lancaster University}
+\institute[2012]{Computing Society of Lancaster University}
+\date{\tiny November 1st, 2012}
 
 \begin{document}
 
@@ -94,7 +133,9 @@
 \frame{\frametitle{Properties of Mazes}
 \begin{itemize}
     \item<1-> \textbf{Bias}---The tendency of a maze to have horizontal or vertical passages.  Makes it hard to go `against the grain'
+    \vspace{15pt}
     \item<2-> \textbf{Run}---A long, straight, uninterrupted passage
+    \vspace{15pt}
     \item<3-> \textbf{Elitism}---The ratio of the maze's shortest path against its total path length
 \end{itemize}
 }
@@ -111,9 +152,11 @@
 \begin{itemize}
     \item<1-> Mice are \textbf{Maze-solving robots}\\
         \visible<2->{\small Mice are also mice}
+    \vspace{10pt}
     \item<3-> Compete in many competitions, solving real-life mazes {\tiny (\href{http://www.youtube.com/watch?v=_L9rkLAskWU}{Click me!})}
-    % TODO: find youtube vid 
+    \vspace{10pt}
     \item<4-> Limited view of the maze, limited processing power
+    \vspace{10pt}
     \item<5-> No awareness of the maze other than what is learned
 \end{itemize}
 
@@ -137,9 +180,11 @@
     \begin{column}[c]{7cm} 
 
 \begin{itemize}
-    \item<1-> Solving a maze is easy, if you can see it all\\
+    \item<1-> Solving a maze is easy, if you can see it all
         \visible<2->{\tiny (\href{http://www.funnyordie.com/videos/2fe034255a/trapped-in-hedge-maze-from-stevanhogg\%20\%5B+\%5D}{Click me!})}
+    \vspace{15pt}
     \item<3-> Mice rely only on pactical real-world input from sensors
+    \vspace{15pt}
     \item<4-> So how do they do it? 
 \end{itemize}
 
@@ -195,7 +240,9 @@
 \frame{\frametitle{Managing the World}
     \begin{itemize}
         \item<1-> \textbf{Stateful/Stateless}---Do we want to remember past events, or treat each sensor reading as a new event?
+        \vspace{10pt}
         \item<2-> \textbf{Deterministic/Stochastic}---Do we want to respond in a purely predictable manner?
+        \vspace{10pt}
         \item<3-> \textbf{Discrete/Continuous}---Are all of our values smoothly variable? Can we react partially/smoothly?
     \end{itemize}
 }
@@ -214,8 +261,10 @@
 \frame{\frametitle{Determinism}
     \begin{itemize}
         \item<1-> Given the same (sequence of) input, will \textbf{always} produce the same output
+        \vspace{10pt}
         \item<2-> Very reliable\\
             \visible<3->{\small but also reliably bad if the rules are poor}
+        \vspace{10pt}
         \item<4-> Nondeterminism can involve fuzzy logic, probability, or guesswork\\
             \visible<5->{\small Closer to human judgement, but very hard to get `just right'}
     \end{itemize}
@@ -223,7 +272,9 @@
 \frame{\frametitle{Discrete \& Continuous Control}
     \begin{itemize}
         \item<1-> Continuous control allows for small tweaks and improvements
+        \vspace{10pt}
         \item<2-> Can be hard to rationalise logically---needs threshold values or statistics
+        \vspace{10pt}
         \item<3-> Can offer better control and progressive feedback\\
             \visible<4->{\small Confident bots can rush quickly; Unsure ones can creep to gather more information}
     \end{itemize}
@@ -236,12 +287,14 @@
             \item<2-> LeftBot is deterministic, has only rules
         \end{itemize}
 
+        \vspace{10pt}
         \item<3-> Discrete vs. Continuous
         \begin{itemize}
             \item<4-> LeftBot is discrete, one move per assessment
             \item<4-> AdvancedBot has some continuous properties: command queueing
         \end{itemize}
 
+        \vspace{10pt}
         \item<5-> Stateful vs. Stateless
         \begin{itemize}
             \item<6-> LeftStateBot is stateful, remembers a long sequence of actions
@@ -255,7 +308,9 @@
     \begin{itemize}
         \item<1-> Algorithmically, the best solution to a maze is to choose the best right path each time:\\
             \textcolor<2->{red}{The maze is just a big tree of choices}
+        \vspace{10pt}
         \item<3-> The best case is thus equivalent to a binary search, plus the time needed to move
+        \vspace{10pt}
         \item<4-> This becomes $O(n log_2 n)$, where $n$ is the number of choices (plus a bit of time to travel from start to finish).
     \end{itemize}
 }
@@ -288,6 +343,7 @@
                 \item<5-> \textcolor<6->{gray}{Finish point co-ordinates}
             \end{itemize}\\
             \visible<6->{\tiny (Technically, all that's needed is the red one, but the other things make it more fun)}
+        \vspace{15pt}
         \item<7-> Bots can move only one tile per `tick', and only Left, Right, Forward and Back (like kings in chess)
     \end{itemize}
 }
@@ -299,6 +355,8 @@
                 \item<3-> Maize calls \texttt{nextMove()} on every tick.
                 \item<4-> Simply return a direction to move.
             \end{itemize}
+        
+        \vspace{10pt}
         \item<5-> \textbf{AdvancedBot}\\
             \begin{itemize}
                 \item<6-> Like \texttt{Bot}, but only requests a move when it has emptied its queue
@@ -320,19 +378,33 @@
     \begin{enumerate}
         \item<1-> Beat \texttt{DaveBot} on any Maze\\
             {\small (An \texttt{EmptyMaze} might be simplest, a ScatterMaze might be hardest)}
+        \vspace{5pt}
         \item<2-> Solve a DFS Maze without using a wall following algorithm\\
             {\small (this requires building a model of the decision tree)}
+        \vspace{5pt}
         \item<3-> Write a wall follower that can also solve \texttt{Empty} and \texttt{Scatter} mazes.
+        \vspace{5pt}
         \item<4-> Improve an existing wall follower with heuristics
     \end{enumerate}
 }
 \frame{\frametitle{Getting Started}
     \begin{itemize}
         \item<1-> Decide on a maze type to run on
+        \vspace{10pt}
         \item<2-> Decide on a strategy to try
+        \vspace{10pt}
         \item<3-> Code, or pair up with someone who wishes to, and hack at it
+        \vspace{10pt}
         \item<4-> Submit to \texttt{stephenwattam@gmail.com} for a glorious battle, with prizes if I can be arsed.
     \end{itemize}
+}
+
+\frame{\frametitle{Fin}
+    \begin{center}
+        All resources available from\\
+        \vspace{10pt}
+        \url{http://extremetomato.com/projects/maize/}
+    \end{center}
 }
 
 
