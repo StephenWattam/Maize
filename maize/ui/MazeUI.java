@@ -69,10 +69,11 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 			}
 		});*/
 
-		//super.setIconImage(new ImageIcon(ICON_PATH).getImage());
-		setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight);
+		/* setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight); */
+		setPreferredSize(new Dimension(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight));
+		setMinimumSize(new Dimension(MazeUISettingsManager.uiMinWidth, MazeUISettingsManager.uiMinHeight));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(false);
+		setResizable(true);
         this.setIconImage(MazeUISettingsManager.icon);
         this.addWindowListener(this);
 
@@ -282,6 +283,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 	// Quit
 	private void quit(){
+        dispose();
         Log.removeLogListener(logTab);
         Log.log("Goodbye.");
 	}

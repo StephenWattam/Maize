@@ -19,7 +19,6 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
     private JButton deleteButton    = new JButton("Delete");
     private JButton saveButton      = new JButton("Save...");
 
-    private JPanel mazePanelPanel   = new JPanel();
     private MazePanel mazePanel;
 
 
@@ -30,13 +29,10 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
         setLayout(new GridBagLayout());
 
 
-        System.out.println("--> " + mazeTest);
-
         // maze panel
         mazePanel = new MazePanel(MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets);
-        mazePanel.setSize(500,500);
-
-        mazePanelPanel.add(mazePanel);
+        mazePanel.setPreferredSize(new Dimension(500,500));
+        mazePanel.setMinimumSize(new Dimension(500,500));
 
 
         deleteButton.addActionListener(this);
@@ -54,42 +50,46 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
 
 
         // panel
+		gbc.anchor = GridBagConstraints.LINE_START;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.ipadx = 40;
         gbc.ipady = 40;
         gbc.gridheight = 2;
-        gbc.fill = GridBagConstraints.CENTER;
-        this.add(mazePanelPanel,gbc);
+        gbc.fill    = GridBagConstraints.BOTH;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.insets  = new Insets(10,10,10,10);
+        this.add(mazePanel,gbc);
 
         //list
+		gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.fill    = GridBagConstraints.VERTICAL;
         gbc.gridwidth = 3;
         gbc.gridheight = 1;
         gbc.gridx = 1;
         gbc.gridy = 0;
+        gbc.weightx = 0;
+        gbc.weighty = 1;
         gbc.ipadx = 300;
         gbc.ipady = 440;
         this.add(mazeListPanel,gbc);
 
         //button
+		gbc.anchor = GridBagConstraints.LINE_START;
         gbc.gridwidth = 1;
         gbc.ipadx = 100;
         gbc.ipady = 20;
-        //gbc.gridx = 1;
-        //gbc.gridy = 1;
-        //gbc.ipadx = 0;
-        //gbc.ipady = 0;
-        //gbc.weightx = 0.5;
-        //this.add(refreshButton,gbc);
-
+        gbc.fill    = GridBagConstraints.NONE;
         gbc.gridx = 2;
         gbc.gridy = 1;
-        gbc.weightx = 0.5;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
         this.add(saveButton,gbc);
 
+		gbc.anchor = GridBagConstraints.LINE_END;
         gbc.gridx = 3;
         gbc.gridy = 1;
-        gbc.weightx = 0.5;
         this.add(deleteButton,gbc);
 
 

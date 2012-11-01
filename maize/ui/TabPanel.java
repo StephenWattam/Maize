@@ -21,23 +21,28 @@ public class TabPanel extends JPanel{
     }
 
     public void attach(){
-        Log.log("Attaching tab '" + name + "'");
+        if(tabContainer.indexOfComponent(this) == -1){
+            Log.log("Attaching tab '" + name + "'");
+            if(frame != null){
+                frame.dispose();
+                frame = null;
+            }
 
-        if(frame != null){
-            frame.dispose();
-            frame = null;
+            tabContainer.add(this, name);
+
+            // TODO: make this less of a hack
+            for(int i=0;i<tabContainer.getTabCount();i++)
+                tabContainer.setTabComponentAt(i, new TabButtonComponent(tabContainer) );
+
+        }else{
+            Log.log("Cannot attach tab '" + name + "', is already attached.");
         }
-
-        tabContainer.add(this, name);
-
-        // TODO: make this less of a hack
-        for(int i=0;i<tabContainer.getTabCount();i++)
-            tabContainer.setTabComponentAt(i, new TabButtonComponent(tabContainer) );
     }
 
     public void detach(){
         if(frame == null){
             // TODO
+            Log.log("Detaching tab '" + name + "'");
             tabContainer.remove(this);
             frame = new TabFrame(this);
         }else{

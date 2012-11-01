@@ -31,6 +31,8 @@ public class MazeUISettingsManager{
 
     public static int uiWidth = 900;
     public static int uiHeight = 630;
+    public static int uiMinWidth = 500;
+    public static int uiMinHeight = 400;
 
     // Attach/detach tabs
     public static BufferedImage attachIcon = null;

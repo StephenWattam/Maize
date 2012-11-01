@@ -60,21 +60,25 @@ public class BotTabPanel extends TabPanel implements ActionListener, ListSelecti
 		botListPanel.setPreferredSize(new Dimension(800, 400));
 
 
-		gbc.fill = GridBagConstraints.CENTER;
+		gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill    = GridBagConstraints.BOTH;
 		// label1
 		gbc.gridwidth = 3;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		gbc.ipadx = 0;
-		gbc.weightx = 0.5;
-		gbc.ipady = 20;
+		gbc.weightx = 0.25;
+		gbc.weighty = 0.25;
+		gbc.ipady = 10;
+        gbc.insets  = new Insets(10,10,0,10);
 		this.add(botNameLabel,gbc);
 
 		// label2
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.ipadx = 0;
-		gbc.ipady = 30;
+		gbc.ipady = 10;
+        gbc.insets  = new Insets(0,10,10,10);
 		this.add(botDescriptionLabel,gbc);
 
 		//list
@@ -82,21 +86,29 @@ public class BotTabPanel extends TabPanel implements ActionListener, ListSelecti
 		gbc.gridx = 0;
 		gbc.gridy = 2;
 		gbc.ipady = 0;
+		gbc.weightx = 0.8;
+		gbc.weighty = 0.8;
 		gbc.gridwidth = 3;
+        gbc.insets  = new Insets(10,10,0,10);
 		this.add(botListPanel,gbc);
 
 
 		gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.fill    = GridBagConstraints.NONE;
 		gbc.gridwidth = 1;
 		gbc.ipadx = 100;
 		gbc.ipady = 20;
 		gbc.gridx = 0;
 		gbc.gridy = 3;
+		gbc.weightx = 0;
+		gbc.weighty = 0;
+        gbc.insets  = new Insets(10,10,10,0);
 		this.add(saveButton,gbc);
 
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridx = 2;
 		gbc.gridy = 3;
+        gbc.insets  = new Insets(10,10,10,10);
 		this.add(deleteButton,gbc);
 
 

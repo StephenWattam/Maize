@@ -64,10 +64,10 @@ public class MazePanel extends Canvas{
     public void resizeCache(){
         // Simply return if the size is the same
         if( getSize().equals(currentSize) && 
-                this.bgBuffer != null && 
-                this.mazeTileCache != null && 
-                this.botTileSetCache != null &&
-                this.maze != null)
+                this.bgBuffer           != null && 
+                this.mazeTileCache      != null && 
+                this.botTileSetCache    != null &&
+                this.maze               != null)
             return;
 
         // Load the size.

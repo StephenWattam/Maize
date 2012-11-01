@@ -45,27 +45,37 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
 
 
 		JScrollPane logScrollPane = new JScrollPane(log);
-		logScrollPane.setPreferredSize(new Dimension(800, 400));
+		/* logScrollPane.setPreferredSize(new Dimension(800, 400)); */
 
 		//list
 		gbc.anchor = GridBagConstraints.CENTER;
+        gbc.fill    = GridBagConstraints.BOTH;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.ipady = 0;
+		gbc.ipady = 10;
+		gbc.ipadx = 10;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
 		gbc.gridwidth = 3;
+        gbc.insets  = new Insets(10,10,0,10);
 		this.add(logScrollPane,gbc);
 
 		gbc.anchor = GridBagConstraints.LINE_END;
+        gbc.fill    = GridBagConstraints.NONE;
 		gbc.gridwidth = 1;
 		gbc.ipadx = 100;
 		gbc.ipady = 20;
 		gbc.gridx = 0;
 		gbc.gridy = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.insets  = new Insets(10,10,10,0);
 		this.add(saveButton,gbc);
 
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridx = 2;
 		gbc.gridy = 1;
+        gbc.insets  = new Insets(10,10,10,10);
 		this.add(deleteButton,gbc);
 
 		setVisible(true);

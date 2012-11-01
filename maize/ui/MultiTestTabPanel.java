@@ -29,7 +29,6 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 
 
 	// Maze UI stuff
-	private JPanel mazePanelPanel                           = new JPanel();
 	private MazePanel mazePanel;
 
 	// Controls
@@ -98,28 +97,33 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 
 		// maze panel
 		mazePanel		= new MazePanel(MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets);
-		mazePanel.setSize(500,500);
-		mazePanelPanel.add(mazePanel);
+		mazePanel.setMinimumSize(new Dimension(500,500));
 
 
 
 
-		gbc.fill = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.insets  = new Insets(10,10,10,10);
 		// panel
 		gbc.gridheight = 7;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.ipadx = 10;
-		gbc.ipady = 10;
-		this.add(mazePanelPanel,gbc);
+		gbc.ipadx = 0;
+		gbc.ipady = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+		this.add(mazePanel,gbc);
 
 
 		// slider
+        gbc.insets  = new Insets(0,0,0,10);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridheight = 1;
 		gbc.gridwidth = 2;
 		gbc.gridx = 1;
-		gbc.ipadx = 200;
-		gbc.ipady = 10;
+        gbc.weightx = 0.1;
+        gbc.weighty = 0;
 		this.add(new JLabel("Speed: "),gbc);
 		gbc.gridy = 1;
 		gbc.gridx = 1;
@@ -136,36 +140,41 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		//this.add(botNameLabel,gbc);
 
 		// maze name
+        gbc.insets  = new Insets(10,0,0,10);
+		gbc.fill = GridBagConstraints.VERTICAL;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.gridx = 1;
 		gbc.gridy = 2;
-		gbc.ipadx = 0;
-		gbc.ipady = 20;
 		this.add(new JLabel("Maze: "),gbc);
+        gbc.insets  = new Insets(0,0,0,10);
 		gbc.gridx = 2;
 		this.add(mazeNameLabel,gbc);
 
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-
-		// Test table
+        // list panel
+		gbc.anchor = GridBagConstraints.CENTER;
+		gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 0.5;
+        gbc.insets  = new Insets(10,10,0,10);
 		gbc.gridwidth = 2;
 		gbc.gridheight = 1;
 		gbc.gridx = 1;
 		gbc.gridy = 3;
-		gbc.ipadx = 100;
 		this.add(testListPanel, gbc);
 
 
 
 
 		// First row of buttons 
+        gbc.insets  = new Insets(10,10,0,10);
+        gbc.weightx = 0;
+        gbc.weighty = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 1;
 		gbc.gridx = 1;
 		gbc.gridy = 4;
-		gbc.ipady = 20;
 		this.add(refreshButton,gbc);
+        gbc.insets  = new Insets(10,0,0,10);
 		gbc.gridx = 2;
 		this.add(startButton,gbc);
 
@@ -173,8 +182,10 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		gbc.gridheight = 1;
 		gbc.gridx = 1;
 		gbc.gridy = 5;
+        gbc.insets  = new Insets(10,10,0,10);
 		this.add(pauseButton,gbc);
 		gbc.gridx = 2;
+        gbc.insets  = new Insets(10,0,0,10);
 		this.add(stopButton,gbc);
 
 		// Move count label
@@ -195,9 +206,11 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		gbc.gridy = 6;
 		gbc.ipady = 90;
 		gbc.ipadx = 80;
+        gbc.insets  = new Insets(10,10,10,10);
 		this.add(botListPanel, gbc);
 		// Maze list
 		gbc.gridx = 2;
+        gbc.insets  = new Insets(10,0,10,10);
 		this.add(mazeListPanel, gbc);
 
 

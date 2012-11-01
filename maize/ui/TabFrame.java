@@ -23,9 +23,10 @@ public class TabFrame extends JFrame implements WindowListener{
         this.panel = panel;
 
 		//super.setIconImage(new ImageIcon(ICON_PATH).getImage());
-		setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight);
+		setPreferredSize(new Dimension(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight));
+		setMinimumSize(new Dimension(MazeUISettingsManager.uiMinWidth, MazeUISettingsManager.uiMinHeight));
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setResizable(false);
+		setResizable(true);
         this.setIconImage(MazeUISettingsManager.icon);
 
 
