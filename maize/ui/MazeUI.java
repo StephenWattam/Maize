@@ -33,6 +33,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 	public MazeUI(MazeTest mazeTest){
 		super("Maize UI");
+        Log.log("Starting Maize UI...");
 
 /*		// Initialize our security manager nice and early
 		System.setSecurityManager(new SecurityManager ()
@@ -84,11 +85,15 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 		menuBar = buildMenu();
 		this.setJMenuBar(menuBar);
 
+
+
 		//tabs
 		mazeTab         = new MazeTabPanel      (mazeTest, tabs, "Manage Mazes");
 		botTab          = new BotTabPanel       (mazeTest, tabs, "Manage Bots");
 		multiTestTab    = new MultiTestTabPanel (mazeTest, tabs, "Run Tests");
         logTab          = new LogTabPanel       (mazeTest, tabs, "Log");
+
+
 
         // List all panels for easy use later
         panels.add(mazeTab);
@@ -99,11 +104,14 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         // Attach the log
         Log.addLogListener(logTab);
 
+		updatePanes();
+
+        // Set part of the window and make us visible
 		setContentPane(tabs);
+        this.pack();
 		setVisible(true);
 
-		updatePanes();
-        Log.log("Started Maize main UI");
+        Log.log("Maize UI running.");
 	}
 
 	// Create a set of default mazes, one for each factory

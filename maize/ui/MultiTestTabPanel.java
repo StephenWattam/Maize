@@ -215,7 +215,6 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 
 
 
-
 		setVisible(true);
 	}
 
