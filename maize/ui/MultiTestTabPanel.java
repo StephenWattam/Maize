@@ -13,16 +13,14 @@ import javax.imageio.*;
 
 
 import maize.*;
-public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeListener, ListSelectionListener, MouseWheelListener{
-    private static final int SPEED_SCROLL_AMOUNT = 1;
-	private static final int MAX_DELAY = 500;
-	private static final int MAZE_DISPLAY_MAX_NAME_LENGTH = 25;
-	private static final String BOT_NAME_PLACEHOLDER	= "No bot";
-	private static final String MAZE_NAME_PLACEHOLDER	= "No maze";
-	private static final String MOVE_COUNT_PLACEHOLDER	= "No moves yet";
+public class MultiTestTabPanel extends TabPanel implements ActionListener, ChangeListener, ListSelectionListener, MouseWheelListener{
 
-	// links to state and to which bot to choose from UI
-	private MazeTest mazeTest;
+    private static final int SPEED_SCROLL_AMOUNT            = 1;
+	private static final int MAX_DELAY                      = 500;
+	private static final int MAZE_DISPLAY_MAX_NAME_LENGTH   = 25;
+	private static final String BOT_NAME_PLACEHOLDER	    = "No bot";
+	private static final String MAZE_NAME_PLACEHOLDER	    = "No maze";
+	private static final String MOVE_COUNT_PLACEHOLDER	    = "No moves yet";
 
 	// Lists of potential bots and mazes
 	private JList botList;
@@ -31,29 +29,29 @@ public class MultiTestTabPanel extends JPanel implements ActionListener, ChangeL
 
 
 	// Maze UI stuff
-	private JPanel mazePanelPanel = new JPanel();
+	private JPanel mazePanelPanel                           = new JPanel();
 	private MazePanel mazePanel;
 
 	// Controls
-	private JButton startButton = new JButton("Start");
-	private JButton pauseButton = new JButton("Pause/play");
-	private JButton stopButton = new JButton("Stop");
-	private JButton refreshButton = new JButton("New Test");
-	private JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, 0, MAX_DELAY, MAX_DELAY/2);
-	private JLabel mazeNameLabel = new JLabel(MAZE_NAME_PLACEHOLDER);
+	private JButton startButton                             = new JButton("Start");
+	private JButton pauseButton                             = new JButton("Pause/play");
+	private JButton stopButton                              = new JButton("Stop");
+	private JButton refreshButton                           = new JButton("New Test");
+	private JSlider speedSlider                             = new JSlider(JSlider.HORIZONTAL, 0, MAX_DELAY, MAX_DELAY/2);
+	private JLabel mazeNameLabel                            = new JLabel(MAZE_NAME_PLACEHOLDER);
 	private JList testList;
 
 
 
 	// Current running things.
 	// Holds selected bots
-	private Vector<Bot> selectedBots = new Vector<Bot>();
-	private Maze maze = null;
-	private TestThread test = null; 
+	private Vector<Bot> selectedBots                        = new Vector<Bot>();
+	private Maze maze                                       = null;
+	private TestThread test                                 = null; 
 
-	public MultiTestTabPanel(MazeTest mazeTest){
-		this.mazeTest = mazeTest;
 
+    public MultiTestTabPanel(MazeTest mazeTest, JTabbedPane tabContainer, String name){
+        super(mazeTest, tabContainer, name);
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(new GridBagLayout());
 

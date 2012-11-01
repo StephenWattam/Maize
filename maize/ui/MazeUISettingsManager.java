@@ -29,6 +29,13 @@ public class MazeUISettingsManager{
     // Program icon
     public static BufferedImage icon;
 
+    public static int uiWidth = 900;
+    public static int uiHeight = 630;
+
+    // Attach/detach tabs
+    public static BufferedImage attachIcon = null;
+    public static BufferedImage detachIcon = null;
+
 
     // Load from JSON
     public static boolean loadConfig(String filename){
@@ -101,6 +108,10 @@ public class MazeUISettingsManager{
 			MazeUISettingsManager.mazeTiles			= mazeTiles;
 			MazeUISettingsManager.botTileSets		= botTileSets;
             MazeUISettingsManager.icon              = icon;
+
+
+			MazeUISettingsManager.attachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("attachIcon").toString()));
+			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));
 
         }catch(NullPointerException NPe){
             Log.log("Missing config key.");

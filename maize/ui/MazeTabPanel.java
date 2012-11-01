@@ -13,24 +13,24 @@ import javax.imageio.*;
 
 
 import maize.*;
-public class MazeTabPanel extends JPanel implements ActionListener, ListSelectionListener{
-
-    private MazeTest mazeTest;
+public class MazeTabPanel extends TabPanel implements ActionListener, ListSelectionListener{
 
     private JList mazeList;
-    private JButton deleteButton = new JButton("Delete");
-    private JButton saveButton = new JButton("Save...");
+    private JButton deleteButton    = new JButton("Delete");
+    private JButton saveButton      = new JButton("Save...");
 
-    private JPanel mazePanelPanel = new JPanel();
+    private JPanel mazePanelPanel   = new JPanel();
     private MazePanel mazePanel;
 
-    public MazeTabPanel(MazeTest mazeTest) throws IOException{
-        this.mazeTest = mazeTest;
+
+    public MazeTabPanel(MazeTest mazeTest, JTabbedPane tabContainer, String name){
+        super(mazeTest, tabContainer, name);
 
         GridBagConstraints gbc = new GridBagConstraints();
         setLayout(new GridBagLayout());
 
 
+        System.out.println("--> " + mazeTest);
 
         // maze panel
         mazePanel = new MazePanel(MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets);

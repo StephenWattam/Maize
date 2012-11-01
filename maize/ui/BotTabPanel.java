@@ -13,7 +13,7 @@ import javax.imageio.*;
 
 
 import maize.*;
-public class BotTabPanel extends JPanel implements ActionListener, ListSelectionListener{
+public class BotTabPanel extends TabPanel implements ActionListener, ListSelectionListener{
 
 	// Text labels
 	private static final String BOT_NAME_PLACEHOLDER	= "Name";
@@ -21,9 +21,6 @@ public class BotTabPanel extends JPanel implements ActionListener, ListSelection
 	private static final String REFRESH_BUTTON_LABEL	= "Refresh";
 	private static final String DELETE_BUTTON_LABEL	    = "Delete";
 	private static final String SAVE_BUTTON_LABEL	    = "Save...";
-
-	// The maze test object to populate
-	private MazeTest mazeTest;
 
 	// The list and controlling buttons
 	private JList botList;
@@ -33,11 +30,9 @@ public class BotTabPanel extends JPanel implements ActionListener, ListSelection
 	private JLabel botNameLabel		= new JLabel(BOT_NAME_PLACEHOLDER);
 	private JLabel botDescriptionLabel	= new JLabel(BOT_DESC_PLACEHOLDER);
 
-
-	public BotTabPanel(MazeTest mazeTest) throws IOException{
-		this.mazeTest = mazeTest;
-
-		GridBagConstraints gbc = new GridBagConstraints();
+    public BotTabPanel(MazeTest mazeTest, JTabbedPane tabContainer, String name){
+        super(mazeTest, tabContainer, name);
+        GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(new GridBagLayout());
 
 		//label style

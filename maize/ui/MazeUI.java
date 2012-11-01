@@ -10,9 +10,10 @@ import java.awt.geom.*;
 import javax.imageio.*;
 import javax.swing.filechooser.*;
 import java.security.Permission;
+import java.util.*;
 
 import maize.*;
-public class MazeUI extends JFrame implements ActionListener{
+public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 	private static int DEFAULT_MAZE_WIDTH = 20;
 	private static int DEFAULT_MAZE_HEIGHT = 20;
@@ -24,14 +25,16 @@ public class MazeUI extends JFrame implements ActionListener{
 	/**The tab handler which holds all of the panels*/
 	private JTabbedPane tabs = new JTabbedPane();
 
+
+    // Panels, and a list of them
+    private Vector<TabPanel> panels = new Vector<TabPanel>();
 	private MazeTabPanel mazeTab;
 	private BotTabPanel botTab;
+	private MultiTestTabPanel multiTestTab;
     private LogTabPanel logTab;
 
-	private MultiTestTabPanel multiTestTab;
 
-
-	public MazeUI(MazeTest mazeTest)throws IOException{
+	public MazeUI(MazeTest mazeTest){
 		super("Maize UI");
 
 /*		// Initialize our security manager nice and early
@@ -67,10 +70,11 @@ public class MazeUI extends JFrame implements ActionListener{
 		});*/
 
 		//super.setIconImage(new ImageIcon(ICON_PATH).getImage());
-		setSize(900, 630);
+		setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
         this.setIconImage(MazeUISettingsManager.icon);
+        this.addWindowListener(this);
 
 
 		this.mazeTest = mazeTest;
@@ -83,18 +87,19 @@ public class MazeUI extends JFrame implements ActionListener{
 		this.setJMenuBar(menuBar);
 
 		//tabs
-		mazeTab = new MazeTabPanel(mazeTest);
-		tabs.add("Manage Mazes", mazeTab);
+		mazeTab         = new MazeTabPanel(mazeTest, tabs, "Manage Mazes");
+		botTab          = new BotTabPanel(mazeTest, tabs, "Manage Bots");
+		multiTestTab    = new MultiTestTabPanel(mazeTest, tabs, "Run Tests");
+        logTab          = new LogTabPanel(mazeTest, tabs, "Log");
 
-		botTab = new BotTabPanel(mazeTest);
-		tabs.add("Manage Bots", botTab);
+        // List all panels for easy use later
+        panels.add(mazeTab);
+        panels.add(botTab);
+        panels.add(multiTestTab);
+        panels.add(logTab);
 
-		multiTestTab = new MultiTestTabPanel(mazeTest);
-		tabs.add("Run Tests", multiTestTab);
-
-        logTab  =   new LogTabPanel(mazeTest);
+        // Attach the log
         Log.addLogListener(logTab);
-        tabs.add("Log", logTab);
 
 		setContentPane(tabs);
 		setVisible(true);
@@ -143,6 +148,18 @@ public class MazeUI extends JFrame implements ActionListener{
 		mazeMenu.add(buildMenuItem("New...","new_maze"));
 		mazeMenu.add(buildMenuItem("Load...","load_maze"));
 		menuBar.add(mazeMenu);
+		
+        JMenu tabMenu = new JMenu("Panels");
+		tabMenu.add(buildMenuItem("Attach All","attach_all"));
+		tabMenu.add(buildMenuItem("Detach All","detach_all"));
+		menuBar.add(tabMenu);
+
+        // RHS
+        menuBar.add(Box.createHorizontalGlue());
+
+		JMenu helpMenu = new JMenu("Help");
+		helpMenu.add(buildMenuItem("About...","about"));
+		menuBar.add(helpMenu);
 
 		return menuBar;
 	}
@@ -153,7 +170,7 @@ public class MazeUI extends JFrame implements ActionListener{
 	 */
 	public void actionPerformed(ActionEvent Ae){
 		if(Ae.getActionCommand().equals("exit_all")){
-			quit();
+            this.dispose();
 		}else if(Ae.getActionCommand().equals("new_maze")){
 			new NewMazeDialog(mazeTest, this);
 		}else if(Ae.getActionCommand().equals("load_maze")){
@@ -169,12 +186,22 @@ public class MazeUI extends JFrame implements ActionListener{
 		}else if(Ae.getActionCommand().equals("reload_bots")){
 			this.mazeTest.bots.clear();
 			BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
+		}else if(Ae.getActionCommand().equals("about")){
+            helpAbout();
+		}else if(Ae.getActionCommand().equals("attach_all")){
+            attachTabs();
+		}else if(Ae.getActionCommand().equals("detach_all")){
+            detachTabs();
 		}else{
-			System.err.println("Unable to find handler for action command: " + Ae.getActionCommand().toString());
+			Log.log("Unable to find handler for action command: " + Ae.getActionCommand().toString());
 		}
 
 		updatePanes();
 	}
+
+    private void helpAbout(){
+        new AboutDialog(mazeTest, this);
+    }
 
 	// Load a maze from a serialised file
 	private void loadMaze(){
@@ -257,7 +284,6 @@ public class MazeUI extends JFrame implements ActionListener{
 	private void quit(){
         Log.removeLogListener(logTab);
         Log.log("Goodbye.");
-		System.exit(0);
 	}
 
 	// Update all of the panes
@@ -266,6 +292,32 @@ public class MazeUI extends JFrame implements ActionListener{
 		this.botTab.update();
 		this.multiTestTab.update();
 	}
+
+    private void attachTabs(){
+        for(TabPanel tp : panels){
+            if(!tp.isAttached())
+                tp.attach();
+        }
+    }
+
+    private void detachTabs(){
+        for(TabPanel tp : panels){
+            if(tp.isAttached())
+                tp.detach();
+        }
+    }
+
+    // WindowListener
+    public void windowClosing(WindowEvent e) { /* displayMessage("Window closing", e); */ 
+        quit();
+    }
+    public void windowClosed(WindowEvent e) {/* displayMessage("Window closed", e); */}
+    public void windowOpened(WindowEvent e) { /* displayMessage("Window opened", e); */ }
+    public void windowIconified(WindowEvent e) { /* displayMessage("Window iconified", e); */ }
+    public void windowDeiconified(WindowEvent e) { /* displayMessage("Window deiconified", e); */ }
+    public void windowActivated(WindowEvent e) { /* displayMessage("Window activated", e); */ }
+    public void windowDeactivated(WindowEvent e) {/* displayMessage("Window deactivated", e); */ }
+
 
 }
 

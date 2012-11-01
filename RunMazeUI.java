@@ -42,11 +42,6 @@ public class RunMazeUI{
 
 
 		// Launch the UI itself.
-		try{
-			new MazeUI(mt);
-		}catch(IOException IOe){
-			Log.log("Unknown Error in Maize!");
-            Log.logException(IOe);
-		}
+        new MazeUI(mt);
 	}	
 }

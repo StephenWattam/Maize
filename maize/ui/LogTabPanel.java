@@ -15,22 +15,24 @@ import java.util.*;
 
 
 import maize.*;
-public class LogTabPanel extends JPanel implements ActionListener, LogListener{
+public class LogTabPanel extends TabPanel implements ActionListener, LogListener{
 
     private static final String DELETE_BUTTON_LABEL = "Clear";
     private static final String SAVE_BUTTON_LABEL = "Save to File";
 
-    private MazeTest mazeTest;
+    // max lines to keep
+    private static final int SCROLLBACK_LIMIT = 10;
 
 	// The list and controlling buttons
 	private JTextArea log;
 	private JButton deleteButton	= new JButton(DELETE_BUTTON_LABEL);
 	private JButton saveButton		= new JButton(SAVE_BUTTON_LABEL);
 
+    // When this number of messages have been seen, kill the top line when adding a new one
+    private int scrollbackLimit = SCROLLBACK_LIMIT;
 
-	public LogTabPanel(MazeTest mazeTest) throws IOException{
-		this.mazeTest = mazeTest;
-
+    public LogTabPanel(MazeTest mazeTest, JTabbedPane tabContainer, String name){
+        super(mazeTest, tabContainer, name);
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(new GridBagLayout());
 
@@ -48,7 +50,7 @@ public class LogTabPanel extends JPanel implements ActionListener, LogListener{
 		//list
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbc.gridx = 0;
-		gbc.gridy = 2;
+		gbc.gridy = 0;
 		gbc.ipady = 0;
 		gbc.gridwidth = 3;
 		this.add(logScrollPane,gbc);
@@ -58,14 +60,13 @@ public class LogTabPanel extends JPanel implements ActionListener, LogListener{
 		gbc.ipadx = 100;
 		gbc.ipady = 20;
 		gbc.gridx = 0;
-		gbc.gridy = 3;
+		gbc.gridy = 1;
 		this.add(saveButton,gbc);
 
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridx = 2;
-		gbc.gridy = 3;
+		gbc.gridy = 1;
 		this.add(deleteButton,gbc);
-
 
 		setVisible(true);
 	}
@@ -75,7 +76,9 @@ public class LogTabPanel extends JPanel implements ActionListener, LogListener{
             saveLog();
 		}else if(Ae.getSource() == deleteButton){
             log.setText("");
-		}
+            // reset line counter
+            scrollbackLimit = SCROLLBACK_LIMIT;
+        }
 
 	}
 
@@ -111,7 +114,17 @@ public class LogTabPanel extends JPanel implements ActionListener, LogListener{
     }
 
     public void logEvent(String str){
-        log.setText( log.getText() + str + "\n" );
+        scrollbackLimit -= 1;
+
+        if(scrollbackLimit == 0){
+            // reset by one line
+            scrollbackLimit += 1;
+
+            // delete top line of text and add new one
+            log.setText( log.getText().substring( log.getText().indexOf('\n') + 1 ) + str + "\n" );
+        }else{
+            log.setText( log.getText() + str + "\n" );
+        }
     }
 
 	/* //called to regtresjh state changes */
