@@ -25,6 +25,7 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
 
 	// The list and controlling buttons
 	private JTextArea log;
+    private JScrollPane logScrollPane;
 	private JButton deleteButton	= new JButton(DELETE_BUTTON_LABEL);
 	private JButton saveButton		= new JButton(SAVE_BUTTON_LABEL);
 
@@ -44,7 +45,7 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
         log = new JTextArea();
 
 
-		JScrollPane logScrollPane = new JScrollPane(log);
+		logScrollPane = new JScrollPane(log);
 		/* logScrollPane.setPreferredSize(new Dimension(800, 400)); */
 
 		//list
@@ -135,6 +136,12 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
         }else{
             log.setText( log.getText() + str + "\n" );
         }
+
+        // scroll to bottom
+        JScrollBar vertical = logScrollPane.getVerticalScrollBar();
+        if(vertical != null)
+            vertical.setValue( vertical.getMaximum() );
+    
     }
 
 	/* //called to regtresjh state changes */

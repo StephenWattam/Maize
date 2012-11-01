@@ -176,7 +176,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 	 */
 	public void actionPerformed(ActionEvent Ae){
 		if(Ae.getActionCommand().equals("exit_all")){
-            this.dispose();
+            quit();
 		}else if(Ae.getActionCommand().equals("new_maze")){
 			new NewMazeDialog(mazeTest, this);
 		}else if(Ae.getActionCommand().equals("load_maze")){
@@ -288,8 +288,15 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 	// Quit
 	private void quit(){
-        dispose();
         Log.removeLogListener(logTab);
+
+        // Kill all the panels
+        for(TabPanel tp : panels){
+            tp.dispose();
+        }
+
+
+        dispose();
         Log.log("Goodbye.");
 	}
 

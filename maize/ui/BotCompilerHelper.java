@@ -43,7 +43,7 @@ public abstract class BotCompilerHelper{
 			System.err.println("No bots found!");
 		}else{
 			for(int i=0; i<children.length; i++){
-                Log.log("Compiling bot " + children[i]);
+                Log.log("Compiling bot " + children[i] + "...");
 				if(compile(dirname + java.io.File.separator + children[i])){
                     Log.log(children[i] + " compiled successfully!");
 					compiled_bots.add(classNameFromBaseName(children[i]));
@@ -79,7 +79,8 @@ public abstract class BotCompilerHelper{
             Log.log("           install the JDK, rather than the JRE.");
             Log.log("           If you already have both installed, check your classpath.");
             Log.log("");
-            System.exit(1);
+            return false;
+            /* System.exit(1); */
         }
 		int compilationResult =	compiler.run(null, null, null, fname);
 

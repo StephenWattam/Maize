@@ -98,10 +98,14 @@ public class TestThread extends Thread{
 				agent.agent.move();
 				// update ui
 				agent.moves++;
-			}else{
-				this.panel.remAgent(agent.agent);
 			}
 		}
+/*  */
+/*         // Remove any finished agents */
+/*         for(int i=0;i<agents.length;i++){ */
+/*             if(agents[i].isFinished) */
+/*                 this.panel.remAgent(agents[i].agent); */
+/*         } */
 
 		panel.repaint();
 		return keepRunning;
