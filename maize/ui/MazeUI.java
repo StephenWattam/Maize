@@ -15,23 +15,20 @@ import java.util.*;
 import maize.*;
 public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
-	private static int DEFAULT_MAZE_WIDTH = 20;
-	private static int DEFAULT_MAZE_HEIGHT = 20;
-
 	// state
-	private MazeTest mazeTest = null;
+	private MazeTest            mazeTest        = null;
 	/**The menu bar*/
-	private JMenuBar menuBar;
+	private JMenuBar            menuBar;
 	/**The tab handler which holds all of the panels*/
-	private JTabbedPane tabs = new JTabbedPane();
+	private JTabbedPane         tabs            = new JTabbedPane();
 
 
     // Panels, and a list of them
-    private Vector<TabPanel> panels = new Vector<TabPanel>();
-	private MazeTabPanel mazeTab;
-	private BotTabPanel botTab;
-	private MultiTestTabPanel multiTestTab;
-    private LogTabPanel logTab;
+    private Vector<TabPanel>    panels          = new Vector<TabPanel>();
+	private MazeTabPanel        mazeTab;
+	private BotTabPanel         botTab;
+	private MultiTestTabPanel   multiTestTab;
+    private LogTabPanel         logTab;
 
 
 	public MazeUI(MazeTest mazeTest){
@@ -88,10 +85,10 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 		this.setJMenuBar(menuBar);
 
 		//tabs
-		mazeTab         = new MazeTabPanel(mazeTest, tabs, "Manage Mazes");
-		botTab          = new BotTabPanel(mazeTest, tabs, "Manage Bots");
-		multiTestTab    = new MultiTestTabPanel(mazeTest, tabs, "Run Tests");
-        logTab          = new LogTabPanel(mazeTest, tabs, "Log");
+		mazeTab         = new MazeTabPanel      (mazeTest, tabs, "Manage Mazes");
+		botTab          = new BotTabPanel       (mazeTest, tabs, "Manage Bots");
+		multiTestTab    = new MultiTestTabPanel (mazeTest, tabs, "Run Tests");
+        logTab          = new LogTabPanel       (mazeTest, tabs, "Log");
 
         // List all panels for easy use later
         panels.add(mazeTab);
@@ -113,7 +110,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 	private void constructDefaultMazes(){
         Log.log("Constructing default mazes");
 		for(MazeFactory mf : this.mazeTest.factories){
-			Maze m = mf.getMaze(DEFAULT_MAZE_WIDTH, DEFAULT_MAZE_HEIGHT);
+			Maze m = mf.getMaze(MazeUISettingsManager.defaultMazeWidth, MazeUISettingsManager.defaultMazeHeight);
 			m.setName("Default " + mf.getClass().getName());
 			mazeTest.mazes.add( m );
 		}

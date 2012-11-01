@@ -20,8 +20,8 @@ public class NewMazeDialog extends JDialog implements ActionListener{
 	private JButton cancelButton = new JButton("Cancel");    
 
 	// Size of maze
-	private JSpinner widthSpinner = new JSpinner(new SpinnerNumberModel(20,1,250,1));
-	private JSpinner heightSpinner = new JSpinner(new SpinnerNumberModel(20,1,250,1));
+	private JSpinner widthSpinner = new JSpinner(new SpinnerNumberModel(MazeUISettingsManager.defaultMazeWidth,1,250,1));
+	private JSpinner heightSpinner = new JSpinner(new SpinnerNumberModel(MazeUISettingsManager.defaultMazeHeight,1,250,1));
 
 	// Combo box of possible maze types
 	private JComboBox factoryCombo;

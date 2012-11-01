@@ -21,7 +21,7 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
     private static final String SAVE_BUTTON_LABEL = "Save to File";
 
     // max lines to keep
-    private static final int SCROLLBACK_LIMIT = 10;
+    private static final int SCROLLBACK_LIMIT = MazeUISettingsManager.logScrollbackLimit;
 
 	// The list and controlling buttons
 	private JTextArea log;
