@@ -41,6 +41,7 @@ public class TabPanel extends JPanel{
                 }
             }
 
+            tabContainer.setSelectedComponent(this);
         }else{
             Log.log("Cannot attach tab '" + name + "', is already attached.");
         }

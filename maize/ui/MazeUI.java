@@ -101,6 +101,9 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         panels.add(multiTestTab);
         panels.add(logTab);
 
+        // Select the first tab
+        tabs.setSelectedIndex(0);
+
         // Attach the log
         Log.addLogListener(logTab);
 
