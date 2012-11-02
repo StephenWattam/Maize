@@ -1,5 +1,5 @@
 
-\documentclass[xcolor=x11names,compress]{beamer}
+\documentclass[xcolor=x11names,compress,handout]{beamer}
 
 % Many thanks to http://cameron.bracken.bz/beamer-template
 %% General document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -49,6 +49,12 @@
 \graphicspath{{./images/}}
 \usepackage{hyperref}
 \usepackage{color}
+% ---------------------------------------------------------------------------------------
+% Thanks to http://www.guidodiepen.nl/2009/07/creating-latex-beamer-handouts-with-notes/
+ % \usepackage{handoutWithNotes}
+ % \pgfpagesuselayout{4 on 1 with notes}[a4paper,border shrink=5mm]
+ % \pgfpagesuselayout{2 on 1 with notes landscape}[a4paper,border shrink=5mm]
+% ---------------------------------------------------------------------------------------
 
 \title{Mazes: An Introduction}
 \author{Stephen Wattam}
@@ -76,7 +82,6 @@
 
             \item<4-> \textbf{Has some feature making it hard to follow the path}
         \end{itemize}
-
     \end{column} 
 \begin{column}[c]{5cm} 
 
@@ -86,6 +91,10 @@
 
 \end{column} 
 \end{columns}
+
+\note{Here are some more insulting comments that I wish to make.  
+The class will not see them on the overhead, but I will see them on my 
+laptop.}
 }
 
 
