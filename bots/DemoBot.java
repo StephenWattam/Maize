@@ -131,10 +131,19 @@ public class DemoBot implements Bot, Serializable {
         return c;
     }
 
-    /** Manage points for a general maze overview render */
+    /* ------------------------------------------------------ */
+    //  Memorising system
+    /* ------------------------------------------------------ */
+
+
+    // Keep track of max in X, Y
     private int[] maxXY = {0,0};
+    // Keep a list of points we have seen.
     private HashSet<Point> points = new HashSet<Point>();
 
+
+    // Record the points in the view at a given X, Y.
+    // Presumes the view is already the correct way up
     private void rememberPoints(boolean[][] view, int xBot, int yBot){
         int x = 0;
         int y = 0;
@@ -146,8 +155,7 @@ public class DemoBot implements Bot, Serializable {
                     x = xBot + (i-1);
                     y = yBot + (j-1);
 
-                    // This may be abusive, but it uses a hash and prevents
-                    // me from having to do duplicate detection!
+                    // Record the adjusted (real) x-y coordinates.
                     points.add(new Point(x, y));
 
                     // count max
@@ -162,8 +170,11 @@ public class DemoBot implements Bot, Serializable {
 
     }
 
+    // Render the memory to screen.
     private void renderPoints(int botX, int botY){
-        // Construct an array of booleans.
+        // ------------------------------------------
+        // Construct a map of booleans.
+        
         // This method should be o(n), rather than o(n^2) of the naive way
         boolean[][] map = new boolean[maxXY[0]+1][maxXY[1]+1];
         for(int i=0;i<map.length;i++)
@@ -182,7 +193,8 @@ public class DemoBot implements Bot, Serializable {
         for(int i=0;i<map.length;i++){ System.out.print("-"); }
         System.out.print("+\n");
 
-        // loop over map
+        // loop over map 
+        // (note order is inverted to display map in |Y|-y layout)
         for(int i=(map[0].length-1);i>=0;i--){
             System.out.print("|");
             for(int j=0;j<map.length;j++){
