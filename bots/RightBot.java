@@ -70,6 +70,7 @@ public class RightBot implements Bot, Serializable {
      *
      * @return           Bot name.
      */
+    @Override
     public String getName(){
         return "RightBot";
     }
@@ -78,6 +79,7 @@ public class RightBot implements Bot, Serializable {
      *
      * @return           Bot Description.
      */
+    @Override
     public String getDescription(){
         return "Follows right walls.";
     }

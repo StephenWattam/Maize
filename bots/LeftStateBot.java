@@ -24,6 +24,7 @@ public class LeftStateBot extends StateBot implements Serializable{
      * @param    fx      X coord of the finish.
      * @param    fy      Y coord of the finish.
      */
+    @Override
     public void makeMove(boolean[][] view, int x, int y, int o, int fx, int fy){
 
         if(isLeftTurn(view)){
@@ -61,6 +62,7 @@ public class LeftStateBot extends StateBot implements Serializable{
      *
      * @return           Bot name.
      */
+    @Override
     public String getName(){
         return "LeftStateBot";
     }
@@ -69,6 +71,7 @@ public class LeftStateBot extends StateBot implements Serializable{
      *
      * @return           Bot Description.
      */
+    @Override
     public String getDescription(){
         return "Left wall follower using StateBot.";
     }

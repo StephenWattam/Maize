@@ -49,7 +49,6 @@ public abstract class BotCompilerHelper{
 					compiled_bots.add(classNameFromBaseName(children[i]));
 					//compiled_bots.add(children[i].replaceAll(".java$", ".class"));
 				}else{
-					System.err.println("Failed to compile " + children[i]);
                     Log.log("Failed to compile " + children[i]);
 				}
 			}
@@ -82,9 +81,8 @@ public abstract class BotCompilerHelper{
             return false;
             /* System.exit(1); */
         }
-		int compilationResult =	compiler.run(null, null, null, fname);
 
+		int compilationResult =	compiler.run(null, new LogOutputStream("<stdout> "), new LogOutputStream("<stderr> "), fname);
 		return compilationResult == 0;
 	}
-
 }

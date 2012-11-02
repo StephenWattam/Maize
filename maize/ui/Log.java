@@ -56,4 +56,6 @@ public class Log{
 			instance = new Log();
 		return instance;
 	}
+
+   
 }
