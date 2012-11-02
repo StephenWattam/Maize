@@ -242,7 +242,7 @@ public class MazePanel extends Canvas{
 	private void renderTile(BufferedImage tile, int x, int y, Graphics g){
 		g.drawImage(tile, 
                 (int)(x*((float)this.getWidth()     / (float)maze.getWidth())), 
-				(int)(y*((float)this.getHeight()    / (float)maze.getHeight())), 
+				this.getHeight() - (int)((y+1)*((float)this.getHeight()    / (float)maze.getHeight())), 
                 this);
 	}
 
