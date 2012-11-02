@@ -292,6 +292,7 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 			return;
 		}else if(this.test.isDone){
 			this.test.quit();
+            this.test = null;
 			loadMazeFromUI();
 			newTest();
 		}else if(this.test.getState() != Thread.State.NEW){

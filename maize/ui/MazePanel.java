@@ -117,10 +117,10 @@ public class MazePanel extends Canvas{
 
 	// Removes an agent from the list to simulate
 	public boolean remAgent(Agent a){
-		if(agents.indexOf(a) == -1){
-            Log.log("Removing agent " + a + " from maze panel "+ this);
+		if(agents.indexOf(a) == -1)
 			return false;
-        }
+        
+        Log.log("Removing agent " + a + " from maze panel "+ this);
 		agents.remove(a);
 		return true;
 	}

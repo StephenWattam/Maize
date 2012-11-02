@@ -100,12 +100,15 @@ public class TestThread extends Thread{
 				agent.moves++;
 			}
 		}
-/*  */
-/*         // Remove any finished agents */
-/*         for(int i=0;i<agents.length;i++){ */
-/*             if(agents[i].isFinished) */
-/*                 this.panel.remAgent(agents[i].agent); */
-/*         } */
+
+        // Remove any finished agents
+        // note that remAgent checks if it's there,
+        // so we don't have to.
+        for(int i=0;i<agents.length;i++)
+            if(agents[i].isFinished)
+                this.panel.remAgent(agents[i].agent);
+            
+        
 
 		panel.repaint();
 		return keepRunning;
