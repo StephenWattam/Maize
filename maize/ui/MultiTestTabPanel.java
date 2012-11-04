@@ -16,8 +16,8 @@ import maize.*;
 public class MultiTestTabPanel extends TabPanel implements ActionListener, ChangeListener, ListSelectionListener, MouseWheelListener{
 
     private static final int SPEED_SCROLL_AMOUNT            = 1;
-	private static final int MAX_DELAY                      = 500;
-	private static final int MAZE_DISPLAY_MAX_NAME_LENGTH   = 25;
+	private static final int MAX_DELAY                      = 750;
+	private static final int MAZE_DISPLAY_MAX_NAME_LENGTH   = 30;
 	private static final String BOT_NAME_PLACEHOLDER	    = "No bot";
 	private static final String MAZE_NAME_PLACEHOLDER	    = "No maze";
 	private static final String MOVE_COUNT_PLACEHOLDER	    = "No moves yet";
@@ -189,10 +189,36 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		this.add(mazeListPanel, gbc);
 
 
+        // Disable buttons in a consistent way
+        enableTheRightButtons();
 
 		setVisible(true);
 	}
 
+    // Based on the test state, enable or disable the UI's buttons in
+    // a coherent manner
+    private void enableTheRightButtons(){
+        if(test == null){
+            refreshButton.setEnabled(true);
+            startButton.setEnabled(false);
+            stopButton.setEnabled(false);
+            pauseButton.setEnabled(false);
+        }else{
+            // Enable start button if test is new, else disable
+            // ensure stop button is only enabled as the inverse.
+            if(this.test.getState() == Thread.State.NEW){
+                startButton.setEnabled(true);
+                stopButton.setEnabled(false);
+            }else{
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+                pauseButton.setEnabled(true);
+            }
+
+        }
+    }
+
+    // Respond to buttons.
 	public void actionPerformed(ActionEvent Ae){
 		if(Ae.getSource() == refreshButton){
 			reset();
@@ -204,23 +230,28 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		}else if(Ae.getSource() == pauseButton){
 			pause();
 		}
+
+        enableTheRightButtons();
 	}
 
-	// Fires when the user selects something in the list
+	// Fires when the user selects something in a list
 	public void valueChanged(ListSelectionEvent LSe){
-		if(LSe.getValueIsAdjusting()) return;
+		if(LSe.getValueIsAdjusting()) 
+            return;
 
 		if(LSe.getSource() == this.botLSM){
 
 			ListSelectionModel lsm = (ListSelectionModel)LSe.getSource();
 			if(lsm.isSelectionEmpty()){
-				System.out.println("Selection is empty.");
+				/* System.out.println("Selection is empty."); */
 			}else{
 
+                // Which bots have people selected?
 				int minI = lsm.getMinSelectionIndex();
 				int maxI = lsm.getMaxSelectionIndex();
 				this.selectedBots.clear();
 
+                // Loop through and count selections.
 				for(int i=minI; i<=maxI;  i++){
 					if(lsm.isSelectedIndex(i)){
 						//System.out.println("Bot" + i + " selected: " + this.mazeTest.bots.get(i));
@@ -233,18 +264,25 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 
 	}
 
+    // Respond to changes in the speed slider
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider)e.getSource();
-		if (!source.getValueIsAdjusting()) {
 
-			int speedval = (int)source.getValue();
-			if(this.test != null){
-				//System.out.println("Changing delay to " + (MAX_DELAY-speedval));
-				this.test.setDelay( MAX_DELAY - speedval);
-			}
-		}
+        // Wait until it's no longer moving
+		if (source.getValueIsAdjusting()) 
+            return;
+
+
+        // Get the delay and set the current test's delay
+        int speedval = (int)source.getValue();
+        if(this.test != null){
+            //System.out.println("Changing delay to " + (MAX_DELAY-speedval));
+            this.test.setDelay( MAX_DELAY - speedval);
+        }
+
 	}
 
+    // Handle mose wheel over the speed slider
     public void mouseWheelMoved(MouseWheelEvent e){
         int notches = e.getWheelRotation();
         int speed = this.speedSlider.getValue();
@@ -261,7 +299,6 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
         }
 
     }
-
 
 	private void stop(){
 		if(test == null){
@@ -290,11 +327,14 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		if(this.test == null){
 			JOptionPane.showMessageDialog(this, "You must first select a maze and some bots and click \"New Test\".");
 			return;
-		}else if(this.test.isDone){
-			this.test.quit();
-            this.test = null;
-			loadMazeFromUI();
-			newTest();
+
+        // Restart if someone clicks start whilst the test is open, but complete
+        //
+		/* }else if(this.test.isDone){ */
+		/* 	this.test.quit(); */
+        /*    this.test = null; */
+		/* 	loadMazeFromUI(); */
+		/* 	newTest(); */
 		}else if(this.test.getState() != Thread.State.NEW){
 			JOptionPane.showMessageDialog(this, "Please stop the current test and create a new one.");
 			return;
@@ -315,7 +355,6 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		}
 
 		newTest();
-
 	}
 
 	private void loadMazeFromUI(){
@@ -362,7 +401,9 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		mazeList.setListData(this.mazeTest.mazes);
 	}
 
-	
+
+    // Adjust the real name of the maze to fit in the panel by truncating it,
+    // and adding an ellipsis.
 	private void setMazeName(String name){
 		if(name.length() > MAZE_DISPLAY_MAX_NAME_LENGTH){
 			mazeNameLabel.setText(name.substring(0, MAZE_DISPLAY_MAX_NAME_LENGTH-3) + "...");
