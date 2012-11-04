@@ -65,6 +65,8 @@ public final class Agent {
     view[2][1] = checkMazePoint(mazedata, x+1,    y);
     view[2][2] = checkMazePoint(mazedata, x+1,  y+1);
 
+
+    /* Rotate into bot view */
     for(int i = 0; i < this.o; i++) { 
       view = rotateArray(view); 
     }
@@ -85,12 +87,16 @@ public final class Agent {
 
     boolean value = false;
 
+
     /* Bound checking */
-    if( x < 0 || y < 0 || x >= maze.length || y >= maze[0].length){
+    if( x < 0 || y < 0 || x >= maze.length || y >= maze[0].length)
       value = true;
-    } else {
+    /* Set finish to blank */
+    else if(x == this.maze.getExiX() && y == this.maze.getExiY())
+        value = false;
+    else
       value = maze[x][y];
-    }
+    
 
     return value;
   }
