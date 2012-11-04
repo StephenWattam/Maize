@@ -22,7 +22,6 @@ public class DemoBot implements Bot, Serializable {
     private Vector<Point> bestRoute = new Vector<Point>();
 
 
-
     /** Sets up default bots */
     public DemoBot(){
     }
@@ -55,7 +54,7 @@ public class DemoBot implements Bot, Serializable {
         boolean[][] map = constructMap();
  
         // If we have new data, force the bot to compute a new route
-        if(newPoints > 0)
+        if(newPoints > 0 && !validateRoute(map, bestRoute))
             bestRoute = null;
 
         // Find the best route only when we run out of instructions from the previous one
@@ -64,9 +63,9 @@ public class DemoBot implements Bot, Serializable {
 
             // If the route is null, or we have run out of data
             // then force a recompute
-            if(bestRoute == null || bestRoute.size() < 2){
+            if(bestRoute == null ||  bestRoute.size() < 2){// || !bestRoute.get(0).equals(new Point(x, y))){
                 System.out.println("Routing...");
-                bestRoute = fillMap(map, x, y, fx, fy);
+                bestRoute = findRoute(map, x, y, fx, fy);
             }
 
             // Take some data off the route, and add it to the buffer
@@ -121,41 +120,64 @@ public class DemoBot implements Bot, Serializable {
         }
 
 
-        // FIXME: this is a cheat.  The bot should understand orientation
-        // ALWAYS FACE iNORTH
-        // This corrects for the edge case that occurs when the bot
-        // finishes and is restarted pointing at some funny angle.
-        if(o == Orientation.WEST)
-            buffer.add(Direction.RIGHT);
-        else if(o == Orientation.EAST)
-            buffer.add(Direction.LEFT);
-        else if(o == Orientation.SOUTH){
-            buffer.add(Direction.LEFT);
-            buffer.add(Direction.LEFT);
-        }
-        // instead of "strafing" sideways.
+        // Decide which way to move, and move.
         if(dx == 0 && dy > 0){
-            System.out.println("BACK");
-            buffer.add(Direction.BACK);
+            /* System.out.println("BACK"); */
+            rotateToMatch(o, Orientation.SOUTH);
         }else if(dx == 0 && dy < 0){
-            System.out.println("FORTH");
-            buffer.add(Direction.FORWARD);
+            /* System.out.println("FORTH"); */
+            rotateToMatch(o, Orientation.NORTH);
         }else if(dy == 0 && dx < 0){
-            System.out.println("LEFT");
-            buffer.add(Direction.LEFT);
-            buffer.add(Direction.FORWARD);
-            buffer.add(Direction.RIGHT);
+            /* System.out.println("LEFT"); */
+            rotateToMatch(o, Orientation.WEST);
         }else{ //if(dy == 0 && dx < 1)
-            System.out.println("RIGHT");
-            buffer.add(Direction.RIGHT);
-            buffer.add(Direction.FORWARD);
-            buffer.add(Direction.LEFT);
+            /* System.out.println("RIGHT"); */
+            rotateToMatch(o, Orientation.EAST);
         }
 
 
         // Then remove the first item in the route
         route.remove(0);
 
+    }
+
+    // Rotates the bot to the desired orientation by adding to the instruction buffer
+    //
+    // TODO: improve this so it is more efficient
+    //       it currently has one case where it turns right three times instead of
+    //       turning left.
+    private void rotateToMatch(int current, int desired){
+        // check for 270 degree left turns
+        /* System.out.println(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); */
+
+        /* // special case to prevent weird 'turning three times right to go left' */
+        if((current - desired) == 1){
+        /*     /* System.out.println("\n####### LEFT HAND TURN"); */ 
+            buffer.add(Direction.LEFT);
+            buffer.add(Direction.FORWARD);
+            return;
+        }
+
+        /* // 180 degrees, */
+        /* // this basically means we can just tell the bot to  */
+        /* // go backwards */
+        if(Math.abs(current - desired) == 2){
+            buffer.add( Direction.BACK );
+            return;
+        }
+        
+        // Else go right until we meet the point we want
+        // then move forward
+        while(current != desired){
+            // Go right
+            buffer.add(Direction.RIGHT);
+            // Keep track
+            current = ((current + 1) % 4);
+        }
+        buffer.add(Direction.FORWARD);
+
+
+        return;
     }
 
     // Make a random move.
@@ -204,10 +226,10 @@ public class DemoBot implements Bot, Serializable {
 
     }
 
-    /** Prints a context matrix. */
+    /** Prints a 3x3 context matrix. */
     private static void printContext(boolean[][] view){
         System.out.println("     +---+");
-        for(int i=0;i<3;i++){
+        for(int i=2;i>=0;i--){
             System.out.print("     |");
             for(int j=0;j<3;j++){
                 System.out.print( "" + viewChar(view, i, j) );
@@ -284,6 +306,10 @@ public class DemoBot implements Bot, Serializable {
 
     }
 
+    // Construct a boolean[][] map out of the set of points we have memorised.
+    //
+    // This basically translates the points into a more usable format, 
+    // but is mainly for ease of processing later
     private boolean[][] constructMap(){
         // ------------------------------------------
         // Construct a map of booleans.
@@ -302,6 +328,9 @@ public class DemoBot implements Bot, Serializable {
     }
 
     // Render the memory to screen.
+    //
+    // This renders somewhat upside-down, so that 0,0 is in the bottom left, just like the
+    // UI display in Maize
     private void renderMap(boolean[][] map, Vector<Point> route, int botX, int botY, int fx, int fy){
 
         // ------------------------------------------
@@ -342,7 +371,8 @@ public class DemoBot implements Bot, Serializable {
     
 
 
-    private Vector<Point> fillMap(boolean[][] map, int x, int y, int fx, int fy){
+    // 
+    private Vector<Point> findRoute(boolean[][] map, int x, int y, int fx, int fy){
         HashMap<Point, Vector<Point>> nodes = new HashMap<Point, Vector<Point>>();
 
 
@@ -371,7 +401,12 @@ public class DemoBot implements Bot, Serializable {
         return route;
     }
 
-    
+   
+    // Recursively seek the finish.
+    //
+    // Note: this does not actually perform a breadth first search,
+    //       because it would be too computationall expensive.
+    //       Instead it performs a directed depth-first search for the finish.
     private Vector<Point> breadthFirstSearch( 
                     boolean[][] map,
                     Point position,
@@ -416,6 +451,10 @@ public class DemoBot implements Bot, Serializable {
 
         // Pick off the minimum each time
         // this is a poor man's sorting algorithm
+        // XXX: This is O(n^2) worst case, and is only used because
+        //      I cannot use an inline class to use Comparable.sort();
+        //      Since the maximum number of items in next can be 4, this
+        //      isn't a particular issue, but it'd be nice to fix it...
         while( remaining.size() > 0 ){
             // establish minimum
             for(Point p: remaining)
@@ -446,7 +485,8 @@ public class DemoBot implements Bot, Serializable {
     }
 
 
-    // Construct a local adjacency list
+    // Construct a list of points that are directly adjacent to x, y, and are not walls.
+    // Since this is designed to map where the bot may move, it does not include diagonals.
     private Vector<Point> createLocalRoutes(boolean[][] map, int x, int y){
         Vector<Point> routes = new Vector<Point>();
 
@@ -459,7 +499,7 @@ public class DemoBot implements Bot, Serializable {
         addPointIfSpace(routes, map, x, y-1);
         addPointIfSpace(routes, map, x, y+1);
 
-        // DEBUG output
+        // DEBUG output to list points.
         /* System.out.print("" + x +"," + y + " : "); */
         /* for(Point p: routes){ */
         /*     System.out.print("(" + p.x + "," + p.y + ") -> "); */
@@ -469,15 +509,33 @@ public class DemoBot implements Bot, Serializable {
         return routes;
     }
 
+    // Add a point to a route IF the point is a space, and IF it falls within bounds
     private void addPointIfSpace(Vector<Point> routes, boolean[][] map, int x, int y){
+        // Check bounds
         if(x >= map.length || x < 0 || map.length == 0)
             return;
         if(y >= map[x].length || y < 0 || map[x].length == 0)
             return;
 
+        // Check walls
         if(!map[x][y])
             routes.add( new Point(x, y) );
     }
 
+    // Returns false if the route tries to go over walls
+    // is used to check updates to the route
+    private boolean validateRoute( boolean[][] map, Vector<Point> route ){
+        // Return false if no route
+        if(route == null)
+            return false;
+
+        // Return false if the route hits a wall
+        for(Point p: route)
+            if(map[p.x][p.y])
+                return false;
+
+        // Else it must be valid
+        return true;
+    }
 
 }
