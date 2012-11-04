@@ -183,9 +183,9 @@ public class GraphBot implements Bot, Serializable {
 
     // Rotates the bot to the desired orientation by adding to the instruction buffer
     //
-    // TODO: improve this so it is more efficient
-    //       it currently has one case where it turns right three times instead of
-    //       turning left.
+    // FIXME: improve this so it is more efficient
+    //        it currently has one case where it turns right three times instead of
+    //        turning left.
     private void rotateToMatch(int current, int desired){
         // check for 270 degree left turns
         /* debugln(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); */
