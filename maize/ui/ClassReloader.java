@@ -48,9 +48,13 @@ public class ClassReloader extends ClassLoader{
             return defineClass(name, classData, 0, classData.length);
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            Log.log("Error forcing reload of bot class: " + name);
+            Log.logException(e);
+            /* e.printStackTrace(); */
         } catch (IOException e) {
-            e.printStackTrace(); 
+            Log.log("Error forcing reload of bot class: " + name);
+            Log.logException(e);
+            /* e.printStackTrace();  */
         }
 
         return null;

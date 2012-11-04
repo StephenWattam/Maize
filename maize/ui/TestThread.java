@@ -12,11 +12,16 @@ import java.util.Vector;
 import java.io.*;
 import javax.imageio.*;
 
+import java.util.concurrent.*;
 
 
 
 
 public class TestThread extends Thread{
+
+    // Thanks to http://blog.smartkey.co.uk/2011/09/adding-a-thread-timeout-to-methods-in-java/
+    // Keep a timeout
+    private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	// store state on one run
 	public MazePanel panel;
@@ -81,6 +86,37 @@ public class TestThread extends Thread{
 
 
 
+    private void moveAgentWithTimeout(int timeout, final BotTest agent){
+        final Future future = executor.submit(new Runnable(){
+            public void run(){
+                try{
+                    agent.agent.move();
+                } catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        try{
+            future.get(timeout, TimeUnit.MILLISECONDS);
+        }catch(TimeoutException Te){
+            future.cancel(true);
+            Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
+        }catch(InterruptedException Ie){
+            future.cancel(true);
+            Log.log("Bot " + agent.bot.getName() + " was interrupted during execution");
+        }catch(Exception e){
+            //ExecutionException: deliverer threw exception
+            //TimeoutException: didn't complete within downloadTimeoutSecs
+            //InterruptedException: the executor thread was interrupted
+
+            future.cancel(true);
+            Log.log("Bot " + agent.bot.getName() + " threw an exception: ");
+            Log.logException(e);
+        }
+    }
+
+
 	private boolean iterate(){
 		BotTest agent;
 		boolean keepRunning = false;
@@ -94,8 +130,13 @@ public class TestThread extends Thread{
 			// Are all of our agents finished?
 			if(agent.isFinished == false){
 				keepRunning = true;
-				// move the agent
-				agent.agent.move();
+
+
+				// move the agent with a timeout
+                moveAgentWithTimeout(MazeUISettingsManager.botWorkTimeout , agent);
+				/* agent.agent.move(); */
+
+
 				// update ui
 				agent.moves++;
 			}
