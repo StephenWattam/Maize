@@ -40,7 +40,7 @@ public abstract class BotCompilerHelper{
 
 		// check through the list and compile stuff
 		if(children == null){
-			System.err.println("No bots found!");
+			Log.log("No bots found!");
 		}else{
 			for(int i=0; i<children.length; i++){
                 Log.log("Compiling bot " + children[i] + "...");

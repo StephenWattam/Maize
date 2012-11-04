@@ -12,20 +12,46 @@ import java.util.HashSet;
 import java.util.Vector;
 import java.util.HashMap;
 
+/** Semi-advanced bot that learns of its surroundings, and uses a guided depth-first search algorithm to find a fairly efficient route to the finish.  It does this by constructing a graph from the tile system the maze uses, and then spidering that, sticking as close to the finish as it can.
+ *
+ * It's also cable of very verbose debug output
+ *
+ * @author Stephen Wattam <stephenwattam@gmail.com>
+ */
+public class GraphBot implements Bot, Serializable {
 
-public class DemoBot implements Bot, Serializable {
+    // ------------------------------------------------------------
+    //  Configuration
+    //
+    // Turn debug on/off
+    private static final boolean DEBUG = true;
 
+    // ------------------------------------------------------------
+    //  Don't edit below this line
+    //  (unless you know what you're doing)
 
     // Contains instructions
     private Vector<Integer> buffer = new Vector<Integer>();
-
     // Holds the best route.
-    private Vector<Point> bestRoute = new Vector<Point>();
+    private Vector<Point> bestRoute = null;
 
-
-    /** Sets up default bots */
-    public DemoBot(){
+    // Make a random move.
+    private int daveMode(){
+        return 0;// (int)(Math.random() * 4);
     }
+
+    /** Implementation of the Bot interface. */
+    @Override
+    public String getName(){
+        return "Graph Bot";
+    }
+
+    /** Implementation of the Bot interface. */
+    @Override
+    public String getDescription(){
+        return "Builds a map of its surroundings, and uses a targeted depth-first graph traversal algorithm to find a route.  Remembered " + points.size() + " walls.";
+    }
+
 
     /** Implementation of the Bot interface.
      * @see Bot
@@ -43,15 +69,12 @@ public class DemoBot implements Bot, Serializable {
      */
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
-      
-
-        System.out.println("==================================================");
-        System.out.println("==================================================");
+        debugln("==================================================");
 
 
         // Memorise points and plot experience
-        System.out.println("Building world model...");
-        int newPoints = rememberPoints(Orientation.rotateToNorth(view, o), x, y, fx, fy);
+        debugln("Building world model...");
+        int newPoints   = rememberPoints(Orientation.rotateToNorth(view, o), x, y, fx, fy);
         boolean[][] map = constructMap();
  
         // If we have new data, force the bot to compute a new route
@@ -65,7 +88,7 @@ public class DemoBot implements Bot, Serializable {
             // If the route is null, or we have run out of data
             // then force a recompute
             if(bestRoute == null ||  bestRoute.size() < 2){// || !bestRoute.get(0).equals(new Point(x, y))){
-                System.out.println("Routing...");
+                debugln("Routing...");
                 bestRoute = findRoute(map, x, y, fx, fy);
             }
 
@@ -75,16 +98,32 @@ public class DemoBot implements Bot, Serializable {
 
         // Display information about the current view,
         // render full map
-        System.out.println("Rendering...");
+        debugln("Rendering...");
         displayView(view, bestRoute, x, y, o, fx, fy);
         renderMap(map, bestRoute, x, y, fx, fy);
-        System.out.println("==================================================");
+        debugln("==================================================");
 
         // Then follow anything in the buffer
         return (int)this.buffer.remove(0);
     }
 
-    // FIXME!
+
+    /* ================================================================================== */
+    //  Subsystems                                                                   
+    /* ================================================================================== */
+
+
+    /* ------------------------------------------------------ */
+    //  Route following
+    /* ------------------------------------------------------ */
+    // These methods presume:
+    //  a) There is a valid route in this.bestRoute (or passed to the method)
+    //  b) A vector with movement instructions exists in this.buffer,
+    //     and it is valid to add to it.
+    //
+
+    // Queues instructions up by reading the route and current orientation,
+    // then pushing things onto this.buffer
     public void queueRoute(Vector<Point> route, int o){
         if(route == null){
             System.err.println("Warning, null route!");
@@ -123,16 +162,16 @@ public class DemoBot implements Bot, Serializable {
 
         // Decide which way to move, and move.
         if(dx == 0 && dy > 0){
-            /* System.out.println("BACK"); */
+            /* debugln("BACK"); */
             rotateToMatch(o, Orientation.SOUTH);
         }else if(dx == 0 && dy < 0){
-            /* System.out.println("FORTH"); */
+            /* debugln("FORTH"); */
             rotateToMatch(o, Orientation.NORTH);
         }else if(dy == 0 && dx < 0){
-            /* System.out.println("LEFT"); */
+            /* debugln("LEFT"); */
             rotateToMatch(o, Orientation.WEST);
         }else{ //if(dy == 0 && dx < 1)
-            /* System.out.println("RIGHT"); */
+            /* debugln("RIGHT"); */
             rotateToMatch(o, Orientation.EAST);
         }
 
@@ -149,11 +188,11 @@ public class DemoBot implements Bot, Serializable {
     //       turning left.
     private void rotateToMatch(int current, int desired){
         // check for 270 degree left turns
-        /* System.out.println(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); */
+        /* debugln(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); */
 
         /* // special case to prevent weird 'turning three times right to go left' */
         if((current - desired) == 1){
-        /*     /* System.out.println("\n####### LEFT HAND TURN"); */ 
+        /*     /* debugln("\n####### LEFT HAND TURN"); */ 
             buffer.add(Direction.LEFT);
             buffer.add(Direction.FORWARD);
             return;
@@ -181,63 +220,37 @@ public class DemoBot implements Bot, Serializable {
         return;
     }
 
-    // Make a random move.
-    private int daveMode(){
-        return 0;// (int)(Math.random() * 4);
-    }
-
-    /** Implementation of the Bot interface.
-     *
-     * @return           Bot name.
-     */
-    @Override
-    public String getName(){
-        return "DemoBot";
-    }
-
-    /** Implementation of the Bot interface.
-     *
-     * @return           Bot Description.
-     */
-    @Override
-    public String getDescription(){
-        return "Remembered " + points.size() + " points.";
-    }
-
-    /* ================================================================================== */
-    /*  Private methods                                                                   */
-    /* ================================================================================== */
 
     /* ------------------------------------------------------ */
     //  Text output
     /* ------------------------------------------------------ */
     /** Outputs status on Bots */
     private void displayView(boolean[][]view, Vector<Point> route, int x, int y, int o, int fx, int fy){
-        System.out.println(" Status");
-        System.out.println("  Position: " + x + ", " + y);
-        System.out.println("  Finish: " + fx+ ", " + fy );
-        System.out.println("  Distance: " + (Math.abs(fx-x) + Math.abs(fy-y)) + " manhattan, " + new DecimalFormat("#.00").format(Math.sqrt(Math.pow(fx-x, 2) + Math.pow(fy-y,2))) +" euclidean");
+        debugln(" Status");
+        debugln("  Position: " + x + ", " + y);
+        debugln("  Finish: " + fx+ ", " + fy );
+        debugln("  Distance: " + (Math.abs(fx-x) + Math.abs(fy-y)) + " manhattan, " + new DecimalFormat("#.00").format(Math.sqrt(Math.pow(fx-x, 2) + Math.pow(fy-y,2))) +" euclidean");
         if(route != null)
-            System.out.println("  Route Length: " + route.size());
-        System.out.println("  Orientation: " + Orientation.getName(o));
-        System.out.println("  Context (default: Forward is up):");
+            debugln("  Route Length: " + route.size());
+        debugln("  Orientation: " + Orientation.getName(o));
+        debugln("  Context (default: Forward is up):");
         printContext(view);
-        System.out.println("  Context (adjusted: North is up):");
+        debugln("  Context (adjusted: North is up):");
         printContext(Orientation.rotateToNorth(view, o));
 
     }
 
     /** Prints a 3x3 context matrix. */
     private static void printContext(boolean[][] view){
-        System.out.println("     +---+");
+        debugln("     +---+");
         for(int i=2;i>=0;i--){
-            System.out.print("     |");
+            debug("     |");
             for(int j=0;j<3;j++){
-                System.out.print( "" + viewChar(view, i, j) );
+                debug( "" + viewChar(view, i, j) );
             }
-            System.out.print( "|\n" );
+            debug( "|\n" );
         }
-        System.out.println("     +---+");
+        debugln("     +---+");
     }
 
     /** Returns the symbols to use when printing context */
@@ -252,22 +265,24 @@ public class DemoBot implements Bot, Serializable {
     //  Memorising system
     /* ------------------------------------------------------ */
 
-
-    // Keep track of max in X, Y
+    // Keep track of max in X, Y so we don't have to loop over
+    // the points.
+    // NB: these values are always one too large, to allow a gutter where
+    //     the route can go around the outside of a maze which has
+    //     only been partially learned.
     private int[] maxXY = {0,0};
     // Keep a list of points we have seen.
     private HashSet<Point> points = new HashSet<Point>();
 
-
     // Record the points in the view at a given X, Y.
     // Presumes the view is already the correct way up
     private int rememberPoints(boolean[][] view, int xBot, int yBot, int fx, int fy){
+        // keep track of 'real' x-y, not relative to bot
         int x = 0;
         int y = 0;
 
         // count new points
         int newPoints = 0;
-
 
         // Loop through, adding absolute points
         for(int i=0;i<3;i++)
@@ -290,13 +305,10 @@ public class DemoBot implements Bot, Serializable {
                         maxXY[1] = y+1;
 
                     // handy debug output
-                    /* System.out.println(i + "," + j +" => " + x + "," + y +" => "+ view[i][j]); */
+                    /* debugln(i + "," + j +" => " + x + "," + y +" => "+ view[i][j]); */
                 }
 
-
-
-        // ------- Add the finish
-        // count max
+        // Add the finish
         if(fx+1 > maxXY[0])
             maxXY[0] = fx+1;
         if(fy+1 > maxXY[1])
@@ -304,7 +316,6 @@ public class DemoBot implements Bot, Serializable {
 
 
         return newPoints;
-
     }
 
     // Construct a boolean[][] map out of the set of points we have memorised.
@@ -312,9 +323,6 @@ public class DemoBot implements Bot, Serializable {
     // This basically translates the points into a more usable format, 
     // but is mainly for ease of processing later
     private boolean[][] constructMap(){
-        // ------------------------------------------
-        // Construct a map of booleans.
-        
         // This method should be o(n), rather than o(n^2) of the naive way
         boolean[][] map = new boolean[maxXY[0]+1][maxXY[1]+1];
         for(int i=0;i<map.length;i++)
@@ -333,52 +341,54 @@ public class DemoBot implements Bot, Serializable {
     // This renders somewhat upside-down, so that 0,0 is in the bottom left, just like the
     // UI display in Maize
     private void renderMap(boolean[][] map, Vector<Point> route, int botX, int botY, int fx, int fy){
-
-        // ------------------------------------------
-        // Now render map
-
         // Header
-        System.out.print("+");
-        for(int i=0;i<map.length;i++){ System.out.print("-"); }
-        System.out.print("+\n");
+        debug("+");
+        for(int i=0;i<map.length;i++){ debug("-"); }
+        debug("+\n");
 
         // loop over map 
         // (note order is inverted to display map in |Y|-y layout)
         for(int i=(map[0].length-1);i>=0;i--){
-            System.out.print("|");
+            debug("|");
             for(int j=0;j<map.length;j++){
 
                 // output wall, bot, space
                 if(i == botY && j == botX)
-                    System.out.print("*");
+                    debug("*");
                 else if(i == fx && j == fy)
-                    System.out.print("F");
+                    debug("F");
                 else if(route != null && route.contains(new Point(j, i)))
-                    System.out.print(".");
+                    debug(".");
                 else if(map[j][i])
-                    System.out.print("#");
+                    debug("#");
                 else
-                    System.out.print(" ");
+                    debug(" ");
                 
             }
-            System.out.print("|\n");
+            debug("|\n");
         }
 
         // Footer
-        System.out.print("+");
-        for(int i=0;i<map.length;i++){ System.out.print("-"); }
-        System.out.print("+\n");
+        debug("+");
+        for(int i=0;i<map.length;i++){ debug("-"); }
+        debug("+\n");
     }
     
 
 
-    // 
+    /* ------------------------------------------------------ */
+    //  Routing system
+    /* ------------------------------------------------------ */
+
+
+    // Find a route from the x, y point to the fx, fy point, using
+    // the boolean map provided.
     private Vector<Point> findRoute(boolean[][] map, int x, int y, int fx, int fy){
         HashMap<Point, Vector<Point>> nodes = new HashMap<Point, Vector<Point>>();
 
 
         // Construct a tree by listing the adjacency for each square
-        /* System.out.println("Constructing tree..."); */
+        /* debugln("Constructing tree..."); */
         /* for(int i=0;i<map.length;i++) */
         /*     for(int j=0;j<map[i].length;j++){ */
         /*         Vector<Point> adjacent = createLocalRoutes(map, i, j); */
@@ -391,12 +401,12 @@ public class DemoBot implements Bot, Serializable {
         Vector<Point> route = breadthFirstSearch( map, new Point(x, y), new Point(fx, fy), new Vector<Point>() );
      
         if(route == null){
-            System.out.println("**** NO ROUTE TO FINISH!");
-            System.out.println("     Perhaps I'm being run on two mazes!");
+            debugln("**** NO ROUTE TO FINISH!");
+            debugln("     Perhaps I'm being run on two mazes!");
         }else{
             for(Point p: route)
-                System.out.print("(" + p.x + "," + p.y + ")");
-            System.out.println("");
+                debug("(" + p.x + "," + p.y + ")");
+            debugln("");
         }
 
         return route;
@@ -413,8 +423,8 @@ public class DemoBot implements Bot, Serializable {
                     Point position,
                     Point finish,
                     Vector<Point> route){
-        /* System.out.print("->(Pos " + position.x + "," + position.y + ")"); */
-        /* System.out.print("(hist " + route.size() + ")\n"); */
+        /* debug("->(Pos " + position.x + "," + position.y + ")"); */
+        /* debug("(hist " + route.size() + ")\n"); */
 
         // then load a point
         Vector<Point> next = createLocalRoutes(map, position.x, position.y);
@@ -422,11 +432,11 @@ public class DemoBot implements Bot, Serializable {
 
         // Return null if nowhere to go!
         if(next == null){
-            /* System.out.println("<-[0]"); */
+            /* debugln("<-[0]"); */
             return null;
         }
 
-        /* System.out.print("  (next " + next.size() + ")\n"); */
+        /* debug("  (next " + next.size() + ")\n"); */
         // Copy the route reference to avoid messing up others' contexts
         // and then add our position and keep searching.
         route.add(position);
@@ -439,7 +449,7 @@ public class DemoBot implements Bot, Serializable {
                 // Check if we have completed the route
                 if(p.equals(finish)){
                     route.add(p);
-                    /* System.out.println("<=[1]"); */
+                    /* debugln("<=[1]"); */
                     return route;
                 }
             }
@@ -472,7 +482,7 @@ public class DemoBot implements Bot, Serializable {
                 Vector<Point> result = breadthFirstSearch(map, minimum, finish, (Vector<Point>)route.clone());
                 // If it is, return, else don't.
                 if(result != null){
-                    /* System.out.println("<=[2]"); */
+                    /* debugln("<=[2]"); */
                     return result;
                 }
             }
@@ -481,7 +491,7 @@ public class DemoBot implements Bot, Serializable {
             minimum = null;
         }
 
-        /* System.out.println("<-[3]"); */
+        /* debugln("<-[3]"); */
         return null;
     }
 
@@ -501,11 +511,11 @@ public class DemoBot implements Bot, Serializable {
         addPointIfSpace(routes, map, x, y+1);
 
         // DEBUG output to list points.
-        /* System.out.print("" + x +"," + y + " : "); */
+        /* debug("" + x +"," + y + " : "); */
         /* for(Point p: routes){ */
-        /*     System.out.print("(" + p.x + "," + p.y + ") -> "); */
+        /*     debug("(" + p.x + "," + p.y + ") -> "); */
         /* } */
-        /* System.out.println("["  + routes.size() + "]"); */
+        /* debugln("["  + routes.size() + "]"); */
 
         return routes;
     }
@@ -525,7 +535,7 @@ public class DemoBot implements Bot, Serializable {
 
     // Returns false if the route tries to go over walls
     // is used to check updates to the route
-    private boolean validateRoute( boolean[][] map, Vector<Point> route ){
+    private static boolean validateRoute( boolean[][] map, Vector<Point> route ){
         // Return false if no route
         if(route == null)
             return false;
@@ -539,4 +549,19 @@ public class DemoBot implements Bot, Serializable {
         return true;
     }
 
+    /* ------------------------------------------------------ */
+    //  Debug/output system
+    /* ------------------------------------------------------ */
+
+    // Debug message (with newline) only if DEBUG set
+    private static void debugln(final String str){
+        debug(str + "\n");
+    }
+
+    // Debug message only if DEBUG set
+    private static void debug(final String str){
+        if(DEBUG)
+            System.out.print(str);
+    }
+    
 }
