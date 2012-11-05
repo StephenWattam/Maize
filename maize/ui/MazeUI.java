@@ -37,27 +37,35 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         Log.log("Starting Maize UI...");
 
         // Initialize our security manager nice and early
-        System.setSecurityManager( new SecurityManager () {
-            public void checkPermission( Permission perm ) {
+        /*System.setSecurityManager( new SecurityManager () {
+
+	   @Override
+           public void checkPermission( Permission perm, Object context ) throws SecurityException {
+	   	System.out.println( "Bugger" );
+	   }
+	   @Override
+           public void checkPermission( Permission perm ) throws SecurityException {
                 // Class[] classContext = getClassContext();
 
-                if( perm instanceof ReflectPermission ) {
-                    ReflectPermission reflectPermission = (ReflectPermission)perm;
-
-                    for( Class c : getClassContext() ) {
-                        if( c.isAssignableFrom( Bot.class ) )
-                            throw new SecurityException("Stop it.");
-
-                        // Skip if it's us, we're in a loop!
-                        if( c == getClass() )
-                            return;
-                    }
-
-                    System.out.println( "Security Violation: Reflection!" );
-                    throw new SecurityException("Stop it.");
-                }
+	    	for( Class c : getClassContext() ) {
+		    if( c.getCanonicalName() != null ) {
+	                if( c.getCanonicalName().startsWith( "bots." ) ) {
+			   System.out.println( "MARK" );
+ 	                   throw new SecurityException( "Class '" +c.getName()+ "' is a descendant of 'Bot', and has restricted permissions." );
+			}
+		    }
+	        }
             }
-        });
+
+	    @Override
+	    public void checkPropertyAccess( String key )
+	    {
+	    	Class[] context = getClassContext();
+
+	    	System.out.println( "WITH : " + key );
+	    }
+        });*/
+	System.setSecurityManager( new maize.ui.BotSecurityManager() );
 
         /* setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight); */
         setPreferredSize(new Dimension(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight));

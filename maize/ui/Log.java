@@ -31,7 +31,7 @@ public class Log{
             System.out.println(str);
     }
 
-    public static void logException(Exception e){
+    public static void logException(Throwable e){
         StackTraceElement[] trace = e.getStackTrace();
         log("Exception -> " + e.toString());
         for(StackTraceElement ste : e.getStackTrace()){

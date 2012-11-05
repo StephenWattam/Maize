@@ -75,7 +75,16 @@ public abstract class BotCompilerHelper{
         Class myObjectClass             = classLoader.loadClass(className);
 
         // And return
-        return (Bot) myObjectClass.newInstance();
+	try {
+        	return (Bot) myObjectClass.newInstance();
+	} catch( SecurityException err ) {
+		Log.logException( err );
+		throw new InstantiationException( "Bot '" +className+ "' caused a SecurityException! (" +err.getMessage()+ ")" );
+	} catch( IllegalAccessError err ) {
+
+		Log.logException( err );
+		throw new InstantiationException( "Bot '" +className+ "' caused an IllegalAccessError! (" +err.getMessage()+ ")" );
+	}
     }
 
     // Compiles a filename
