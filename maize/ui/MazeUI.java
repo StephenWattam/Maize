@@ -16,75 +16,73 @@ import java.lang.reflect.ReflectPermission;
 import maize.*;
 public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
-	// state
-	private MazeTest            mazeTest        = null;
-	/**The menu bar*/
-	private JMenuBar            menuBar;
-	/**The tab handler which holds all of the panels*/
-	private JTabbedPane         tabs            = new DnDTabbedPane();
+    // state
+    private MazeTest            mazeTest        = null;
+    /**The menu bar*/
+    private JMenuBar            menuBar;
+    /**The tab handler which holds all of the panels*/
+    private JTabbedPane         tabs            = new DnDTabbedPane();
 
 
     // Panels, and a list of them
     private Vector<TabPanel>    panels          = new Vector<TabPanel>();
-	private MazeTabPanel        mazeTab;
-	private BotTabPanel         botTab;
-	private MultiTestTabPanel   multiTestTab;
+    private MazeTabPanel        mazeTab;
+    private BotTabPanel         botTab;
+    private MultiTestTabPanel   multiTestTab;
     private LogTabPanel         logTab;
 
 
-	public MazeUI(MazeTest mazeTest){
-		super("Maize UI");
+    public MazeUI(MazeTest mazeTest){
+        super("Maize UI");
         Log.log("Starting Maize UI...");
 
-/*		// Initialize our security manager nice and early
-		System.setSecurityManager( new SecurityManager () {
-			public void checkPermission( Permission perm ) {
-			//	Class[] classContext = getClassContext();
+        // Initialize our security manager nice and early
+        System.setSecurityManager( new SecurityManager () {
+            public void checkPermission( Permission perm ) {
+                // Class[] classContext = getClassContext();
 
-				if( perm instanceof ReflectPermission )
-				{
-					ReflectPermission reflectPermission = (ReflectPermission)perm;
+                if( perm instanceof ReflectPermission ) {
+                    ReflectPermission reflectPermission = (ReflectPermission)perm;
 
-					for( Class c : getClassContext() )
-					{
-						if( c.isAssignableFrom( Bot.class ) )
-							throw new SecurityException("Stop it.");
-							
-						// Skip if it's us, we're in a loop!
-						if( c == getClass() )
-							return;
-					}
+                    for( Class c : getClassContext() ) {
+                        if( c.isAssignableFrom( Bot.class ) )
+                            throw new SecurityException("Stop it.");
 
-					System.out.println( "Security Violation: Reflection!" );
-					throw new SecurityException("Stop it.");
-//				}
-			}
-		});*/
+                        // Skip if it's us, we're in a loop!
+                        if( c == getClass() )
+                            return;
+                    }
 
-		/* setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight); */
-		setPreferredSize(new Dimension(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight));
-		setMinimumSize(new Dimension(MazeUISettingsManager.uiMinWidth, MazeUISettingsManager.uiMinHeight));
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(true);
+                    System.out.println( "Security Violation: Reflection!" );
+                    throw new SecurityException("Stop it.");
+                }
+            }
+        });
+
+        /* setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight); */
+        setPreferredSize(new Dimension(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight));
+        setMinimumSize(new Dimension(MazeUISettingsManager.uiMinWidth, MazeUISettingsManager.uiMinHeight));
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(true);
         this.setIconImage(MazeUISettingsManager.icon);
         this.addWindowListener(this);
 
 
-		this.mazeTest = mazeTest;
-		BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
-		constructDefaultMazes();
+        this.mazeTest = mazeTest;
+        BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
+        constructDefaultMazes();
 
 
-		//menu
-		menuBar = buildMenu();
-		this.setJMenuBar(menuBar);
+        //menu
+        menuBar = buildMenu();
+        this.setJMenuBar(menuBar);
 
 
 
-		//tabs
-		mazeTab         = new MazeTabPanel      (mazeTest, tabs, "Manage Mazes");
-		botTab          = new BotTabPanel       (mazeTest, tabs, "Manage Bots");
-		multiTestTab    = new MultiTestTabPanel (mazeTest, tabs, "Run Tests");
+        //tabs
+        mazeTab         = new MazeTabPanel      (mazeTest, tabs, "Manage Mazes");
+        botTab          = new BotTabPanel       (mazeTest, tabs, "Manage Bots");
+        multiTestTab    = new MultiTestTabPanel (mazeTest, tabs, "Run Tests");
         logTab          = new LogTabPanel       (mazeTest, tabs, "Log");
 
 
@@ -101,191 +99,191 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         // Attach the log
         Log.addLogListener(logTab);
 
-		updatePanes();
+        updatePanes();
 
         // Set part of the window and make us visible
-		setContentPane(tabs);
+        setContentPane(tabs);
         this.pack();
-		setVisible(true);
+        setVisible(true);
 
         Log.log("Maize UI running.");
-	}
+    }
 
-	// Create a set of default mazes, one for each factory
-	private void constructDefaultMazes(){
+    // Create a set of default mazes, one for each factory
+    private void constructDefaultMazes(){
         Log.log("Constructing default mazes");
-		for(MazeFactory mf : this.mazeTest.factories){
-			Maze m = mf.getMaze(MazeUISettingsManager.defaultMazeWidth, MazeUISettingsManager.defaultMazeHeight);
-			m.setName("Default " + mf.getClass().getName());
-			mazeTest.mazes.add( m );
-		}
-	}
+        for(MazeFactory mf : this.mazeTest.factories){
+            Maze m = mf.getMaze(MazeUISettingsManager.defaultMazeWidth, MazeUISettingsManager.defaultMazeHeight);
+            m.setName("Default " + mf.getClass().getName());
+            mazeTest.mazes.add( m );
+        }
+    }
 
-	// Builds a single menu item
-	private JMenuItem buildMenuItem(String label, String actionCommand){
-		JMenuItem menuItem = new JMenuItem(label);
-		menuItem.setActionCommand(actionCommand);
-		menuItem.addActionListener(this);
-		return menuItem;
-	}
+    // Builds a single menu item
+    private JMenuItem buildMenuItem(String label, String actionCommand){
+        JMenuItem menuItem = new JMenuItem(label);
+        menuItem.setActionCommand(actionCommand);
+        menuItem.addActionListener(this);
+        return menuItem;
+    }
 
-	// Builds the whole drop-down menu
-	private JMenuBar buildMenu(){
-		JMenuBar menuBar = new JMenuBar();
+    // Builds the whole drop-down menu
+    private JMenuBar buildMenu(){
+        JMenuBar menuBar = new JMenuBar();
 
-		JMenu fileMenu = new JMenu("File");
-		/*fileMenu.add(buildMenuItem("Analyse","analyse"));*/
-		fileMenu.add(buildMenuItem("Exit","exit_all"));
-		menuBar.add(fileMenu);
+        JMenu fileMenu = new JMenu("File");
+        /*fileMenu.add(buildMenuItem("Analyse","analyse"));*/
+        fileMenu.add(buildMenuItem("Exit","exit_all"));
+        menuBar.add(fileMenu);
 
 
-		JMenu botMenu = new JMenu("Bots");
-		botMenu.add(buildMenuItem("Reload all bots (" + MazeUISettingsManager.botDirectory + ")","reload_bots"));
-		botMenu.add(buildMenuItem("Compile (" + MazeUISettingsManager.botDirectory + ")","compile_bot"));
-		botMenu.add(buildMenuItem("Instantiate...","inst_bot_choose"));
-		botMenu.add(buildMenuItem("Instantiate (advanced)...","inst_bot"));
-		botMenu.add(buildMenuItem("Load...","load_bot"));
-		menuBar.add(botMenu);
+        JMenu botMenu = new JMenu("Bots");
+        botMenu.add(buildMenuItem("Reload all bots (" + MazeUISettingsManager.botDirectory + ")","reload_bots"));
+        botMenu.add(buildMenuItem("Compile (" + MazeUISettingsManager.botDirectory + ")","compile_bot"));
+        botMenu.add(buildMenuItem("Instantiate...","inst_bot_choose"));
+        botMenu.add(buildMenuItem("Instantiate (advanced)...","inst_bot"));
+        botMenu.add(buildMenuItem("Load...","load_bot"));
+        menuBar.add(botMenu);
 
-		JMenu mazeMenu = new JMenu("Mazes");
-		mazeMenu.add(buildMenuItem("New...","new_maze"));
-		mazeMenu.add(buildMenuItem("Load...","load_maze"));
-		menuBar.add(mazeMenu);
-		
+        JMenu mazeMenu = new JMenu("Mazes");
+        mazeMenu.add(buildMenuItem("New...","new_maze"));
+        mazeMenu.add(buildMenuItem("Load...","load_maze"));
+        menuBar.add(mazeMenu);
+        
         JMenu tabMenu = new JMenu("Panels");
-		tabMenu.add(buildMenuItem("Attach All","attach_all"));
-		tabMenu.add(buildMenuItem("Detach All","detach_all"));
-		menuBar.add(tabMenu);
+        tabMenu.add(buildMenuItem("Attach All","attach_all"));
+        tabMenu.add(buildMenuItem("Detach All","detach_all"));
+        menuBar.add(tabMenu);
 
         // RHS
         menuBar.add(Box.createHorizontalGlue());
 
-		JMenu helpMenu = new JMenu("Help");
-		helpMenu.add(buildMenuItem("About...","about"));
-		menuBar.add(helpMenu);
+        JMenu helpMenu = new JMenu("Help");
+        helpMenu.add(buildMenuItem("About...","about"));
+        menuBar.add(helpMenu);
 
-		return menuBar;
-	}
+        return menuBar;
+    }
 
 
-	/**fired when a component performs an action whilst this class is listening to it.
-	  @param Ae the action even generated
-	 */
-	public void actionPerformed(ActionEvent Ae){
-		if(Ae.getActionCommand().equals("exit_all")){
+    /**fired when a component performs an action whilst this class is listening to it.
+      @param Ae the action even generated
+     */
+    public void actionPerformed(ActionEvent Ae){
+        if(Ae.getActionCommand().equals("exit_all")){
             quit();
-		}else if(Ae.getActionCommand().equals("new_maze")){
-			new NewMazeDialog(mazeTest, this);
-		}else if(Ae.getActionCommand().equals("load_maze")){
-			loadMaze();
-		}else if(Ae.getActionCommand().equals("load_bot")){
-			loadBot();
-		}else if(Ae.getActionCommand().equals("inst_bot")){
-			new NewBotDialog(mazeTest, this, MazeUISettingsManager.botPackageName);
-		}else if(Ae.getActionCommand().equals("inst_bot_choose")){
-			compileBot();
-		}else if(Ae.getActionCommand().equals("compile_bot")){
-			BotCompilerHelper.compileAllBots(MazeUISettingsManager.botDirectory); 
-		}else if(Ae.getActionCommand().equals("reload_bots")){
-			this.mazeTest.bots.clear();
-			BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
-		}else if(Ae.getActionCommand().equals("about")){
+        }else if(Ae.getActionCommand().equals("new_maze")){
+            new NewMazeDialog(mazeTest, this);
+        }else if(Ae.getActionCommand().equals("load_maze")){
+            loadMaze();
+        }else if(Ae.getActionCommand().equals("load_bot")){
+            loadBot();
+        }else if(Ae.getActionCommand().equals("inst_bot")){
+            new NewBotDialog(mazeTest, this, MazeUISettingsManager.botPackageName);
+        }else if(Ae.getActionCommand().equals("inst_bot_choose")){
+            compileBot();
+        }else if(Ae.getActionCommand().equals("compile_bot")){
+            BotCompilerHelper.compileAllBots(MazeUISettingsManager.botDirectory); 
+        }else if(Ae.getActionCommand().equals("reload_bots")){
+            this.mazeTest.bots.clear();
+            BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
+        }else if(Ae.getActionCommand().equals("about")){
             helpAbout();
-		}else if(Ae.getActionCommand().equals("attach_all")){
+        }else if(Ae.getActionCommand().equals("attach_all")){
             attachTabs();
-		}else if(Ae.getActionCommand().equals("detach_all")){
+        }else if(Ae.getActionCommand().equals("detach_all")){
             detachTabs();
-		}else{
-			Log.log("Unable to find handler for action command: " + Ae.getActionCommand().toString());
-		}
+        }else{
+            Log.log("Unable to find handler for action command: " + Ae.getActionCommand().toString());
+        }
 
-		updatePanes();
-	}
+        updatePanes();
+    }
 
     private void helpAbout(){
         new AboutDialog(mazeTest, this);
     }
 
-	// Load a maze from a serialised file
-	private void loadMaze(){
-		final JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setMultiSelectionEnabled(false);
-		//fileChooser.setFileFilter(new ImageFileFilter());
-		if(fileChooser.showOpenDialog(this) == 0){
-			try{
+    // Load a maze from a serialised file
+    private void loadMaze(){
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(false);
+        //fileChooser.setFileFilter(new ImageFileFilter());
+        if(fileChooser.showOpenDialog(this) == 0){
+            try{
                 Log.log("Loading maze from " + fileChooser.getSelectedFile());
-				Maze m = (Maze)ClassSerializer.load(fileChooser.getSelectedFile());
-				mazeTest.mazes.add(m);
-				updatePanes();
-			}catch(Exception e){
-				JOptionPane.showMessageDialog(this, "Error loading maze.");
+                Maze m = (Maze)ClassSerializer.load(fileChooser.getSelectedFile());
+                mazeTest.mazes.add(m);
+                updatePanes();
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(this, "Error loading maze.");
                 Log.log("Error loading maze.");
                 Log.logException(e);
-			}
-		}
-	}
+            }
+        }
+    }
 
-	// Load a bot from a serialised file
-	private void loadBot(){
-		final JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setMultiSelectionEnabled(false);
-		//fileChooser.setFileFilter(new ImageFileFilter());
-		if(fileChooser.showOpenDialog(this) == 0){
-			try{
+    // Load a bot from a serialised file
+    private void loadBot(){
+        final JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setMultiSelectionEnabled(false);
+        //fileChooser.setFileFilter(new ImageFileFilter());
+        if(fileChooser.showOpenDialog(this) == 0){
+            try{
                 Log.log("Loading bot from " + fileChooser.getSelectedFile());
-				Bot b = (Bot)ClassSerializer.load(fileChooser.getSelectedFile());
-				mazeTest.bots.add(b);
-				updatePanes();
-			}catch(Exception e){
-				JOptionPane.showMessageDialog(this, "Error loading bot.");
+                Bot b = (Bot)ClassSerializer.load(fileChooser.getSelectedFile());
+                mazeTest.bots.add(b);
+                updatePanes();
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(this, "Error loading bot.");
                 Log.log("Error loading bot.");
                 Log.logException(e);
-			}
-		}
-	}
+            }
+        }
+    }
 
 
-	private void compileBot(){
-		final JFileChooser fileChooser = new JFileChooser(MazeUISettingsManager.botDirectory);
-		fileChooser.setMultiSelectionEnabled(false);
+    private void compileBot(){
+        final JFileChooser fileChooser = new JFileChooser(MazeUISettingsManager.botDirectory);
+        fileChooser.setMultiSelectionEnabled(false);
 
-		// Filter all .java files from the filename
-		javax.swing.filechooser.FileFilter filter = new javax.swing.filechooser.FileFilter(){
-			public boolean accept(File file){
-				String name = file.getName();
-				return file.canRead() && name.endsWith(".java") && !name.startsWith(".");
-			}
+        // Filter all .java files from the filename
+        javax.swing.filechooser.FileFilter filter = new javax.swing.filechooser.FileFilter(){
+            public boolean accept(File file){
+                String name = file.getName();
+                return file.canRead() && name.endsWith(".java") && !name.startsWith(".");
+            }
 
-			public String getDescription(){
-				return "Java source files only";
-			}
-		};
+            public String getDescription(){
+                return "Java source files only";
+            }
+        };
 
-		fileChooser.setFileFilter(filter);
-		if(fileChooser.showOpenDialog(this) == 0){
-			try{
-				String filename = fileChooser.getSelectedFile().getName();
-				//System.out.println("DEBUG: " + filename);
+        fileChooser.setFileFilter(filter);
+        if(fileChooser.showOpenDialog(this) == 0){
+            try{
+                String filename = fileChooser.getSelectedFile().getName();
+                //System.out.println("DEBUG: " + filename);
                 Log.log("Compiling bot from file: " + filename);
-				if(BotCompilerHelper.compile(MazeUISettingsManager.botDirectory + java.io.File.separator + filename)){
-					mazeTest.bots.add(BotCompilerHelper.loadBotClass( 
+                if(BotCompilerHelper.compile(MazeUISettingsManager.botDirectory + java.io.File.separator + filename)){
+                    mazeTest.bots.add(BotCompilerHelper.loadBotClass( 
                                 MazeUISettingsManager.botPackageName + "." + 
-								BotCompilerHelper.classNameFromBaseName(filename)));
-					updatePanes();
-				}
-			}catch(Exception e){
-				JOptionPane.showMessageDialog(this, "Error loading bot.");
+                                BotCompilerHelper.classNameFromBaseName(filename)));
+                    updatePanes();
+                }
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(this, "Error loading bot.");
                 Log.log("Error loading bot.");
                 Log.logException(e);
-			}
-		}
+            }
+        }
 
-	}
+    }
 
 
 
-	// Quit
-	private void quit(){
+    // Quit
+    private void quit(){
         Log.removeLogListener(logTab);
 
         // Kill all the panels
@@ -297,14 +295,14 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         dispose();
         Log.log("Goodbye.");
         System.exit(0);
-	}
+    }
 
-	// Update all of the panes
-	public void updatePanes(){
-		this.mazeTab.update();
-		this.botTab.update();
-		this.multiTestTab.update();
-	}
+    // Update all of the panes
+    public void updatePanes(){
+        this.mazeTab.update();
+        this.botTab.update();
+        this.multiTestTab.update();
+    }
 
     private void attachTabs(){
         for(TabPanel tp : panels){

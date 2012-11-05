@@ -6,66 +6,66 @@ import maize.*;
 
 public abstract class BotCompilerHelper{
 
-	// Compileas and loads bots into a given mazeTest 
-	public static void compileAndLoadBots(MazeTest mazeTest, String packageName, String dirname){
-		Log.log("Compiling bots...");
-		Vector<String> bot_classes = compileAllBots(dirname); // compile
-		for(String s: bot_classes){ // and load
-			try{ 
-				mazeTest.bots.add(loadBotClass(packageName + "." + s));
-			}catch(Exception e){
+    // Compileas and loads bots into a given mazeTest 
+    public static void compileAndLoadBots(MazeTest mazeTest, String packageName, String dirname){
+        Log.log("Compiling bots...");
+        Vector<String> bot_classes = compileAllBots(dirname); // compile
+        for(String s: bot_classes){ // and load
+            try{ 
+                mazeTest.bots.add(loadBotClass(packageName + "." + s));
+            }catch(Exception e){
                 Log.log("Error loading bot " + s);
                 Log.logException(e);
-			}
-		}
-	}
+            }
+        }
+    }
 
 
 
-	// returns a list of class files to load as bots
-	public static Vector<String> compileAllBots(String dirname){
+    // returns a list of class files to load as bots
+    public static Vector<String> compileAllBots(String dirname){
 
 
-		// Filter all .java files from the filename
-		FilenameFilter filter = new FilenameFilter(){
-			public boolean accept(File dir, String name){
-				return name.endsWith(".java") && !name.startsWith(".");
-			}
-		};
+        // Filter all .java files from the filename
+        FilenameFilter filter = new FilenameFilter(){
+            public boolean accept(File dir, String name){
+                return name.endsWith(".java") && !name.startsWith(".");
+            }
+        };
 
-		// Read the file listing
-		File pwd = new File(dirname);
-		String[] children = pwd.list(filter);
-		Vector<String> compiled_bots = new Vector<String>();
+        // Read the file listing
+        File pwd = new File(dirname);
+        String[] children = pwd.list(filter);
+        Vector<String> compiled_bots = new Vector<String>();
 
-		// check through the list and compile stuff
-		if(children == null){
-			Log.log("No bots found!");
-		}else{
-			for(int i=0; i<children.length; i++){
+        // check through the list and compile stuff
+        if(children == null){
+            Log.log("No bots found!");
+        }else{
+            for(int i=0; i<children.length; i++){
                 Log.log("Compiling bot " + children[i] + "...");
-				if(compile(dirname + java.io.File.separator + children[i])){
+                if(compile(dirname + java.io.File.separator + children[i])){
                     Log.log(children[i] + " compiled successfully!");
-					compiled_bots.add(classNameFromBaseName(children[i]));
-					//compiled_bots.add(children[i].replaceAll(".java$", ".class"));
-				}else{
+                    compiled_bots.add(classNameFromBaseName(children[i]));
+                    //compiled_bots.add(children[i].replaceAll(".java$", ".class"));
+                }else{
                     Log.log("Failed to compile " + children[i]);
-				}
-			}
-		}
+                }
+            }
+        }
 
-		// Return the list of class names
-		return compiled_bots;
-	}
+        // Return the list of class names
+        return compiled_bots;
+    }
 
-	public static String classNameFromBaseName(String baseName){
-		return baseName.replaceAll(".java$", "");
-	}
+    public static String classNameFromBaseName(String baseName){
+        return baseName.replaceAll(".java$", "");
+    }
 
-	// Load a bot from a class name
+    // Load a bot from a class name
     //
     // Note that THIS ONLY WORKS BECAUSE BOT IS AN INTERFACE!
-	public static Bot loadBotClass(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
+    public static Bot loadBotClass(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
 
         // Pass the current ClassLoader to the BotClassLoader
         ClassLoader parentClassLoader   = ClassReloader.class.getClassLoader();
@@ -76,11 +76,11 @@ public abstract class BotCompilerHelper{
 
         // And return
         return (Bot) myObjectClass.newInstance();
-	}
+    }
 
-	// Compiles a filename
-	public static boolean compile(String fname){
-		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    // Compiles a filename
+    public static boolean compile(String fname){
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if(compiler == null){
             Log.log("");
             Log.log("IMPORTANT: No compiler is available on this platform.");
@@ -92,7 +92,7 @@ public abstract class BotCompilerHelper{
             /* System.exit(1); */
         }
 
-		int compilationResult =	compiler.run(null, new LogOutputStream("<stdout> "), new LogOutputStream("<stderr> "), fname);
-		return compilationResult == 0;
-	}
+        int compilationResult = compiler.run(null, new LogOutputStream("<stdout> "), new LogOutputStream("<stderr> "), fname);
+        return compilationResult == 0;
+    }
 }
