@@ -19,24 +19,30 @@ public class DaveBot implements Bot, Serializable {
      *
      * @return     Next move in form of Direction.####
      */
+    @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
-	return (int)(Math.random() * 4);
+        // For those of you not familiar with constants:
+        // Orientation.NORTH, EAST, SOUTH, WEST are all integers
+        // from 0 to 3.  The code below returns one of these at random.
+        return (int)(Math.random() * 4);
     }
 
     /** Implementation of the Bot interface.
      *
      * @return           Bot name.
      */
+    @Override
     public String getName(){
-	return "DaveBot";
+        return "DaveBot";
     }
 
     /** Implementation of the Bot interface.
      *
      * @return           Bot Description.
      */
+    @Override
     public String getDescription(){
-	return "Randomly dithers around with no real judgement, like the real dave.";
+        return "Randomly dithers around with no real judgement, like the real dave.";
     }
 }
 

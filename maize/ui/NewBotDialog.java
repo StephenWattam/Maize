@@ -81,8 +81,8 @@ public class NewBotDialog extends JDialog implements ActionListener{
 			try{ 
                 Log.log("Instantiating bot '" + nameField.getText() + "' from existing scope by name.");
 
-				Class theClass  = Class.forName( nameField.getText() );
-				Bot b = (Bot)theClass.newInstance();
+				Class theClass      = Class.forName( nameField.getText() );
+				Bot b               = (Bot)theClass.newInstance();
 				mazeTest.bots.add(b);
 
 				this.parent.updatePanes();

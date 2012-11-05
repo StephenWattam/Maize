@@ -12,7 +12,7 @@ public abstract class BotCompilerHelper{
 		Vector<String> bot_classes = compileAllBots(dirname); // compile
 		for(String s: bot_classes){ // and load
 			try{ 
-				mazeTest.bots.add(loadBot(packageName + "." + s));
+				mazeTest.bots.add(loadBotClass(packageName + "." + s));
 			}catch(Exception e){
                 Log.log("Error loading bot " + s);
                 Log.logException(e);
@@ -40,7 +40,7 @@ public abstract class BotCompilerHelper{
 
 		// check through the list and compile stuff
 		if(children == null){
-			System.err.println("No bots found!");
+			Log.log("No bots found!");
 		}else{
 			for(int i=0; i<children.length; i++){
                 Log.log("Compiling bot " + children[i] + "...");
@@ -49,7 +49,6 @@ public abstract class BotCompilerHelper{
 					compiled_bots.add(classNameFromBaseName(children[i]));
 					//compiled_bots.add(children[i].replaceAll(".java$", ".class"));
 				}else{
-					System.err.println("Failed to compile " + children[i]);
                     Log.log("Failed to compile " + children[i]);
 				}
 			}
@@ -64,9 +63,19 @@ public abstract class BotCompilerHelper{
 	}
 
 	// Load a bot from a class name
-	public static Bot loadBot(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
-		Class theClass  = Class.forName( className );
-		return (Bot)theClass.newInstance();
+    //
+    // Note that THIS ONLY WORKS BECAUSE BOT IS AN INTERFACE!
+	public static Bot loadBotClass(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
+
+        // Pass the current ClassLoader to the BotClassLoader
+        ClassLoader parentClassLoader   = ClassReloader.class.getClassLoader();
+        ClassReloader classLoader    = new ClassReloader(parentClassLoader, className);
+
+        // Then load the desired bot with it
+        Class myObjectClass             = classLoader.loadClass(className);
+
+        // And return
+        return (Bot) myObjectClass.newInstance();
 	}
 
 	// Compiles a filename
@@ -82,9 +91,8 @@ public abstract class BotCompilerHelper{
             return false;
             /* System.exit(1); */
         }
-		int compilationResult =	compiler.run(null, null, null, fname);
 
+		int compilationResult =	compiler.run(null, new LogOutputStream("<stdout> "), new LogOutputStream("<stderr> "), fname);
 		return compilationResult == 0;
 	}
-
 }

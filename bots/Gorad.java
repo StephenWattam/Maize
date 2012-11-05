@@ -19,11 +19,13 @@ public class Gorad implements Bot
 	private int prevSqCard = 5;
 	private int logicFails = 0;
 	
+    @Override
 	public String getName()
 	{
 		return "Gorad, the Go-Getter";
 	}
 	
+    @Override
 	public String getDescription()
 	{
 		//return "Moves directly to the goal. If blocked, Gorad will try 1)to go around in the perpendicularly but still towards the goal, 2) the other perpendicular direction , or 3) the opposite direction to the optimum one.";
@@ -37,6 +39,7 @@ public class Gorad implements Bot
 		 * *Based on average consumption rates for undergrads.*/
 	}
 	
+    @Override
 	public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy)
 	{
 		int dx = x - fx;

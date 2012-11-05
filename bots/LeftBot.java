@@ -22,57 +22,60 @@ public class LeftBot implements Bot, Serializable {
      *
      * @return     Next move in form of Direction.####
      */
+    @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
 
-	int move = 0;
+        int move = 0;
 
-	/* For managing crossroads */
-	if(!view[1][0] && !view[2][1] && !view[1][2] && !view[0][1]){
-	    if (!cross){
-		cross = true;
-		move = Direction.LEFT;
-	    } else {
-		cross = false;
-		move = Direction.FORWARD;
-	    }
-	}
-	/* For managing blind corners */
-	else if(!view[0][1] && !view[1][0] && view[1][2])	{	
-	    move = Direction.FORWARD;
-	    /* For managing T junction */
-	} else if(!view[2][1] && !view[0][1] && !view[1][2])	{	
-	    move = Direction.LEFT;
-	    tee = true;
-	} else if(!view[0][1]) {
-	    if(!tee){
-		move = Direction.LEFT;
-	    } else {
-		move = Direction.FORWARD;
-		tee = false;
-	    }
-	} else if(view[1][0]){
-	    move = Direction.RIGHT;
-	} else {
-	    move = Direction.FORWARD;
-	} 
+        /* For managing crossroads */
+        if(!view[1][0] && !view[2][1] && !view[1][2] && !view[0][1]){
+            if (!cross){
+                cross = true;
+                move = Direction.LEFT;
+            } else {
+                cross = false;
+                move = Direction.FORWARD;
+            }
+        }
+        /* For managing blind corners */
+        else if(!view[0][1] && !view[1][0] && view[1][2])	{	
+            move = Direction.FORWARD;
+            /* For managing T junction */
+        } else if(!view[2][1] && !view[0][1] && !view[1][2])	{	
+            move = Direction.LEFT;
+            tee = true;
+        } else if(!view[0][1]) {
+            if(!tee){
+                move = Direction.LEFT;
+            } else {
+                move = Direction.FORWARD;
+                tee = false;
+            }
+        } else if(view[1][0]){
+            move = Direction.RIGHT;
+        } else {
+            move = Direction.FORWARD;
+        } 
 
-	return move;
+        return move;
     }
 
     /** Implementation of the Bot interface.
      *
      * @return           Bot name.
      */
+    @Override
     public String getName(){
-	return "LeftBot";
+        return "LeftBot";
     }
 
     /** Implementation of the Bot interface.
      *
      * @return           Bot Description.
      */
+    @Override
     public String getDescription(){
-	return "Follows left walls.";
+        return "Follows left walls.";
     }
 }
 

@@ -47,6 +47,7 @@ public class MazePanel extends Canvas{
 		this.botTileSets = botTileSets;
 	}
 
+    // Resizes all cache images from the originals.
     public void resizeCache(){
         // Simply return if the size is the same
         if( getSize().equals(currentSize) && 
@@ -86,7 +87,7 @@ public class MazePanel extends Canvas{
         renderBackground( this.bgBuffer.getGraphics() );
     }
 
-
+    // Rescales a tile to fit the current maze size for a given screen size.
     private BufferedImage rescaleTile(Dimension targetSize, BufferedImage img){
         //rescale the image to be done
         int tilex = (int)(targetSize.width / maze.getWidth());
@@ -94,6 +95,7 @@ public class MazePanel extends Canvas{
         return rescaleImage(new Dimension(tilex, tiley), img);
     }
 
+    // Arbitrarily scales an image using bilinear filtering
     private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
         AffineTransform transform = AffineTransform.getScaleInstance(
                 (float)targetSize.width / (float)img.getWidth(),  
@@ -115,10 +117,10 @@ public class MazePanel extends Canvas{
 
 	// Removes an agent from the list to simulate
 	public boolean remAgent(Agent a){
-		if(agents.indexOf(a) == -1){
-            Log.log("Removing agent " + a + " from maze panel "+ this);
+		if(agents.indexOf(a) == -1)
 			return false;
-        }
+        
+        Log.log("Removing agent " + a + " from maze panel "+ this);
 		agents.remove(a);
 		return true;
 	}
@@ -182,6 +184,9 @@ public class MazePanel extends Canvas{
 		boolean[][] mdata = maze.getData();
 		BufferedImage img = null;
 
+        if(p.x > mdata.length)
+            return;
+
 		// Check for maze background section
 		if(maze.getEntX() == p.x && maze.getEntY() == p.y)
 			img = mazeTileCache.start;
@@ -189,9 +194,11 @@ public class MazePanel extends Canvas{
 		else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
 			img = mazeTileCache.finish;
 		//renderTile(finish, p.x, p.y, bg);
-		else if( mdata[p.x][p.y] )
+		else if( mdata[p.x][p.y] ){
+            if( p.y > mdata[p.x].length )
+                return;
 			img = mazeTileCache.wall;
-		else
+        }else
 			img = mazeTileCache.space;
 
 
@@ -235,7 +242,7 @@ public class MazePanel extends Canvas{
 	private void renderTile(BufferedImage tile, int x, int y, Graphics g){
 		g.drawImage(tile, 
                 (int)(x*((float)this.getWidth()     / (float)maze.getWidth())), 
-				(int)(y*((float)this.getHeight()    / (float)maze.getHeight())), 
+				this.getHeight() - (int)((y+1)*((float)this.getHeight()    / (float)maze.getHeight())), 
                 this);
 	}
 

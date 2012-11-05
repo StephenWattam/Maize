@@ -12,11 +12,16 @@ import java.util.Vector;
 import java.io.*;
 import javax.imageio.*;
 
+import java.util.concurrent.*;
 
 
 
 
 public class TestThread extends Thread{
+
+    // Thanks to http://blog.smartkey.co.uk/2011/09/adding-a-thread-timeout-to-methods-in-java/
+    // Keep a timeout
+    private ExecutorService executor = Executors.newFixedThreadPool(1);
 
 	// store state on one run
 	public MazePanel panel;
@@ -38,19 +43,24 @@ public class TestThread extends Thread{
 
 	public TestThread(Maze m, Bot[] bs, MazePanel mp, int delayms, JList agentList){
 		if(m==null) return;
-		AgentFactory af = new AgentFactory();
-		this.agents = new BotTest[bs.length];
+		AgentFactory af     = new AgentFactory();
 
-		this.delayms = delayms;
-		this.panel = mp;
+		this.agents         = new BotTest[bs.length];
+		this.delayms        = delayms;
+		this.panel          = mp;
+
+
 		// Add each bot
 		for(int i=0; i<bs.length; i++){
             Log.log("Building runtime environment for bot " + (i+1) + "/" + bs.length);
-			agents[i] = new BotTest();
-			agents[i].bot = bs[i];
 
+            // Create a bot test
+			agents[i]       = new BotTest();
+			agents[i].bot   = bs[i];
 			agents[i].agent = af.getAgent(m, bs[i]);
 			agents[i].moves = 0;
+
+            // Add to the maze panel
 			panel.addAgent(agents[i].agent);
 		}
 
@@ -60,27 +70,65 @@ public class TestThread extends Thread{
 		agentList.setListData(agents);
 	}	
 
+    // Set the delay used when repeating
+    // moves using run()
 	public void setDelay(int delayms){
 		if(delayms >= 0)
 			this.delayms = delayms;
 	}
 
+    // Quit, stopping the test and removing
+    // the agents from the panel
 	public void quit(){
 		for(int i=0;i<agents.length;i++)
 			panel.remAgent(agents[i].agent);
 		quit = true;
 	}
 
+    // Returns the current state of pause
 	public boolean isPaused(){
 		return pause;
 	}
 
+    // Switches pause on/off
 	public void toggle_pause(){
 		pause = !pause;
 	}
 
 
 
+    // Call agent.agent.move() asynchronously, with a given timeout (in milliseconds).
+    // This is used to limit the power bots have to starve each other.
+    private void moveAgentWithTimeout(int timeout, final BotTest agent){
+        final Future future = executor.submit(new Runnable(){
+            public void run(){
+                try{
+                    agent.agent.move();
+                } catch(Exception e){
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        try{
+            future.get(timeout, TimeUnit.MILLISECONDS);
+        //ExecutionException: deliverer threw exception
+        //TimeoutException: didn't complete within downloadTimeoutSecs
+        //InterruptedException: the executor thread was interrupted
+        }catch(TimeoutException Te){
+            Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
+        }catch(InterruptedException Ie){
+            Log.log("Bot " + agent.bot.getName() + " was interrupted during execution");
+        }catch(Exception e){
+            Log.log("Bot " + agent.bot.getName() + " threw an exception: ");
+            Log.logException(e);
+        }finally{
+            future.cancel(true);
+        }
+    }
+
+
+    // Perform one move for all bots.
 	private boolean iterate(){
 		BotTest agent;
 		boolean keepRunning = false;
@@ -94,23 +142,32 @@ public class TestThread extends Thread{
 			// Are all of our agents finished?
 			if(agent.isFinished == false){
 				keepRunning = true;
-				// move the agent
-				agent.agent.move();
+
+
+				// move the agent with a timeout
+                moveAgentWithTimeout(MazeUISettingsManager.botWorkTimeout , agent);
+				/* agent.agent.move(); */
+
+
 				// update ui
 				agent.moves++;
 			}
 		}
-/*  */
-/*         // Remove any finished agents */
-/*         for(int i=0;i<agents.length;i++){ */
-/*             if(agents[i].isFinished) */
-/*                 this.panel.remAgent(agents[i].agent); */
-/*         } */
+
+        // Remove any finished agents
+        // note that remAgent checks if it's there,
+        // so we don't have to.
+        for(int i=0;i<agents.length;i++)
+            if(agents[i].isFinished)
+                this.panel.remAgent(agents[i].agent);
+            
+        
 
 		panel.repaint();
 		return keepRunning;
 	}
 
+    // Repeatedly iterate until all bots are complete
 	public void run(){
 		while(iterate() == true){
 

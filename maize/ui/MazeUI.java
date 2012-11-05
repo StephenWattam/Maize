@@ -268,7 +268,8 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 				//System.out.println("DEBUG: " + filename);
                 Log.log("Compiling bot from file: " + filename);
 				if(BotCompilerHelper.compile(MazeUISettingsManager.botDirectory + java.io.File.separator + filename)){
-					mazeTest.bots.add(BotCompilerHelper.loadBot( MazeUISettingsManager.botPackageName + "." + 
+					mazeTest.bots.add(BotCompilerHelper.loadBotClass( 
+                                MazeUISettingsManager.botPackageName + "." + 
 								BotCompilerHelper.classNameFromBaseName(filename)));
 					updatePanes();
 				}

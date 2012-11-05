@@ -14,9 +14,12 @@ import org.json.simple.parser.*;
 // Singleton class to control settings
 public class MazeUISettingsManager{
 
-    public static final String VERSION = "0.1.1";
+    public static final String VERSION = "0.1.2";
 
 	private static MazeUISettingsManager instance = null;
+
+    // How long bots can work before being timed out
+    public static int botWorkTimeout = 10000;
 
 	// Bot loading
 	public static String botDirectory;
@@ -115,6 +118,8 @@ public class MazeUISettingsManager{
 	        MazeUISettingsManager.defaultMazeHeight  = Integer.parseInt(((JSONObject)config.get("ui")).get("defaultMazeHeight").toString());
 	        
             MazeUISettingsManager.logScrollbackLimit  = Integer.parseInt(((JSONObject)config.get("ui")).get("logScrollback").toString());
+
+            MazeUISettingsManager.botWorkTimeout  = Integer.parseInt(((JSONObject)config.get("ui")).get("botTimeout").toString());
 
 			MazeUISettingsManager.attachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("attachIcon").toString()));
 			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));

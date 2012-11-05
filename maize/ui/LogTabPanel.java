@@ -43,6 +43,8 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
 
         // TODO: configure editability, etc
         log = new JTextArea();
+        Font font = new Font("Courier", 0, 11);
+        log.setFont(font);
 
 
 		logScrollPane = new JScrollPane(log);
