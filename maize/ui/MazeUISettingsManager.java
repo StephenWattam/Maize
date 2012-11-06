@@ -46,6 +46,11 @@ public class MazeUISettingsManager{
 
     public static int           logScrollbackLimit  = 1000;
 
+    // SecurityManager stuff
+    public static boolean smEnabled = true;
+    public static boolean smDebug = false;
+    public static boolean smAllowThreading = false;
+
     // Load from JSON
     public static boolean loadConfig(String filename){
         // JSON parser
@@ -123,6 +128,11 @@ public class MazeUISettingsManager{
 
 			MazeUISettingsManager.attachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("attachIcon").toString()));
 			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));
+
+            // SecurityManager flags/settings
+            MazeUISettingsManager.smEnabled        = (Boolean)(((JSONObject)config.get("security")).get("enabled"));
+            MazeUISettingsManager.smDebug          = (Boolean)(((JSONObject)config.get("security")).get("debug"));
+            MazeUISettingsManager.smAllowThreading = (Boolean)(((JSONObject)config.get("security")).get("allowThreading"));
 
         }catch(NullPointerException NPe){
             Log.log("Missing config key.");

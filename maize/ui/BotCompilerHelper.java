@@ -78,6 +78,7 @@ public abstract class BotCompilerHelper{
 	try {
         	return (Bot) myObjectClass.newInstance();
 	} catch( SecurityException err ) {
+        Log.log( "Security Error!" );
 		Log.logException( err );
 		throw new InstantiationException( "Bot '" +className+ "' caused a SecurityException! (" +err.getMessage()+ ")" );
 	} catch( IllegalAccessError err ) {

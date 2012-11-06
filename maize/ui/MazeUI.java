@@ -37,35 +37,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         Log.log("Starting Maize UI...");
 
         // Initialize our security manager nice and early
-        /*System.setSecurityManager( new SecurityManager () {
-
-	   @Override
-           public void checkPermission( Permission perm, Object context ) throws SecurityException {
-	   	System.out.println( "Bugger" );
-	   }
-	   @Override
-           public void checkPermission( Permission perm ) throws SecurityException {
-                // Class[] classContext = getClassContext();
-
-	    	for( Class c : getClassContext() ) {
-		    if( c.getCanonicalName() != null ) {
-	                if( c.getCanonicalName().startsWith( "bots." ) ) {
-			   System.out.println( "MARK" );
- 	                   throw new SecurityException( "Class '" +c.getName()+ "' is a descendant of 'Bot', and has restricted permissions." );
-			}
-		    }
-	        }
-            }
-
-	    @Override
-	    public void checkPropertyAccess( String key )
-	    {
-	    	Class[] context = getClassContext();
-
-	    	System.out.println( "WITH : " + key );
-	    }
-        });*/
-	System.setSecurityManager( new maize.ui.BotSecurityManager() );
+	    System.setSecurityManager( new maize.ui.BotSecurityManager() );
 
         /* setSize(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight); */
         setPreferredSize(new Dimension(MazeUISettingsManager.uiWidth, MazeUISettingsManager.uiHeight));

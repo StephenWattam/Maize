@@ -1,4 +1,5 @@
 package maize.ui;
+
 import java.security.*;
 import java.io.FileDescriptor;
 import java.io.File;
@@ -13,143 +14,125 @@ import java.net.InetAddress;
 import java.lang.reflect.Member;
 import java.lang.reflect.*;
 import java.net.URL;
-import sun.security.util.SecurityConstants;
 
-public
-class BotSecurityManager extends SecurityManager {
-    @Deprecated
+import maize.ui.SecurityConstants;
 
-        protected boolean inCheck;
+/**
+ * A SecurityManager extension to only allow bots to do nice things in the simulation.
+ * 
+ * Very messy, and could be minimised, but works for now.
+ * 
+ * @author John Vidler
+ */
+public class BotSecurityManager extends SecurityManager {
 
-    private boolean initialized = false;
+    protected final String[] blacklist  = { "sun.reflect.", "setSecurityManager", "setAccessible" };
+    protected final String[] dangerlist = { "bots." };
 
-    private boolean hasAllPermission()
+    public void checkPermission( Permission perm ) throws SecurityException {
+
+        // Only check if we're actually enabled!
+        if( !MazeUISettingsManager.smEnabled )
+            return;
+
+        Object o        = getSecurityContext();
+        Class[] context = getClassContext();
+
+        for( String black : blacklist )
+        {
+            if( black.equals( perm.getName() ) )
+                throw new SecurityException( "The call '" +black+ "' is a blacklisted method" );
+        }
+
+        // Uncommenting this causes much spam, you are fore-warned!
+        //Log.log( perm.getClass().getName() + " --> " + perm.getName() );
+
+        // Runtime/Reflection permission check (?)
+        if( perm instanceof RuntimePermission || perm instanceof ReflectPermission ) {
+            int dangerIndex = -1;
+            for( String cls : dangerlist )
+            {
+                int idx = searchCallStack( context, cls );
+                dangerIndex = Math.max( dangerIndex, idx );
+            }
+
+            // Scan the blacklist!
+            if( dangerIndex != -1 )
+            {
+                // Disallow threads, if the configuration mandates it.
+                if( !MazeUISettingsManager.smAllowThreading )
+                {
+                    if( perm.getName().equals(SecurityConstants.MODIFY_THREADGROUP_PERMISSION.getName()) ||
+                        perm.getName().equals(SecurityConstants.MODIFY_THREAD_PERMISSION.getName()) )
+                        throw new SecurityException( "Threading is disabled!" );
+                }
+
+                for( String black : blacklist )
+                {
+                    int violationIdx = searchCallStack( context, black );
+                    if( violationIdx > 0 )
+                        debugWrite( "Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
+
+                    if( violationIdx > 0 && violationIdx < dangerIndex ) {
+                        debugWrite( "RuntimePermission denied on '" +black+ "'!" );
+                        if( MazeUISettingsManager.smDebug )
+                            dumpCallStack( context, black );
+                        throw new SecurityException( "RuntimePermissions are disabled for '" +black+ "'!" );
+                    }
+                }
+            }
+        }
+    }
+
+    protected void debugWrite( String s )
     {
-        try {
-            checkPermission(SecurityConstants.ALL_PERMISSION);
-            return true;
-        } catch (SecurityException se) {
-            return false;
-        }
+        if( MazeUISettingsManager.smDebug )
+            Log.log( s );
     }
-    @Deprecated
 
-        public boolean getInCheck() {
-            return inCheck;
-        }
-
-    public BotSecurityManager() {
-        synchronized(SecurityManager.class) {
-            SecurityManager sm = System.getSecurityManager();
-            if (sm != null) {
-                // ask the currently installed security manager if we
-                // can create a new one.
-                sm.checkPermission(new RuntimePermission
-                        ("createSecurityManager"));
+    public void dumpCallStack( Class[] stack, String classSpec ) {
+        boolean found = false;
+        debugWrite( "StackDump:" );
+        
+        for( int d = stack.length-1; d>0; d-- )
+        {
+            Class c = stack[d];
+            if( classSpec.endsWith(".") ) {
+                if( c.getName().startsWith( classSpec ) )
+                    found = true;
             }
-            initialized = true;
+            else
+                if( c.getName().equals( classSpec ) )
+                    found = true;
+            debugWrite( "\t#" +d+ " - " +(found?"* ":"- ") +c.getName() );
         }
     }
 
-    protected native Class[] getClassContext();
-    @Deprecated
-
-        protected ClassLoader currentClassLoader()
+    public int searchCallStack( Class[] stack, String classSpec ) {
+        for( int d = stack.length-1; d>0; d-- )
         {
-            ClassLoader cl = currentClassLoader0();
-            if ((cl != null) && hasAllPermission())
-                cl = null;
-            return cl;
-        }
-
-    private native ClassLoader currentClassLoader0();
-    @Deprecated
-
-        protected Class<?> currentLoadedClass() {
-            Class c = currentLoadedClass0();
-            if ((c != null) && hasAllPermission())
-                c = null;
-            return c;
-        }
-    @Deprecated
-
-        protected native int classDepth(String name);
-    @Deprecated
-
-        protected int classLoaderDepth()
-        {
-            int depth = classLoaderDepth0();
-            if (depth != -1) {
-                if (hasAllPermission())
-                    depth = -1;
+            Class c = stack[d];
+            if( c != BotSecurityManager.class )
+            {
+                if( classSpec.endsWith(".") )
+                {
+                    if( c.getName().startsWith( classSpec ) )
+                        return d;
+                }
                 else
-                    depth--; // make sure we don't include ourself
+                    if( c.getName().equals( classSpec ) )
+                        return d;
             }
-            return depth;
         }
-
-    private native int classLoaderDepth0();
-    @Deprecated
-
-        protected boolean inClass(String name) {
-            return classDepth(name) >= 0;
-        }
-    @Deprecated
-
-        protected boolean inClassLoader() {
-            return currentClassLoader() != null;
-        }
-
-    public Object getSecurityContext() {
-        return AccessController.getContext();
+        return -1;
     }
 
-    public void checkPermission(Permission perm) {
-        //java.security.AccessController.checkPermission(perm);
-    }
-
-    public void checkPermission(Permission perm, Object context) {
-        if (context instanceof AccessControlContext) {
-            ((AccessControlContext)context).checkPermission(perm);
-        } else {
-            throw new SecurityException();
-        }
+    public void checkPermission( Permission perm, Object context ) {
+        checkPermission( perm );
     }
 
     public void checkCreateClassLoader() {
         checkPermission(SecurityConstants.CREATE_CLASSLOADER_PERMISSION);
-    }
-
-    private static ThreadGroup rootGroup = getRootGroup();
-
-    private static ThreadGroup getRootGroup() {
-        ThreadGroup root =  Thread.currentThread().getThreadGroup();
-        while (root.getParent() != null) {
-            root = root.getParent();
-        }
-        return root;
-    }
-
-    public void checkAccess(Thread t) {
-        if (t == null) {
-            throw new NullPointerException("thread can't be null");
-        }
-        if (t.getThreadGroup() == rootGroup) {
-            checkPermission(SecurityConstants.MODIFY_THREAD_PERMISSION);
-        } else {
-            // just return
-        }
-    }
-
-    public void checkAccess(ThreadGroup g) {
-        if (g == null) {
-            throw new NullPointerException("thread group can't be null");
-        }
-        if (g == rootGroup) {
-            checkPermission(SecurityConstants.MODIFY_THREADGROUP_PERMISSION);
-        } else {
-            // just return
-        }
     }
 
     public void checkExit(int status) {
@@ -159,136 +142,18 @@ class BotSecurityManager extends SecurityManager {
     public void checkExec(String cmd) {
         File f = new File(cmd);
         if (f.isAbsolute()) {
-            checkPermission(new FilePermission(cmd,
-                        SecurityConstants.FILE_EXECUTE_ACTION));
+            checkPermission( new FilePermission(cmd, SecurityConstants.FILE_EXECUTE_ACTION) );
         } else {
-            checkPermission(new FilePermission("<<ALL FILES>>",
-                        SecurityConstants.FILE_EXECUTE_ACTION));
+            checkPermission( new FilePermission("<<ALL FILES>>", SecurityConstants.FILE_EXECUTE_ACTION) );
         }
     }
-
-    public void checkLink(String lib) {
-        if (lib == null) {
-            throw new NullPointerException("library can't be null");
-        }
-        checkPermission(new RuntimePermission("loadLibrary."+lib));
-    }
-
-    public void checkRead(FileDescriptor fd) {
-        if (fd == null) {
-            throw new NullPointerException("file descriptor can't be null");
-        }
-        checkPermission(new RuntimePermission("readFileDescriptor"));
-    }
-
-    public void checkRead(String file) {
-        checkPermission(new FilePermission(file,
-                    SecurityConstants.FILE_READ_ACTION));
-    }
-
-    public void checkRead(String file, Object context) {
-        checkPermission(
-                new FilePermission(file, SecurityConstants.FILE_READ_ACTION),
-                context);
-    }
-
-    public void checkWrite(FileDescriptor fd) {
-        if (fd == null) {
-            throw new NullPointerException("file descriptor can't be null");
-        }
-        checkPermission(new RuntimePermission("writeFileDescriptor"));
-    }
-
-    public void checkWrite(String file) {
-        checkPermission(new FilePermission(file,
-                    SecurityConstants.FILE_WRITE_ACTION));
-    }
-
-    public void checkDelete(String file) {
-        checkPermission(new FilePermission(file,
-                    SecurityConstants.FILE_DELETE_ACTION));
-    }
-
-    public void checkConnect(String host, int port) {
-        if (host == null) {
-            throw new NullPointerException("host can't be null");
-        }
-        if (!host.startsWith("[") && host.indexOf(':') != -1) {
-            host = "[" + host + "]";
-        }
-        if (port == -1) {
-            checkPermission(new SocketPermission(host,
-                        SecurityConstants.SOCKET_RESOLVE_ACTION));
-        } else {
-            checkPermission(new SocketPermission(host+":"+port,
-                        SecurityConstants.SOCKET_CONNECT_ACTION));
-        }
-    }
-
-    public void checkConnect(String host, int port, Object context) {
-        if (host == null) {
-            throw new NullPointerException("host can't be null");
-        }
-        if (!host.startsWith("[") && host.indexOf(':') != -1) {
-            host = "[" + host + "]";
-        }
-        if (port == -1)
-            checkPermission(new SocketPermission(host,
-                        SecurityConstants.SOCKET_RESOLVE_ACTION),
-                    context);
-        else
-            checkPermission(new SocketPermission(host+":"+port,
-                        SecurityConstants.SOCKET_CONNECT_ACTION),
-                    context);
-    }
-
-    public void checkListen(int port) {
-        if (port == 0) {
-            checkPermission(SecurityConstants.LOCAL_LISTEN_PERMISSION);
-        } else {
-            checkPermission(new SocketPermission("localhost:"+port,
-                        SecurityConstants.SOCKET_LISTEN_ACTION));
-        }
-    }
-
-    public void checkAccept(String host, int port) {
-        if (host == null) {
-            throw new NullPointerException("host can't be null");
-        }
-        if (!host.startsWith("[") && host.indexOf(':') != -1) {
-            host = "[" + host + "]";
-        }
-        checkPermission(new SocketPermission(host+":"+port,
-                    SecurityConstants.SOCKET_ACCEPT_ACTION));
-    }
-
-    public void checkMulticast(InetAddress maddr) {
-        String host = maddr.getHostAddress();
-        if (!host.startsWith("[") && host.indexOf(':') != -1) {
-            host = "[" + host + "]";
-        }
-        checkPermission(new SocketPermission(host,
-                    SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION));
-    }
-    @Deprecated
-
-        public void checkMulticast(InetAddress maddr, byte ttl) {
-            String host = maddr.getHostAddress();
-            if (!host.startsWith("[") && host.indexOf(':') != -1) {
-                host = "[" + host + "]";
-            }
-            checkPermission(new SocketPermission(host,
-                        SecurityConstants.SOCKET_CONNECT_ACCEPT_ACTION));
-        }
 
     public void checkPropertiesAccess() {
-        checkPermission(new PropertyPermission("*",
-                    SecurityConstants.PROPERTY_RW_ACTION));
+        checkPermission(new PropertyPermission( "*", SecurityConstants.PROPERTY_RW_ACTION) );
     }
 
     public void checkPropertyAccess(String key) {
-        checkPermission(new PropertyPermission(key,
-                    SecurityConstants.PROPERTY_READ_ACTION));
+        checkPermission(new PropertyPermission( key, SecurityConstants.PROPERTY_READ_ACTION) );
     }
 
     public boolean checkTopLevelWindow(Object window) {
@@ -322,8 +187,7 @@ class BotSecurityManager extends SecurityManager {
     private static String[] getPackages(String p) {
         String packages[] = null;
         if (p != null && !p.equals("")) {
-            java.util.StringTokenizer tok =
-                new java.util.StringTokenizer(p, ",");
+            java.util.StringTokenizer tok = new java.util.StringTokenizer(p, ",");
             int n = tok.countTokens();
             if (n > 0) {
                 packages = new String[n];
@@ -410,7 +274,7 @@ class BotSecurityManager extends SecurityManager {
     }
 
     public void checkMemberAccess(Class<?> clazz, int which) {
-        //super.checkMemberAccess( clazz, which );
+        super.checkMemberAccess( clazz, which );
     }
 
     public void checkSecurityAccess(String target) {
