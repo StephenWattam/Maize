@@ -15,7 +15,7 @@ import javax.imageio.*;
 import maize.*;
 public class MazeTabPanel extends TabPanel implements ActionListener, ListSelectionListener{
 
-    private JList<Maze> mazeList;
+    private JList mazeList;
     private JButton deleteButton    = new JButton("Delete");
     private JButton saveButton      = new JButton("Save...");
 
@@ -40,7 +40,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
 
 
         ////symbol list
-        mazeList = new JList<Maze>(mazeTest.mazes);
+        mazeList = new JList(mazeTest.mazes);
         mazeList.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         mazeList.setCellRenderer(new MazeListCellRenderer());
         mazeList.addListSelectionListener(this);
@@ -101,9 +101,9 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
 
     public void actionPerformed(ActionEvent Ae){
         if(Ae.getSource() == saveButton){
-            saveMaze(mazeList.getSelectedValue());
+            saveMaze((Maze)mazeList.getSelectedValue());
         }else if(Ae.getSource() == deleteButton){
-            deleteMaze(mazeList.getSelectedValue());
+            deleteMaze((Maze)mazeList.getSelectedValue());
         }
 
         //System.out.println("number of mazes: " + mazeTest.mazes.size());
@@ -124,7 +124,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
         if(LSe.getSource() != mazeList)
             return;
 
-        mazePanel.setMaze(mazeList.getSelectedValue());
+        mazePanel.setMaze((Maze)mazeList.getSelectedValue());
         mazePanel.repaint();
     }
 
@@ -146,6 +146,6 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
 
 
     public Maze getSelectedMaze(){
-        return mazeList.getSelectedValue();
+        return (Maze)mazeList.getSelectedValue();
     }
 }

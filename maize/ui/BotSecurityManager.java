@@ -35,14 +35,14 @@ public class BotSecurityManager extends SecurityManager {
         if( !MazeUISettingsManager.smEnabled )
             return;
 
-        Object o        = getSecurityContext();
-        Class[] context = getClassContext();
-
         for( String black : blacklist )
         {
             if( black.equals( perm.getName() ) )
                 throw new SecurityException( "The call '" +black+ "' is a blacklisted method" );
         }
+
+        Object o        = getSecurityContext();
+        Class[] context = getClassContext();
 
         // Uncommenting this causes much spam, you are fore-warned!
         //Log.log( perm.getClass().getName() + " --> " + perm.getName() );
@@ -70,8 +70,8 @@ public class BotSecurityManager extends SecurityManager {
                 for( String black : blacklist )
                 {
                     int violationIdx = searchCallStack( context, black );
-                    if( violationIdx > 0 )
-                        debugWrite( "Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
+                    /* if( violationIdx > 0 ) */
+                    debugWrite( "Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
 
                     if( violationIdx > 0 && violationIdx < dangerIndex ) {
                         debugWrite( "RuntimePermission denied on '" +black+ "'!" );
