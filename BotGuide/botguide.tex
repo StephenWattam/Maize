@@ -143,6 +143,7 @@ Note that \texttt{Direction.LEFT} and \texttt{Direction.RIGHT} will instruct the
 \label{section:alternativeapis}
 In addition to the \texttt{Bot} interface, two other classes exist which provide further functionality.  If you wish to use these, I recommend reading their javadoc documentation, where a full API is given:
 \begin{itemize}
+\item \texttt{AbsoluteBot}---Rotates the view matrix to always face north, and understands commands in terms of compass points, rather than forward/backward.  When using this bot, override \texttt{calculateMove()} and return a value from \texttt{Orientation} to move.
 \item \texttt{StateBot}---Supports retaining just one piece of information by calling \texttt{setState()} and \texttt{getState()};
 \item \texttt{AdvancedBot}---Supports a queue of actions, held in a buffer.  When the buffer is empty, \texttt{nextMove()} is called for more instructions.  Contains high-level APIs that take advantage of this functionality (\textsl{e.g.} \texttt{strafeRight()}, \texttt{rotate180()}).
 \end{itemize}
