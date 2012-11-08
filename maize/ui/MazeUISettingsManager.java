@@ -86,13 +86,38 @@ public class MazeUISettingsManager{
 		try{
 			// Load the maze tile set
             String mazeTilePrefix   = ((JSONObject)config.get("maze")).get("tileSet").toString();
-			BufferedImage space	    = ImageIO.read(new File(mazeTilePrefix + "/" + "space.png"));
-			BufferedImage wall	    = ImageIO.read(new File(mazeTilePrefix + "/" + "wall.png"));
+            System.out.println( "Using " +mazeTilePrefix+ " as a tile source" );
+            File tileSet = new File( mazeTilePrefix );
+
+            ArrayList<BufferedImage> spaceTiles = new ArrayList<BufferedImage>();
+            ArrayList<BufferedImage> wallTiles = new ArrayList<BufferedImage>();
+            ArrayList<BufferedImage> bgTiles = new ArrayList<BufferedImage>();
+
+            for( File tile : tileSet.listFiles() ) {
+                if( tile.getName().endsWith( ".png" ) ) {
+
+                    // Is it a space?
+                    if( tile.getName().contains( "space" ) )
+                        spaceTiles.add( ImageIO.read(tile) );
+
+                    // Is it a wall?
+                    if( tile.getName().contains( "wall" ) )
+                        wallTiles.add( ImageIO.read(tile) );
+
+                    // Is is a background?
+                    if( tile.getName().contains( "bg" ) )
+                        bgTiles.add( ImageIO.read(tile) );
+                }
+            }
+
 			BufferedImage start	    = ImageIO.read(new File(mazeTilePrefix + "/" + "start.png"));
 			BufferedImage finish	= ImageIO.read(new File(mazeTilePrefix + "/" + "finish.png"));
-			BufferedImage bg        = ImageIO.read(new File(mazeTilePrefix + "/" + "bg.png"));
             // then the maze tilesets
-			mazeTiles = new MazeTileSet(bg, space, wall, start, finish);
+			mazeTiles = new MazeTileSet( bgTiles.toArray( new BufferedImage[1] ),
+                                         spaceTiles.toArray( new BufferedImage[1] ),
+                                         wallTiles.toArray( new BufferedImage[1] ),
+                                         start,
+                                         finish);
 
 
 			// Load a series of bot tile-sets, up to 99
@@ -161,7 +186,6 @@ public class MazeUISettingsManager{
         return true;
     }
 
-    
 	// Constructs a BotTileSet from a directory pattern
 	private static BotTileSet loadBotTiles(String prefix, String postfix, String number){
 		try{
@@ -171,8 +195,6 @@ public class MazeUISettingsManager{
 			return null;
 		}
 	}
-
-
 
     // Ensures this remains as a singleton
 	public static MazeUISettingsManager getInstance(){

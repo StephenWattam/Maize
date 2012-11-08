@@ -60,13 +60,10 @@ public class MazePanel extends Canvas{
         // Load the size.
         currentSize = getSize();
 
+        System.out.println( mazeTileCache );
+
         // Rescale tiles from original to avoid lossiness
-        this.mazeTileCache = new MazeTileSet(
-                mazeTiles.bg,
-                rescaleTile(currentSize, mazeTiles.space),
-                rescaleTile(currentSize, mazeTiles.wall),
-                rescaleTile(currentSize, mazeTiles.start),
-                rescaleTile(currentSize, mazeTiles.finish));
+        this.mazeTileCache = this.mazeTiles.rescale( currentSize, maze );
 
         // Scale bots from original to avoid lossiness.
         this.botTileSetCache = new BotTileSet[botTileSets.length];
@@ -88,6 +85,7 @@ public class MazePanel extends Canvas{
     }
 
     // Rescales a tile to fit the current maze size for a given screen size.
+    @Deprecated
     private BufferedImage rescaleTile(Dimension targetSize, BufferedImage img){
         //rescale the image to be done
         int tilex = (int)(targetSize.width / maze.getWidth());
@@ -130,7 +128,7 @@ public class MazePanel extends Canvas{
 	{
 		// If no maze then make sure we render everything when the maze is added
 		if(maze == null){
-            g.drawImage(rescaleImage(new Dimension(this.getWidth(), this.getHeight()), mazeTiles.bg), 0, 0, this);
+            g.drawImage(rescaleImage(new Dimension(this.getWidth(), this.getHeight()), mazeTiles.getBackground()), 0, 0, this);
             /* g.setColor(Color.BLACK); */
             /* g.drawString("No Maze.", (this.getWidth()/2 - 15), (this.getHeight()/2 - 5)); */
 		}else{
@@ -144,7 +142,7 @@ public class MazePanel extends Canvas{
     // then rendering without any bots added
     private void renderBackground(Graphics g){
         // Set bg to a scaled version of the background image
-        g.drawImage(rescaleImage(new Dimension(this.getWidth(), this.getHeight()), mazeTiles.bg), 0, 0, this);
+        g.drawImage(rescaleImage(new Dimension(this.getWidth(), this.getHeight()), mazeTiles.getBackground()), 0, 0, this);
         
 
         // and then render all the tiles
@@ -189,17 +187,17 @@ public class MazePanel extends Canvas{
 
 		// Check for maze background section
 		if(maze.getEntX() == p.x && maze.getEntY() == p.y)
-			img = mazeTileCache.start;
+			img = mazeTileCache.getStart();
 		//renderTile(start, p.x, p.y, bg);
 		else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
-			img = mazeTileCache.finish;
+			img = mazeTileCache.getFinish();
 		//renderTile(finish, p.x, p.y, bg);
 		else if( mdata[p.x][p.y] ){
             if( p.y > mdata[p.x].length )
                 return;
-			img = mazeTileCache.wall;
+			img = mazeTileCache.getWall();
         }else
-			img = mazeTileCache.space;
+			img = mazeTileCache.getSpace();
 
 
 		// Check each agent
