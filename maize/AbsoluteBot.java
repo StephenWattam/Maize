@@ -11,16 +11,31 @@ public class AbsoluteBot implements Bot
 	private int nextMove = -1;
 	private int nextNextMove = -1;
 
+    /** Implementation of the Bot interface.
+     *
+     * @return           Bot name.
+     */
+    @Override
 	public String getName()
 	{
 		return "AbsoluteBot";
 	}
 
+    /** Implementation of the Bot interface.
+     *
+     * @return           Bot name.
+     */
+    @Override
 	public String getDescription()
 	{
 		return "Shell.  Provides a normalised form of the context matrix and bot motion (in maze space).";
 	}
 
+    /** Implementation of Bot#nextMove.  Should not be overridden when subclassing.  Use calculateMove() instead.
+     *
+     * @see Bot
+     */
+    @Override
 	public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy)
 	{
 		if(nextMove == -1)
@@ -163,7 +178,22 @@ public class AbsoluteBot implements Bot
 		}
 	}
 
-    /* Override me instead of nextMove */
+    /** Override me instead of nextMove.  Returns an Orientation in which to move, rather than a Direction.
+     *
+     * @see Orientation
+     * @see Bot
+     *
+     * @param    view    View matric from the perspective of the bot, orientated so
+     *                   the top of the matrix is facing the same direction as the 
+     *                   bot.
+     * @param    x       X coord of the bot.
+     * @param    y       Y coord of the bot.
+     * @param    o       Orientation of the bot @see Orientation
+     * @param    fx      X coord of the finish.
+     * @param    fy      Y coord of the finish.
+     *
+     * @return A value from Orientation
+     */
 	public int calculateMove(boolean[][] view, int x, int y, int o, int fx, int fy)
 	{
 		boolean[][] correctedView = Orientation.rotateToNorth(view, o);
