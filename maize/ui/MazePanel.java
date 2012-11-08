@@ -13,6 +13,9 @@ public class MazePanel extends Canvas{
 	// The maze to show
 	private Maze maze = null;
 
+    // Render using fast or HQ algorithm?
+    private boolean fastRender = false;
+
 	// Keep lists of stuff to render
 	private Vector<Agent> agents = new Vector<Agent>();
 	private Vector<Point> dirty_tiles = new Vector<Point>();
@@ -27,10 +30,15 @@ public class MazePanel extends Canvas{
 	private MazeTileSet mazeTileCache = null;
 	private BotTileSet[] botTileSetCache = null;
 
-	public MazePanel(Maze maze, MazeTileSet mazeTiles, BotTileSet[] botTileSets){ 
+
+    // Construct with maze
+	public MazePanel(Maze maze, MazeTileSet mazeTiles, BotTileSet[] botTileSets, boolean fastRender){ 
 
 		// Set maze
 		this.maze = maze;
+
+        // Set fast rendering
+        this.fastRender = fastRender;
 
 		// Populate images	
 		this.mazeTiles      = mazeTiles;
@@ -40,12 +48,24 @@ public class MazePanel extends Canvas{
         currentSize = getSize();
 	}
 
-	public MazePanel(MazeTileSet mazeTiles, BotTileSet[] botTileSets){
+    // Construct with maze
+	public MazePanel(Maze maze, MazeTileSet mazeTiles, BotTileSet[] botTileSets){ 
+        new MazePanel(maze, mazeTiles, botTileSets, false);
+    }
 
-		// Populate images	
-		this.mazeTiles = mazeTiles;
-		this.botTileSets = botTileSets;
+    // Construct without maze
+	public MazePanel(MazeTileSet mazeTiles, BotTileSet[] botTileSets){
+        new MazePanel(null, mazeTiles, botTileSets);
 	}
+
+    // Set fast rendering or not.
+    public void setFastRendering(boolean fast){
+        // Re-render if different.
+        if(this.fastRender != fast){
+            this.fastRender = fast;
+            resizeCache();
+        }
+    }
 
     // Resizes all cache images from the originals.
     public void resizeCache(){
@@ -68,12 +88,16 @@ public class MazePanel extends Canvas{
         // Don't render bots when pre-rendering bg image
         this.botTileSetCache = null;
 
-        /* // Reconstruct the background to that size */
-        Dimension targetSize = new Dimension( mazeTileCache.space.getWidth()  * this.maze.getWidth(),
-                                              mazeTileCache.space.getHeight() * this.maze.getHeight() );
-        BufferedImage newBuffer = new BufferedImage(targetSize.width, targetSize.height, BufferedImage.TYPE_INT_ARGB);
-        renderBackground( targetSize, newBuffer.getGraphics() );
-        this.bgBuffer = rescaleImage( this.currentSize, newBuffer );
+        /* High quality rendering:
+         *
+         * Render at full size, THEN scale.  Allows contiguous walls to look good. */
+        if(!this.fastRender){
+            Dimension targetSize = new Dimension( mazeTileCache.space.getWidth()  * this.maze.getWidth(),
+                                                  mazeTileCache.space.getHeight() * this.maze.getHeight() );
+            BufferedImage newBuffer = new BufferedImage(targetSize.width, targetSize.height, BufferedImage.TYPE_INT_ARGB);
+            renderBackground( targetSize, newBuffer.getGraphics() );
+            this.bgBuffer = rescaleImage( this.currentSize, newBuffer );
+        }
 
 
         // Scale the cache
@@ -96,6 +120,15 @@ public class MazePanel extends Canvas{
             this.botTileSetCache[i].botW = rescaleTile(currentSize, botTileSetCache[i].botW);
         }
         
+        /* Low quality rendering.
+         *
+         * Pre-scale everything, then render onto a small plane.
+         * Very very fast, but can have problems with placing things.
+         */
+        if(this.fastRender){
+            this.bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
+            renderBackground(  currentSize, this.bgBuffer.getGraphics());
+        }
 
     }
 

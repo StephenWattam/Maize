@@ -96,7 +96,7 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 
 
 		// maze panel
-		mazePanel		= new MazePanel(MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets);
+		mazePanel		= new MazePanel(null, MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets, MazeUISettingsManager.fastMazeRendering);
 		mazePanel.setMinimumSize(new Dimension(500,500));
 
 

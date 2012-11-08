@@ -30,7 +30,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
 
 
         // maze panel
-        mazePanel = new MazePanel(MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets);
+        mazePanel = new MazePanel(null, MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets, MazeUISettingsManager.fastMazeRendering);
         mazePanel.setPreferredSize(new Dimension(500,500));
         mazePanel.setMinimumSize(new Dimension(500,500));
 

@@ -34,7 +34,7 @@ public class DoubleMazeFrame extends JFrame {
 	setLayout(new GridBagLayout());
 	
 
-	this.m1Panel = new MazePanel(MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets);
+	this.m1Panel = new MazePanel(null, MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets, MazeUISettingsManager.fastMazeRendering);
 	this.m1Panel.setSize(500,500);
 
 	// mazes are canvases -- reign in their greedy getSize();
