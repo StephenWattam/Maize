@@ -58,9 +58,25 @@ public class MazePanel extends Canvas{
             return;
 
         // Load the size.
-        currentSize = getSize();
+        this.currentSize = getSize();
 
-        // Rescale tiles from original to avoid lossiness
+        // Rescale tiles from original
+        // This also sets the tiles to be original-sized for
+        // the rendering of the background image below
+        this.mazeTileCache = mazeTiles;
+
+        // Don't render bots when pre-rendering bg image
+        this.botTileSetCache = null;
+
+        /* // Reconstruct the background to that size */
+        Dimension targetSize = new Dimension( mazeTileCache.space.getWidth()  * this.maze.getWidth(),
+                                              mazeTileCache.space.getHeight() * this.maze.getHeight() );
+        BufferedImage newBuffer = new BufferedImage(targetSize.width, targetSize.height, BufferedImage.TYPE_INT_ARGB);
+        renderBackground( targetSize, newBuffer.getGraphics() );
+        this.bgBuffer = rescaleImage( this.currentSize, newBuffer );
+
+
+        // Scale the cache
         this.mazeTileCache = new MazeTileSet(
                 mazeTiles.bg,
                 rescaleTile(currentSize, mazeTiles.space),
@@ -68,7 +84,7 @@ public class MazePanel extends Canvas{
                 rescaleTile(currentSize, mazeTiles.start),
                 rescaleTile(currentSize, mazeTiles.finish));
 
-        // Scale bots from original to avoid lossiness.
+        // Scale the bot tile set
         this.botTileSetCache = new BotTileSet[botTileSets.length];
         for(int i=0; i<botTileSets.length; i++){
             // set, get it to map and rotate 
@@ -81,10 +97,6 @@ public class MazePanel extends Canvas{
         }
         
 
-
-        /* // Reconstruct the background to that size */
-        this.bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
-        renderBackground( this.bgBuffer.getGraphics() );
     }
 
     // Rescales a tile to fit the current maze size for a given screen size.
@@ -142,16 +154,16 @@ public class MazePanel extends Canvas{
 
     // Draws the whole of the background, equivalent to dirtying everything
     // then rendering without any bots added
-    private void renderBackground(Graphics g){
+    private void renderBackground(Dimension planeSize, Graphics g){
+
         // Set bg to a scaled version of the background image
-        g.drawImage(rescaleImage(new Dimension(this.getWidth(), this.getHeight()), mazeTiles.bg), 0, 0, this);
+        g.drawImage(rescaleImage(planeSize, mazeTiles.bg), 0, 0, this);
         
 
         // and then render all the tiles
-        // TODO: prevent things from rendering the bots onto the background!
         for(int i=0; i < maze.getWidth(); i++){
             for(int j=0; j < maze.getHeight(); j++){
-                drawTile(new Point(i, j), g);
+                drawTile(new Point(i, j), g, planeSize);
             }
         }	
     }
@@ -176,9 +188,15 @@ public class MazePanel extends Canvas{
 		}
 	}
 
+
+	private void drawTile(Point p, Graphics bg){
+        drawTile(p, bg, this.currentSize );
+        //new Dimension(this.maze.getWidth(), this.maze.getHeight()) );
+    }
+
 	// Plots a tile at a given point
 	// takes into account agents, etc
-	private void drawTile(Point p, Graphics bg)
+	private void drawTile(Point p, Graphics bg, Dimension planeSize)
 	{
 		//System.out.println("No. Agents on this MazePanel: " + agents.size());
 		boolean[][] mdata = maze.getData();
@@ -204,46 +222,58 @@ public class MazePanel extends Canvas{
 
 		// Check each agent
 		//hopefully now renders last agent in the vector in blue.
-		Iterator<Agent> ia = agents.iterator();
-		Agent current;
-		int tileSetCount = 0;
-		while( ia.hasNext()){
-			int set = tileSetCount++ % this.botTileSets.length;
-			current = ia.next();
+        //
+        
+        // Don't try to render agents if there is no tile set cache yet
+        // this nicely prevents the baking of bot images onto the background
+        if(this.botTileSetCache != null){
+            Iterator<Agent> ia = agents.iterator();
+            Agent current;
+            int tileSetCount = 0;
+            while( ia.hasNext()){
+                int set = tileSetCount++ % this.botTileSets.length;
+                current = ia.next();
 
-			if(current.getX() == p.x && current.getY() == p.y)
-			{
-				switch(current.getOrientation())
-				{
-					case Orientation.NORTH:
-						img = botTileSetCache[set].botN;
-						break;
+                if(current.getX() == p.x && current.getY() == p.y)
+                {
+                    switch(current.getOrientation())
+                    {
+                        case Orientation.NORTH:
+                            img = botTileSetCache[set].botN;
+                            break;
 
-					case Orientation.EAST:
-						img = botTileSetCache[set].botE;
-						break;
+                        case Orientation.EAST:
+                            img = botTileSetCache[set].botE;
+                            break;
 
-					case Orientation.WEST:
-						img = botTileSetCache[set].botW;
-						break;
+                        case Orientation.WEST:
+                            img = botTileSetCache[set].botW;
+                            break;
 
-					default:
-						img = botTileSetCache[set].botS;
-				}
-			}
-		}
+                        default:
+                            img = botTileSetCache[set].botS;
+                    }
+                }
+            }
+        }
 
 		// If we found something, scale and render the tile
 		if(img != null)
-			renderTile(img, p.x, p.y, bg);
+			renderTile(img, p.x, p.y, bg, planeSize);
 	}
 
-	// Renders a tile with a given buffered image
+
 	private void renderTile(BufferedImage tile, int x, int y, Graphics g){
+        renderTile(tile, x, y, g, this.currentSize);
+            //new Dimension(this.getWidth(), this.getHeight()));
+    }
+
+	// Renders a tile with a given buffered image
+	private void renderTile(BufferedImage tile, int x, int y, Graphics g, Dimension planeSize){
 		g.drawImage(tile, 
-                (int)(x*((float)this.getWidth()     / (float)maze.getWidth())), 
+                (int)(x*((float)planeSize.getWidth()     / (float)maze.getWidth())), 
                 /* Computer rendering (0,0) in the top left) */
-				(int)(y*((float)this.getHeight()    / (float)maze.getHeight())), 
+				(int)(y*((float)planeSize.getHeight()    / (float)maze.getHeight())), 
 				/* Euclidean rendering (0,0) in the bottom-left
                  *
                  * this.getHeight() - (int)((y+1)*((float)this.getHeight()    / (float)maze.getHeight())),  */

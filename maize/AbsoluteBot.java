@@ -2,10 +2,10 @@ package maize;
 
 import maize.*;
 
-/* Provides a bot-like interface, but corrects for the orientation of the bot. 
+/** Provides a bot-like interface, but corrects for the orientation of the bot. 
  *
- * @author Ben Sharatt
- * */
+ * @author Ben Sherratt
+ */
 public class AbsoluteBot implements Bot
 {
 	private int nextMove = -1;
@@ -183,9 +183,9 @@ public class AbsoluteBot implements Bot
      * @see Orientation
      * @see Bot
      *
-     * @param    view    View matric from the perspective of the bot, orientated so
+     * @param    view    View matrix from the perspective of the maze, orientated so
      *                   the top of the matrix is facing the same direction as the 
-     *                   bot.
+     *                   maze (NOT the bot!).
      * @param    x       X coord of the bot.
      * @param    y       Y coord of the bot.
      * @param    o       Orientation of the bot @see Orientation
