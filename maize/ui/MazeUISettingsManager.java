@@ -47,9 +47,11 @@ public class MazeUISettingsManager{
     public static int           logScrollbackLimit  = 1000;
 
     // SecurityManager stuff
-    public static boolean smEnabled = true;
-    public static boolean smDebug = false;
-    public static boolean smAllowThreading = false;
+    public static boolean   smEnabled = true;
+    public static long      smLogLevel = 0;
+    public static boolean   smAllowThreading = false;
+    public static JSONArray smBlackList = null;
+    public static JSONArray smDangerList = null;
 
     // Load from JSON
     public static boolean loadConfig(String filename){
@@ -130,9 +132,21 @@ public class MazeUISettingsManager{
 			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));
 
             // SecurityManager flags/settings
-            MazeUISettingsManager.smEnabled        = (Boolean)(((JSONObject)config.get("security")).get("enabled"));
-            MazeUISettingsManager.smDebug          = (Boolean)(((JSONObject)config.get("security")).get("debug"));
-            MazeUISettingsManager.smAllowThreading = (Boolean)(((JSONObject)config.get("security")).get("allowThreading"));
+            JSONObject security = (JSONObject)config.get( "security" );
+            if( security != null )
+            {
+                MazeUISettingsManager.smEnabled        = (Boolean)(security.get( "enabled" ));
+                MazeUISettingsManager.smLogLevel       = (Long)(security.get( "logLevel" ));
+                MazeUISettingsManager.smAllowThreading = (Boolean)(security.get( "allowThreading" ));
+
+                Object blackList = security.get( "blackList" );
+                if( blackList != null && blackList instanceof JSONArray )
+                    MazeUISettingsManager.smBlackList = (JSONArray)blackList;
+
+                Object dangerList = security.get( "dangerList" );
+                if( dangerList != null && dangerList instanceof JSONArray )
+                    MazeUISettingsManager.smDangerList = (JSONArray)dangerList;
+            }
 
         }catch(NullPointerException NPe){
             Log.log("Missing config key.");

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FilePermission;
 import java.awt.AWTPermission;
 import java.util.PropertyPermission;
+import java.util.ArrayList;
 import java.lang.RuntimePermission;
 import java.net.SocketPermission;
 import java.net.NetPermission;
@@ -15,7 +16,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.*;
 import java.net.URL;
 
-import maize.ui.SecurityConstants;
+import maize.ui.BotSecurityConstants;
 
 /**
  * A SecurityManager extension to only allow bots to do nice things in the simulation.
@@ -26,8 +27,35 @@ import maize.ui.SecurityConstants;
  */
 public class BotSecurityManager extends SecurityManager {
 
-    protected final String[] blacklist  = { "sun.reflect.", "setSecurityManager", "setAccessible" };
-    protected final String[] dangerlist = { "bots." };
+    protected String[] blacklist  = { "sun.reflect.", "setSecurityManager", "setAccessible" };
+    protected String[] dangerlist = { "bots." };
+    protected long     checkID    = 0;
+
+    public BotSecurityManager() {
+        super();
+        debugWrite( "Logging at level: " +MazeUISettingsManager.smLogLevel );
+
+        // Check for overridden blacklist
+        if( MazeUISettingsManager.smBlackList != null )
+        {
+            debugWrite( 2, "Default blacklist replaced by: " + MazeUISettingsManager.smBlackList.toString() );
+            ArrayList<String> tmp = new ArrayList<String>();
+            for( Object o : MazeUISettingsManager.smBlackList )
+                tmp.add( o.toString() );
+            blacklist = tmp.toArray( new String[1] );
+        }
+        
+        // Check for overridden dangerlist
+        if( MazeUISettingsManager.smDangerList != null )
+        {
+            debugWrite( 2, "Default dangerlist replaced by: " + MazeUISettingsManager.smDangerList.toString() );
+            ArrayList<String> tmp = new ArrayList<String>();
+            for( Object o : MazeUISettingsManager.smDangerList )
+                tmp.add( o.toString() );
+            dangerlist = tmp.toArray( new String[1] );
+        }
+
+    }
 
     public void checkPermission( Permission perm ) throws SecurityException {
 
@@ -35,14 +63,21 @@ public class BotSecurityManager extends SecurityManager {
         if( !MazeUISettingsManager.smEnabled )
             return;
 
-        for( String black : blacklist )
-        {
-            if( black.equals( perm.getName() ) )
-                throw new SecurityException( "The call '" +black+ "' is a blacklisted method" );
-        }
+        checkID++;
 
         Object o        = getSecurityContext();
         Class[] context = getClassContext();
+
+        for( String black : blacklist )
+        {
+            if( black.equals( perm.getName() ) )
+            {
+                debugWrite( 1, "[DENY]  #" +checkID+ "   Violation: blacklist on '" +black+ "'" );
+                if( MazeUISettingsManager.smLogLevel >= 3 )
+                    dumpCallStack( context, "" );
+                throw new SecurityException( "The call '" +black+ "' is a blacklisted method" );
+            }
+        }
 
         // Uncommenting this causes much spam, you are fore-warned!
         //Log.log( perm.getClass().getName() + " --> " + perm.getName() );
@@ -62,23 +97,31 @@ public class BotSecurityManager extends SecurityManager {
                 // Disallow threads, if the configuration mandates it.
                 if( !MazeUISettingsManager.smAllowThreading )
                 {
-                    if( perm.getName().equals(SecurityConstants.MODIFY_THREADGROUP_PERMISSION.getName()) ||
-                        perm.getName().equals(SecurityConstants.MODIFY_THREAD_PERMISSION.getName()) )
+                    if( perm.getName().equals(BotSecurityConstants.MODIFY_THREADGROUP_PERMISSION.getName()) ||
+                            perm.getName().equals(BotSecurityConstants.MODIFY_THREAD_PERMISSION.getName()) )
+                    {
+                        debugWrite( 1, "[DENY]  #" +checkID+ "   Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
+                        if( MazeUISettingsManager.smLogLevel >= 3 )
+                            dumpCallStack( context, "" );
                         throw new SecurityException( "Threading is disabled!" );
+                    }
                 }
 
                 for( String black : blacklist )
                 {
                     int violationIdx = searchCallStack( context, black );
-                    /* if( violationIdx > 0 ) */
-                    debugWrite( "Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
 
                     if( violationIdx > 0 && violationIdx < dangerIndex ) {
-                        debugWrite( "RuntimePermission denied on '" +black+ "'!" );
-                        if( MazeUISettingsManager.smDebug )
+                        debugWrite( 1, "[DENY]  #" +checkID+ "   Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
+                        if( MazeUISettingsManager.smLogLevel >= 3 )
                             dumpCallStack( context, black );
                         throw new SecurityException( "RuntimePermissions are disabled for '" +black+ "'!" );
+                    } else if( violationIdx > 0 ) {
+                        debugWrite( 2, "[ALLOW] #" +checkID+ "   Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
+                        if( MazeUISettingsManager.smLogLevel >= 3 )
+                            dumpCallStack( context, black );
                     }
+
                 }
             }
         }
@@ -86,7 +129,13 @@ public class BotSecurityManager extends SecurityManager {
 
     protected void debugWrite( String s )
     {
-        if( MazeUISettingsManager.smDebug )
+        if( MazeUISettingsManager.smLogLevel > 0 )
+            Log.log( s );
+    }
+
+    protected void debugWrite( int level, String s )
+    {
+        if( MazeUISettingsManager.smLogLevel >= level )
             Log.log( s );
     }
 
@@ -132,7 +181,7 @@ public class BotSecurityManager extends SecurityManager {
     }
 
     public void checkCreateClassLoader() {
-        checkPermission(SecurityConstants.CREATE_CLASSLOADER_PERMISSION);
+        checkPermission(BotSecurityConstants.CREATE_CLASSLOADER_PERMISSION);
     }
 
     public void checkExit(int status) {
@@ -142,18 +191,18 @@ public class BotSecurityManager extends SecurityManager {
     public void checkExec(String cmd) {
         File f = new File(cmd);
         if (f.isAbsolute()) {
-            checkPermission( new FilePermission(cmd, SecurityConstants.FILE_EXECUTE_ACTION) );
+            checkPermission( new FilePermission(cmd, BotSecurityConstants.FILE_EXECUTE_ACTION) );
         } else {
-            checkPermission( new FilePermission("<<ALL FILES>>", SecurityConstants.FILE_EXECUTE_ACTION) );
+            checkPermission( new FilePermission("<<ALL FILES>>", BotSecurityConstants.FILE_EXECUTE_ACTION) );
         }
     }
 
     public void checkPropertiesAccess() {
-        checkPermission(new PropertyPermission( "*", SecurityConstants.PROPERTY_RW_ACTION) );
+        checkPermission(new PropertyPermission( "*", BotSecurityConstants.PROPERTY_RW_ACTION) );
     }
 
     public void checkPropertyAccess(String key) {
-        checkPermission(new PropertyPermission( key, SecurityConstants.PROPERTY_READ_ACTION) );
+        checkPermission(new PropertyPermission( key, BotSecurityConstants.PROPERTY_READ_ACTION) );
     }
 
     public boolean checkTopLevelWindow(Object window) {
@@ -162,14 +211,6 @@ public class BotSecurityManager extends SecurityManager {
 
     public void checkPrintJobAccess() {
         checkPermission(new RuntimePermission("queuePrintJob"));
-    }
-
-    public void checkSystemClipboardAccess() {
-        //checkPermission(SecurityConstants.ACCESS_CLIPBOARD_PERMISSION);
-    }
-
-    public void checkAwtEventQueueAccess() {
-        //checkPermission(SecurityConstants.CHECK_AWT_EVENTQUEUE_PERMISSION);
     }
 
     private static boolean packageAccessValid = false;
