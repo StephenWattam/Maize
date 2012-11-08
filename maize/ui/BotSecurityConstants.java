@@ -9,9 +9,9 @@ import java.security.AllPermission;
  * @author John Vidler
  * @version 1.0
  */
-public final class SecurityConstants
+public final class BotSecurityConstants
 {
-    private SecurityConstants() { /* Supress creation */ }
+    private BotSecurityConstants() { /* Supress creation */ }
 
     public static final String FILE_DELETE_ACTION = "delete";
     public static final String FILE_EXECUTE_ACTION = "execute";
