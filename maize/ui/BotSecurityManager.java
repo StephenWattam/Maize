@@ -110,7 +110,6 @@ public class BotSecurityManager extends SecurityManager {
                 for( String black : blacklist )
                 {
                     int violationIdx = searchCallStack( context, black );
-
                     if( violationIdx > 0 && violationIdx < dangerIndex ) {
                         debugWrite( 1, "[DENY]  #" +checkID+ "   Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
                         if( MazeUISettingsManager.smLogLevel >= 3 )
