@@ -79,7 +79,7 @@ The maze you are navigating is represented internally by three quantities:
 \item \textbf{The co-ordinates of the start}---The $(x,y)$ co-ordinates of the start position in the above;
 \item \textbf{The co-ordinates of the finish}---The $(x,y)$ co-ordinates of the goal in the above.
 \end{enumerate}
-The maze is rendered on-screen using conventional euclidean co-ordinates, \textit{not} those used in computer displays.  This means that the bottom-left corner is $(0,0)$, and the top-right is $(i,j)$.
+The maze is rendered on-screen using conventional display co-ordinates, \textit{not} those conventionally used for graph display.  This means that the top-left corner is $(0,0)$, and the bottom-right is $(i,j)$.
 
 
 During a test, your bot will be positioned at the start co-ordinates, and the \texttt{nextMove()} method will be called once for each time tick, unless your bot's current position is equal to the finish.  All mazes are solvable (that is, the generation algorithm generally ensures it), and static.
@@ -101,13 +101,13 @@ In addition to this simple API, there are two classes, \texttt{AdvancedBot} and 
 \label{section:dataformat}
 Each call to \texttt{nextMove()} provides the bot with information that is similar to a real world maze-solving digital mouse.  This is limited to:
 \begin{itemize}
-\item \texttt{view}---A $3 \times 3$ boolean matrix representing the immediate surroundings of the bot.  Note that this is rotated in a similar manner to the Maze, with $(0,0)$ being the lower-left corner:\\
+\item \texttt{view}---A $3 \times 3$ boolean matrix representing the immediate surroundings of the bot.  Note that this is rotated in a similar manner to the Maze, with $(0,0)$ being the top-left corner:\\
         \begin{center}
         \begin{tabular}{|c|c|c|}
             \hline
-            $(2,0)$ & $(2,1)$ & $(2,2)$ \\ \hline
-            $(1,0)$ & bot     & $(1,2)$ \\ \hline
             $(0,0)$ & $(0,1)$ & $(0,2)$ \\ \hline
+            $(1,0)$ & bot     & $(1,2)$ \\ \hline
+            $(2,0)$ & $(2,1)$ & $(2,2)$ \\ \hline
         \end{tabular}\\
         \end{center}
         \vspace{12pt}

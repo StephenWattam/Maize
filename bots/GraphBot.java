@@ -94,6 +94,7 @@ public class GraphBot implements Bot, Serializable {
 
             // Take some data off the route, and add it to the buffer
             queueRoute(bestRoute, o);
+            //buffer.add( Direction.FORWARD );
         }
 
         // Display information about the current view,
@@ -243,7 +244,7 @@ public class GraphBot implements Bot, Serializable {
     /** Prints a 3x3 context matrix. */
     private static void printContext(boolean[][] view){
         debugln("     +---+");
-        for(int i=2;i>=0;i--){
+        for(int i=0;i<3;i++){
             debug("     |");
             for(int j=0;j<3;j++){
                 debug( "" + viewChar(view, i, j) );
@@ -348,7 +349,7 @@ public class GraphBot implements Bot, Serializable {
 
         // loop over map 
         // (note order is inverted to display map in |Y|-y layout)
-        for(int i=(map[0].length-1);i>=0;i--){
+        for(int i=0;i<map[0].length;i++){
             debug("|");
             for(int j=0;j<map.length;j++){
 
