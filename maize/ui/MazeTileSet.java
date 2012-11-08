@@ -12,12 +12,19 @@ public class MazeTileSet{
 	private BufferedImage finish = null;
     private BufferedImage[] bg = null;
 
+    private int width = 1;
+    private int height = 1;
+
+
 	public MazeTileSet(BufferedImage[] bg, BufferedImage[] space, BufferedImage[] wall, BufferedImage start, BufferedImage finish){
         this.bg     = bg;
 		this.space  = space;
 		this.wall   = wall;
 		this.start  = start;
 		this.finish = finish;
+
+        width = (int)space[0].getWidth();
+        height = (int)space[0].getHeight();
 
         System.out.println( "New tile set [spaces:" +space.length+ ", walls:" +wall.length+ ", backgrounds:" +bg.length+ "]" );
 	}
@@ -26,8 +33,11 @@ public class MazeTileSet{
         MazeTileSet newSet = new MazeTileSet( this.bg,
                                               this.space,
                                               this.wall,
-                                              rescaleTile( newSize, maze, this.start ),
-                                              rescaleTile( newSize, maze, this.finish ) );
+                                              this.start,
+                                              this.finish );
+
+        newSet.start = rescaleTile( newSize, maze, newSet.start );
+        newSet.finish = rescaleTile( newSize, maze, newSet.finish );
 
         // Spaces
         for( int idx = 0; idx<newSet.space.length; idx++ )
@@ -41,6 +51,9 @@ public class MazeTileSet{
         for( int idx = 0; idx<newSet.bg.length; idx++ )
             newSet.bg[idx] = rescaleTile( newSize, maze, newSet.bg[idx] );
 
+        newSet.width  = (int)newSize.getWidth();
+        newSet.height = (int)newSize.getHeight();
+
         return newSet;
     }
     
@@ -51,7 +64,7 @@ public class MazeTileSet{
         int tiley = (int)(targetSize.height / maze.getHeight());
         return rescaleImage(new Dimension(tilex, tiley), img);
     }
-    
+
     // Arbitrarily scales an image using bilinear filtering
     private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
         AffineTransform transform = AffineTransform.getScaleInstance(
