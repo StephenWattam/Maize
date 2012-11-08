@@ -100,7 +100,7 @@ public class GraphBot implements Bot, Serializable {
         // render full map
         debugln("Rendering...");
         displayView(view, bestRoute, x, y, o, fx, fy);
-        renderMap(map, bestRoute, x, y, fx, fy);
+        renderMap(map, bestRoute, x, y, fx, fy, o);
         debugln("==================================================");
 
         // Then follow anything in the buffer
@@ -340,7 +340,7 @@ public class GraphBot implements Bot, Serializable {
     //
     // This renders somewhat upside-down, so that 0,0 is in the bottom left, just like the
     // UI display in Maize
-    private void renderMap(boolean[][] map, Vector<Point> route, int botX, int botY, int fx, int fy){
+    private void renderMap(boolean[][] map, Vector<Point> route, int botX, int botY, int fx, int fy, int o){
         // Header
         debug("+");
         for(int i=0;i<map.length;i++){ debug("-"); }
@@ -353,9 +353,22 @@ public class GraphBot implements Bot, Serializable {
             for(int j=0;j<map.length;j++){
 
                 // output wall, bot, space
-                if(i == botY && j == botX)
-                    debug("*");
-                else if(i == fx && j == fy)
+                if(i == botY && j == botX){
+                    switch(o){
+                        case Orientation.NORTH:
+                            debug("^");
+                            break;
+                        case Orientation.EAST:
+                            debug(">");
+                            break;
+                        case Orientation.SOUTH:
+                            debug("v");
+                            break;
+                        case Orientation.WEST:
+                            debug("<");
+                            break;
+                    }
+                }else if(i == fx && j == fy)
                     debug("F");
                 else if(route != null && route.contains(new Point(j, i)))
                     debug(".");

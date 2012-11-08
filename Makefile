@@ -5,7 +5,8 @@ CC=javac
 #CC=/usr/libexec/java_home -v 1.7.0_09 --exec javac
 
 # Use 1.6 language features only.
-CFLAGS=-cp ./lib/json-simple-1.1.1.jar -source 1.6 -Xlint:unchecked
+CFLAGS=-cp ./lib/json-simple-1.1.1.jar -source 1.6 
+#-Xlint:unchecked
 
 JAVA=java
 # Mac users should use this instead (see http://docs.oracle.com/javase/7/docs/webnotes/install/mac/mac-jdk.html )

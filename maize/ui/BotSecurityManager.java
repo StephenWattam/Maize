@@ -70,7 +70,7 @@ public class BotSecurityManager extends SecurityManager {
                 for( String black : blacklist )
                 {
                     int violationIdx = searchCallStack( context, black );
-                    /* if( violationIdx > 0 ) */
+                    if( violationIdx > 0 )
                     debugWrite( "Violation: " +context[violationIdx].getName()+ " [" +violationIdx+ "], Danger: " +context[dangerIndex]+ " [" +dangerIndex+ "]" );
 
                     if( violationIdx > 0 && violationIdx < dangerIndex ) {

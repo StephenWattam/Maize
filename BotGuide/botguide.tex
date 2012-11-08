@@ -1,0 +1,198 @@
+
+
+
+\documentclass[11pt]{article}
+% Default margins are too wide all the way around. I reset them here
+\setlength{\topmargin}{-.5in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{.125in}
+\setlength{\textwidth}{6.25in}
+
+% Nicer paragraph style
+\setlength{\parskip}{\baselineskip}%
+\setlength{\parindent}{0pt}%
+
+% Font
+%\usepackage[urw-garamond]{mathdesign}
+%\usepackage[T1]{fontenc}
+
+
+\usepackage{listings}
+\usepackage{color}
+ 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+ 
+\lstset{ %
+  language=Java,                % the language of the code
+  basicstyle=\footnotesize,           % the size of the fonts that are used for the code
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+                                  % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,                   % adds a frame around the code
+  rulecolor=\color{black},        % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                   % show the filename of files included with \lstinputlisting;
+                                  % also try caption instead of title
+  keywordstyle=\color{blue},          % keyword style
+  commentstyle=\color{dkgreen},       % comment style
+  stringstyle=\color{mauve},         % string literal style
+  escapeinside={\%*}{*)},            % if you want to add LaTeX within your code
+  morekeywords={*,...},              % if you want to add more keywords to the set
+  deletekeywords={...}              % if you want to delete keywords from the given language
+}
+
+
+\begin{document}
+
+
+\title{Writing Bots for Maize}
+\author{Stephen Wattam}
+\date{\today}
+\maketitle
+
+% Table of contents
+\tableofcontents{}
+\pagebreak
+
+
+\section{Introduction}
+This is a rough guide on getting started with writing your own bot for Maize.  It descibes the conventions and data format used in the Bot API, as well as pointing at some of the more advanced features available.
+
+As an overview, you will be writing a class that controls a virtual agent as it moves around a virtual maze.  You will be provided only with a small amount of data abuot the surroundings of the bot, and can only instruct it to turn left or right, and move forward or backwards.  The aim is to reach the goal (or finish).
+
+
+\section{World Format}
+The maze you are navigating is represented internally by three quantities:
+\begin{enumerate}
+\item \textbf{A boolean matrix}---This represents the wall and space structure of the maze.  Each cell holds a boolean value: true for the presence of a wall, false for a space;
+\item \textbf{The co-ordinates of the start}---The $(x,y)$ co-ordinates of the start position in the above;
+\item \textbf{The co-ordinates of the finish}---The $(x,y)$ co-ordinates of the goal in the above.
+\end{enumerate}
+The maze is rendered on-screen using conventional euclidean co-ordinates, \textit{not} those used in computer displays.  This means that the bottom-left corner is $(0,0)$, and the top-right is $(i,j)$.
+
+
+During a test, your bot will be positioned at the start co-ordinates, and the \texttt{nextMove()} method will be called once for each time tick, unless your bot's current position is equal to the finish.  All mazes are solvable (that is, the generation algorithm generally ensures it), and static.
+
+
+
+\section{Bot API}
+Bots are run by calling a re-entrant API on an existing instance of a class that implements the \texttt{Bot} interface.  This comprises three methods, all of which must be implemented:
+\begin{itemize}
+\item \texttt{nextMove()}---Is called once per time tick, and returns a value from the \texttt{Direction} enumeration in order to indicate which way the bot should move.  The full format for this is listed below, in Section~\ref{section:dataformat};
+\item \texttt{getName()}---Returns a name for the bot.  Used in lists and the UI to identify your creation;
+\item \texttt{getDescription()}---Returns a sentence or two about how your bot works, and any state information you may wish to check on.
+\end{itemize}
+In addition to this simple API, there are two classes, \texttt{AdvancedBot} and \texttt{StateBot}, which add a higher level API to the above.  They are documented below in Section~\ref{section:alternativeapis}.
+
+
+
+\subsection{Bot Data Format}
+\label{section:dataformat}
+Each call to \texttt{nextMove()} provides the bot with information that is similar to a real world maze-solving digital mouse.  This is limited to:
+\begin{itemize}
+\item \texttt{view}---A $3 \times 3$ boolean matrix representing the immediate surroundings of the bot.  Note that this is rotated in a similar manner to the Maze, with $(0,0)$ being the lower-left corner:\\
+        \begin{center}
+        \begin{tabular}{|c|c|c|}
+            \hline
+            $(2,0)$ & $(2,1)$ & $(2,2)$ \\ \hline
+            $(1,0)$ & bot     & $(1,2)$ \\ \hline
+            $(0,0)$ & $(0,1)$ & $(0,2)$ \\ \hline
+        \end{tabular}\\
+        \end{center}
+        \vspace{12pt}
+        Note that the view matrix is rotated so that \textbf{the bot always faces towards $(2,1)$}.  It is possible to rotate it to face north by calling \texttt{Orientation.rotateToNorth()}.
+
+\item \texttt{x}---The integer $x$ co-ordinate of the bot's current position in the maze.
+\item \texttt{y}---The integer $y$ co-ordinate of the bot's current position in the maze.
+
+\item \texttt{o}---An integer taking one of the values from the \texttt{Orientation} class, representing the bot's current orientation (which way it is facing relative to the maze).  This can take one of the following values:
+    \begin{itemize}
+    \item \texttt{Orientation.NORTH} = 0
+    \item \texttt{Orientation.EAST} = 1 
+    \item \texttt{Orientation.SOUTH} = 2
+    \item \texttt{Orientation.WEST} = 3
+    \end{itemize}
+
+\item \texttt{fx}---The integer $x$ co-ordinate of the finish square.
+\item \texttt{fy}---The integer $y$ co-ordinate of the finish square.
+\end{itemize}
+
+The method should return an integer, between 0 and 3 (inclusive), representing which way the bot should move.  The easiest way to do this is to use the \texttt{Direction} class, which has four values coded into it:
+\begin{itemize}
+\item \textt{Direction.FORWARD} = 0
+\item \textt{Direction.BACK} = 1
+\item \textt{Direction.LEFT} = 2
+\item \textt{Direction.RIGHT} = 3
+\end{itemize}
+Note that \texttt{Direction.LEFT} and \texttt{Direction.RIGHT} will instruct the bot to \textit{turn} left or right, not strafe.
+
+
+
+\subsection{Alternative Interfaces to Bot}
+\label{section:alternativeapis}
+In addition to the \texttt{Bot} interface, two other classes exist which provide further functionality.  If you wish to use these, I recommend reading their javadoc documentation, where a full API is given:
+\begin{itemize}
+\item \texttt{StateBot}---Supports retaining just one piece of information by calling \texttt{setState()} and \texttt{getState()};
+\item \texttt{AdvancedBot}---Supports a queue of actions, held in a buffer.  When the buffer is empty, \texttt{nextMove()} is called for more instructions.  Contains high-level APIs that take advantage of this functionality (\textsl{e.g.} \texttt{strafeRight()}, \texttt{rotate180()}).
+\end{itemize}
+
+
+\subsection{Further Considerations}
+We have attempted to minimise the technical requirements for your bot, however, some remain (mainly due to the design of Java).  The sample code in Section~\ref{section:template} covers all of these, and I recommend you start from it (or from the source of another bot).
+
+\begin{itemize}
+\item In order to save/load bots, your class must implement \texttt{java.io.Serializable}.  
+\item In order to use the \texttt{Orientation} and \texttt{Direction} classes, you must import them .
+\item Your bot \textbf{must} be in the package that corresponds to its directory relative to \texttt{RunMazeUI.class}.  This is, typically, \texttt{bots} (if in doubt, check the config file).
+\end{itemize}
+
+\pagebreak
+\section{Template Bot Code}
+\label{section:template}
+\begin{lstlisting}
+package bots;
+import maize.*;
+import java.io.Serializable;
+
+public class EmptyBot implements Bot, Serializable {
+
+    /** Implementation of the Bot interface.
+     * @see Bot
+     */
+    @Override
+    public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
+        // Behaviour Code in here
+        return Direction.FORWARD;
+    }
+
+    /** Implementation of the Bot interface.
+     * @see Bot
+     */
+    @Override
+    public String getName(){
+        return "Bot Name";
+    }
+
+    /** Implementation of the Bot interface.
+     * @see Bot
+     */
+    @Override
+    public String getDescription(){
+        return "A quick bit of info about the bot.";
+    }
+}
+\end{lstlisting}
+
+
+\end{document}
