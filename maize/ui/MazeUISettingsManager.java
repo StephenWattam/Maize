@@ -44,6 +44,9 @@ public class MazeUISettingsManager{
 	public static int          defaultMazeWidth      = 20;
 	public static int          defaultMazeHeight     = 20;
 
+    // Switch MazePanels into fast mode?
+    public static boolean       fastMazeRendering   = false;
+
     public static int           logScrollbackLimit  = 1000;
 
     // SecurityManager stuff
@@ -155,6 +158,8 @@ public class MazeUISettingsManager{
 
 			MazeUISettingsManager.attachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("attachIcon").toString()));
 			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));
+
+            MazeUISettingsManager.fastMazeRendering = (Boolean)(((JSONObject)config.get( "maze" )).get("fastRendering"));
 
             // SecurityManager flags/settings
             JSONObject security = (JSONObject)config.get( "security" );

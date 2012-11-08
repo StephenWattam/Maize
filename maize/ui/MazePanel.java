@@ -13,6 +13,9 @@ public class MazePanel extends Canvas{
 	// The maze to show
 	private Maze maze = null;
 
+    // Render using fast or HQ algorithm?
+    private boolean fastRender = false;
+
 	// Keep lists of stuff to render
 	private Vector<Agent> agents = new Vector<Agent>();
 	private Vector<Point> dirty_tiles = new Vector<Point>();
@@ -27,10 +30,15 @@ public class MazePanel extends Canvas{
 	private MazeTileSet mazeTileCache = null;
 	private BotTileSet[] botTileSetCache = null;
 
-	public MazePanel(Maze maze, MazeTileSet mazeTiles, BotTileSet[] botTileSets){ 
+
+    // Construct with maze
+	public MazePanel(Maze maze, MazeTileSet mazeTiles, BotTileSet[] botTileSets, boolean fastRender){ 
 
 		// Set maze
 		this.maze = maze;
+
+        // Set fast rendering
+        this.fastRender = fastRender;
 
 		// Populate images	
 		this.mazeTiles      = mazeTiles;
@@ -40,12 +48,24 @@ public class MazePanel extends Canvas{
         currentSize = getSize();
 	}
 
-	public MazePanel(MazeTileSet mazeTiles, BotTileSet[] botTileSets){
+    // Construct with maze
+	public MazePanel(Maze maze, MazeTileSet mazeTiles, BotTileSet[] botTileSets){ 
+        new MazePanel(maze, mazeTiles, botTileSets, false);
+    }
 
-		// Populate images	
-		this.mazeTiles = mazeTiles;
-		this.botTileSets = botTileSets;
+    // Construct without maze
+	public MazePanel(MazeTileSet mazeTiles, BotTileSet[] botTileSets){
+        new MazePanel(null, mazeTiles, botTileSets);
 	}
+
+    // Set fast rendering or not.
+    public void setFastRendering(boolean fast){
+        // Re-render if different.
+        if(this.fastRender != fast){
+            this.fastRender = fast;
+            resizeCache();
+        }
+    }
 
     // Resizes all cache images from the originals.
     public void resizeCache(){
@@ -58,14 +78,32 @@ public class MazePanel extends Canvas{
             return;
 
         // Load the size.
-        currentSize = getSize();
+        this.currentSize = getSize();
 
-        System.out.println( mazeTileCache );
+        // Rescale tiles from original
+        // This also sets the tiles to be original-sized for
+        // the rendering of the background image below
+        this.mazeTileCache = mazeTiles;
+
+        // Don't render bots when pre-rendering bg image
+        this.botTileSetCache = null;
+
+        /* High quality rendering:
+         *
+         * Render at full size, THEN scale.  Allows contiguous walls to look good. */
+        if(!this.fastRender){
+            Dimension targetSize = new Dimension( mazeTileCache.getWidth()  * this.maze.getWidth(),
+                                                  mazeTileCache.getHeight() * this.maze.getHeight() );
+            BufferedImage newBuffer = new BufferedImage(targetSize.width, targetSize.height, BufferedImage.TYPE_INT_ARGB);
+            renderBackground( targetSize, newBuffer.getGraphics() );
+            this.bgBuffer = rescaleImage( this.currentSize, newBuffer );
+        }
+
 
         // Rescale tiles from original to avoid lossiness
         this.mazeTileCache = this.mazeTiles.rescale( currentSize, maze );
 
-        // Scale bots from original to avoid lossiness.
+        // Scale the bot tile set
         this.botTileSetCache = new BotTileSet[botTileSets.length];
         for(int i=0; i<botTileSets.length; i++){
             // set, get it to map and rotate 
@@ -77,15 +115,19 @@ public class MazePanel extends Canvas{
             this.botTileSetCache[i].botW = rescaleTile(currentSize, botTileSetCache[i].botW);
         }
         
+        /* Low quality rendering.
+         *
+         * Pre-scale everything, then render onto a small plane.
+         * Very very fast, but can have problems with placing things.
+         */
+        if(this.fastRender){
+            this.bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
+            renderBackground(  currentSize, this.bgBuffer.getGraphics());
+        }
 
-
-        /* // Reconstruct the background to that size */
-        this.bgBuffer = new BufferedImage(currentSize.width, currentSize.height, BufferedImage.TYPE_INT_ARGB);
-        renderBackground( this.bgBuffer.getGraphics() );
     }
 
     // Rescales a tile to fit the current maze size for a given screen size.
-    @Deprecated
     private BufferedImage rescaleTile(Dimension targetSize, BufferedImage img){
         //rescale the image to be done
         int tilex = (int)(targetSize.width / maze.getWidth());
@@ -140,16 +182,15 @@ public class MazePanel extends Canvas{
 
     // Draws the whole of the background, equivalent to dirtying everything
     // then rendering without any bots added
-    private void renderBackground(Graphics g){
+    private void renderBackground(Dimension planeSize, Graphics g){
+
         // Set bg to a scaled version of the background image
         g.drawImage(rescaleImage(new Dimension(this.getWidth(), this.getHeight()), mazeTiles.getBackground()), 0, 0, this);
-        
 
         // and then render all the tiles
-        // TODO: prevent things from rendering the bots onto the background!
         for(int i=0; i < maze.getWidth(); i++){
             for(int j=0; j < maze.getHeight(); j++){
-                drawTile(new Point(i, j), g);
+                drawTile(new Point(i, j), g, planeSize);
             }
         }	
     }
@@ -174,9 +215,15 @@ public class MazePanel extends Canvas{
 		}
 	}
 
+
+	private void drawTile(Point p, Graphics bg){
+        drawTile(p, bg, this.currentSize );
+        //new Dimension(this.maze.getWidth(), this.maze.getHeight()) );
+    }
+
 	// Plots a tile at a given point
 	// takes into account agents, etc
-	private void drawTile(Point p, Graphics bg)
+	private void drawTile(Point p, Graphics bg, Dimension planeSize)
 	{
 		//System.out.println("No. Agents on this MazePanel: " + agents.size());
 		boolean[][] mdata = maze.getData();
@@ -202,46 +249,58 @@ public class MazePanel extends Canvas{
 
 		// Check each agent
 		//hopefully now renders last agent in the vector in blue.
-		Iterator<Agent> ia = agents.iterator();
-		Agent current;
-		int tileSetCount = 0;
-		while( ia.hasNext()){
-			int set = tileSetCount++ % this.botTileSets.length;
-			current = ia.next();
+        //
+        
+        // Don't try to render agents if there is no tile set cache yet
+        // this nicely prevents the baking of bot images onto the background
+        if(this.botTileSetCache != null){
+            Iterator<Agent> ia = agents.iterator();
+            Agent current;
+            int tileSetCount = 0;
+            while( ia.hasNext()){
+                int set = tileSetCount++ % this.botTileSets.length;
+                current = ia.next();
 
-			if(current.getX() == p.x && current.getY() == p.y)
-			{
-				switch(current.getOrientation())
-				{
-					case Orientation.NORTH:
-						img = botTileSetCache[set].botN;
-						break;
+                if(current.getX() == p.x && current.getY() == p.y)
+                {
+                    switch(current.getOrientation())
+                    {
+                        case Orientation.NORTH:
+                            img = botTileSetCache[set].botN;
+                            break;
 
-					case Orientation.EAST:
-						img = botTileSetCache[set].botE;
-						break;
+                        case Orientation.EAST:
+                            img = botTileSetCache[set].botE;
+                            break;
 
-					case Orientation.WEST:
-						img = botTileSetCache[set].botW;
-						break;
+                        case Orientation.WEST:
+                            img = botTileSetCache[set].botW;
+                            break;
 
-					default:
-						img = botTileSetCache[set].botS;
-				}
-			}
-		}
+                        default:
+                            img = botTileSetCache[set].botS;
+                    }
+                }
+            }
+        }
 
 		// If we found something, scale and render the tile
 		if(img != null)
-			renderTile(img, p.x, p.y, bg);
+			renderTile(img, p.x, p.y, bg, planeSize);
 	}
 
-	// Renders a tile with a given buffered image
+
 	private void renderTile(BufferedImage tile, int x, int y, Graphics g){
+        renderTile(tile, x, y, g, this.currentSize);
+            //new Dimension(this.getWidth(), this.getHeight()));
+    }
+
+	// Renders a tile with a given buffered image
+	private void renderTile(BufferedImage tile, int x, int y, Graphics g, Dimension planeSize){
 		g.drawImage(tile, 
-                (int)(x*((float)this.getWidth()     / (float)maze.getWidth())), 
+                (int)(x*((float)planeSize.getWidth()     / (float)maze.getWidth())), 
                 /* Computer rendering (0,0) in the top left) */
-				(int)(y*((float)this.getHeight()    / (float)maze.getHeight())), 
+				(int)(y*((float)planeSize.getHeight()    / (float)maze.getHeight())), 
 				/* Euclidean rendering (0,0) in the bottom-left
                  *
                  * this.getHeight() - (int)((y+1)*((float)this.getHeight()    / (float)maze.getHeight())),  */
