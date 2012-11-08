@@ -9,7 +9,6 @@ import maize.*;
 public class AbsoluteBot implements Bot
 {
 	private int nextMove = -1;
-	private int nextNextMove = -1;
 
     /** Implementation of the Bot interface.
      *
@@ -55,9 +54,7 @@ public class AbsoluteBot implements Bot
 							break;
 
 						case Orientation.SOUTH:
-							r = Direction.LEFT;
-							nextMove = Direction.LEFT;
-							nextNextMove = Direction.FORWARD;
+							r = Direction.BACK;
 
 							break;
 
@@ -80,9 +77,7 @@ public class AbsoluteBot implements Bot
 					switch(nextMoveVal)
 					{
 						case Orientation.NORTH:
-							r = Direction.LEFT;
-							nextMove = Direction.LEFT;
-							nextNextMove = Direction.FORWARD;
+							r = Direction.BACK;
 
 							break;
 
@@ -127,9 +122,7 @@ public class AbsoluteBot implements Bot
 							break;
 
 						case Orientation.EAST:
-							r = Direction.LEFT;
-							nextMove = Direction.LEFT;
-							nextNextMove = Direction.FORWARD;
+							r = Direction.BACK;
 
 							break;
 					}
@@ -152,9 +145,7 @@ public class AbsoluteBot implements Bot
 							break;
 
 						case Orientation.WEST:
-							r = Direction.LEFT;
-							nextMove = Direction.LEFT;
-							nextNextMove = Direction.FORWARD;
+							r = Direction.BACK;
 
 							break;
 
@@ -172,8 +163,7 @@ public class AbsoluteBot implements Bot
 		else
 		{
 			int r = nextMove;
-			nextMove = nextNextMove;
-			nextNextMove = -1;
+			nextMove = -1;
 			return r;
 		}
 	}
