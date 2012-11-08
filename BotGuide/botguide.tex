@@ -29,7 +29,7 @@
   basicstyle=\footnotesize,           % the size of the fonts that are used for the code
   numbers=left,                   % where to put the line-numbers
   numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
-  stepnumber=2,                   % the step between two line-numbers. If it's 1, each line 
+  stepnumber=1,                   % the step between two line-numbers. If it's 1, each line 
                                   % will be numbered
   numbersep=5pt,                  % how far the line-numbers are from the code
   backgroundcolor=\color{white},      % choose the background color. You must add \usepackage{color}
@@ -67,9 +67,9 @@
 
 
 \section{Introduction}
-This is a rough guide on getting started with writing your own bot for Maize.  It descibes the conventions and data format used in the Bot API, as well as pointing at some of the more advanced features available.
+This is a rough guide on getting started with writing your own bot for Maize.  It describes the conventions and data format used in the Bot API, as well as pointing at some of the more advanced features available.
 
-As an overview, you will be writing a class that controls a virtual agent as it moves around a virtual maze.  You will be provided only with a small amount of data abuot the surroundings of the bot, and can only instruct it to turn left or right, and move forward or backwards.  The aim is to reach the goal (or finish).
+As an overview, you will be writing a class that controls a virtual agent as it moves around a virtual maze.  You will be provided only with a small amount of data about the surroundings of the bot, and can only instruct it to turn left or right, and move forward or backwards.  The aim is to reach the goal (or finish).
 
 
 \section{World Format}
@@ -194,5 +194,51 @@ public class EmptyBot implements Bot, Serializable {
 }
 \end{lstlisting}
 
+
+\pagebreak
+\appendix
+\section{Listing of Method Signatures}
+\subsection{Orientation}
+\begin{lstlisting}
+/** NORTH direction */
+public static final int NORTH = 0;
+
+/** EAST direction */
+public static final int EAST = 1;
+
+/** SOUTH direction */
+public static final int SOUTH = 2;
+
+/** WEST direction */
+public static final int WEST = 3;
+
+// Get the name of an orientation as a string
+public static String getName(int o);
+
+// Rotate to fit current context
+public static boolean[][] rotateToNorth(boolean[][] view, int o);
+
+// Rotate clockwise
+private static boolean[][] rotateCW(boolean[][] mat);
+\end{lstlisting}
+
+
+\subsection{Direction}
+\begin{lstlisting}
+/** FORWARD move */
+public static final int FORWARD = 0;
+
+/** BACKWARD move */
+public static final int BACK = 1;
+
+/** RIGHT move */
+public static final int RIGHT = 2;
+
+/** LEFT move */
+public static final int LEFT = 3;
+
+// Get the name of a direction as a string.
+public static String getName(int d);
+\end{lstlisting}
 
 \end{document}
