@@ -184,41 +184,157 @@ public class GraphBot implements Bot, Serializable {
 
     // Rotates the bot to the desired orientation by adding to the instruction buffer
     //
-    // FIXME: improve this so it is more efficient
-    //        it currently has one case where it turns right three times instead of
-    //        turning left.
+    // This is the version from AbsoluteBot, by Ben.  My version is below.
     private void rotateToMatch(int current, int desired){
+        switch(current)
+        {
+            case Orientation.NORTH:
+                switch(desired)
+                {
+                    case Orientation.NORTH:
+                        this.buffer.add(Direction.FORWARD);
+
+                        break;
+
+                    case Orientation.SOUTH:
+                        this.buffer.add( Direction.BACK );
+
+                        break;
+
+                    case Orientation.WEST:
+                        this.buffer.add( Direction.LEFT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.EAST:
+                        this.buffer.add( Direction.RIGHT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+                }
+
+                break;
+
+            case Orientation.SOUTH:
+                switch(desired)
+                {
+                    case Orientation.NORTH:
+                        this.buffer.add( Direction.BACK );
+
+                        break;
+
+                    case Orientation.SOUTH:
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.WEST:
+                        this.buffer.add( Direction.RIGHT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.EAST:
+                        this.buffer.add( Direction.LEFT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+                }
+
+                break;
+
+            case Orientation.WEST:
+                switch(desired)
+                {
+                    case Orientation.NORTH:
+                        this.buffer.add( Direction.RIGHT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.SOUTH:
+                        this.buffer.add( Direction.LEFT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.WEST:
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.EAST:
+                        this.buffer.add( Direction.BACK );
+
+                        break;
+                }
+
+                break;
+
+            case Orientation.EAST:
+                switch(desired)
+                {
+                    case Orientation.NORTH:
+                        this.buffer.add( Direction.LEFT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.SOUTH:
+                        this.buffer.add( Direction.RIGHT );
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+
+                    case Orientation.WEST:
+                        this.buffer.add( Direction.BACK );
+
+                        break;
+
+                    case Orientation.EAST:
+                        this.buffer.add( Direction.FORWARD );
+
+                        break;
+                }
+                break;
+        }
+
+
+        /*
+
         // check for 270 degree left turns
-        /* debugln(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); */
+        /* debugln(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); * /
 
-        /* // special case to prevent weird 'turning three times right to go left' */
-        if((current - desired) == 1){
-        /*     /* debugln("\n####### LEFT HAND TURN"); */ 
-            buffer.add(Direction.LEFT);
-            buffer.add(Direction.FORWARD);
-            return;
+        /* // special case to prevent weird 'turning three times right to go left' * /
+        if(Math.abs(current - desired) == 1){
+    /*     /* debugln("\n####### LEFT HAND TURN"); * / 
+    buffer.add(Direction.LEFT);
+    buffer.add(Direction.FORWARD);
+    return;
         }
 
-        /* // 180 degrees, */
-        /* // this basically means we can just tell the bot to  */
-        /* // go backwards */
+        /* // 180 degrees, * /
+        /* // this basically means we can just tell the bot to  * /
+        /* // go backwards * /
         if(Math.abs(current - desired) == 2){
-            buffer.add( Direction.BACK );
-            return;
+        buffer.add( Direction.BACK );
+        return;
         }
-        
+
         // Else go right until we meet the point we want
         // then move forward
         while(current != desired){
-            // Go right
-            buffer.add(Direction.RIGHT);
-            // Keep track
-            current = ((current + 1) % 4);
+    // Go right
+    buffer.add(Direction.RIGHT);
+    // Keep track
+    current = ((current + 1) % 4);
         }
         buffer.add(Direction.FORWARD);
 
 
-        return;
+        return; 
+        */
     }
 
 
