@@ -53,7 +53,6 @@ public final class Agent {
         boolean[][] view = new boolean[3][3];
 
 
-        System.out.println("  -> " + checkMazePoint(x, y-1));
 
         /* Fill view array */
         view[0][0] = checkMazePoint(x-1,  y-1);
