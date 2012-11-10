@@ -106,7 +106,8 @@ public class MazePanel extends Canvas{
                 rescaleTile(currentSize, mazeTiles.space),
                 rescaleTile(currentSize, mazeTiles.wall),
                 rescaleTile(currentSize, mazeTiles.start),
-                rescaleTile(currentSize, mazeTiles.finish));
+                rescaleTile(currentSize, mazeTiles.finish)
+        );
 
         // Scale the bot tile set
         this.botTileSetCache = new BotTileSet[botTileSets.length];
@@ -232,10 +233,9 @@ public class MazePanel extends Canvas{
 	private void drawTile(Point p, Graphics bg, Dimension planeSize)
 	{
 		//System.out.println("No. Agents on this MazePanel: " + agents.size());
-		boolean[][] mdata = maze.getData();
 		BufferedImage img = null;
 
-        if(p.x > mdata.length)
+        if( p.x > maze.getWidth() || p.y > maze.getHeight() )
             return;
 
 		// Check for maze background section
@@ -245,9 +245,7 @@ public class MazePanel extends Canvas{
 		else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
 			img = mazeTileCache.finish;
 		//renderTile(finish, p.x, p.y, bg);
-		else if( mdata[p.x][p.y] ){
-            if( p.y > mdata[p.x].length )
-                return;
+		else if( maze.getPoint(p.x, p.y) ){
 			img = mazeTileCache.wall;
         }else
 			img = mazeTileCache.space;

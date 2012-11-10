@@ -47,7 +47,7 @@ public class LineMazeFactory implements MazeFactory {
     int finishx = this.width/2 + 1 + ((int)(Math.random() * ((this.width/2)-3)));
     int finishy = this.height/2 + 2 + ((int)(Math.random() * ((this.height/2)-3)));
 
-    return new Maze(data, width, height, startx, starty, finishx, finishy);
+    return new Maze(data, startx, starty, finishx, finishy);
   } 
 }
 
