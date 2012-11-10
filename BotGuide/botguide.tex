@@ -101,17 +101,17 @@ In addition to this simple API, there are two classes, \texttt{AdvancedBot} and 
 \label{section:dataformat}
 Each call to \texttt{nextMove()} provides the bot with information that is similar to a real world maze-solving digital mouse.  This is limited to:
 \begin{itemize}
-\item \texttt{view}---A $3 \times 3$ boolean matrix representing the immediate surroundings of the bot.  Note that this is rotated in a similar manner to the Maze, with $(0,0)$ being the top-left corner:\\
+    \item \texttt{view}---A $3 \times 3$ boolean matrix representing the immediate surroundings of the bot, formatted as $(x,y)$.  Note that this is rotated in a similar manner to the Maze, with $(0,0)$ being the top-left corner:\\
         \begin{center}
         \begin{tabular}{|c|c|c|}
             \hline
-            $(0,0)$ & $(0,1)$ & $(0,2)$ \\ \hline
-            $(1,0)$ & bot     & $(1,2)$ \\ \hline
-            $(2,0)$ & $(2,1)$ & $(2,2)$ \\ \hline
+            $(0,0)$ & $(1,0)$ & $(2,0)$ \\ \hline
+            $(0,1)$ & bot     & $(2,1)$ \\ \hline
+            $(0,2)$ & $(1,2)$ & $(2,2)$ \\ \hline
         \end{tabular}\\
         \end{center}
         \vspace{12pt}
-        Note that the view matrix is rotated so that \textbf{the bot always faces towards $(2,1)$}.  It is possible to rotate it to face north by calling \texttt{Orientation.rotateToNorth()}.
+        Note that the view matrix is rotated so that \textbf{the bot always faces towards $(1,0)$}.  It is possible to rotate it to face north by calling \texttt{Orientation.rotateToNorth()}.
 
 \item \texttt{x}---The integer $x$ co-ordinate of the bot's current position in the maze.
 \item \texttt{y}---The integer $y$ co-ordinate of the bot's current position in the maze.
