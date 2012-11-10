@@ -66,8 +66,9 @@ public final class Agent {
         view[2][2] = checkMazePoint(mazedata, x+1,  y+1);
 
 
+
         /* Rotate into bot view */
-        for(int i = 0; i < this.o; i++) { 
+        for(int i = this.o; i > 0; i--) { 
             view = rotateArray(view); 
         }
 
@@ -84,30 +85,38 @@ public final class Agent {
      * @return           true for hedge, false for path
      */
     private boolean checkMazePoint(boolean[][] maze, int x, int y){
-
-        boolean value = false;
-
-
         /* Bound checking */
-        if( x < 0 || y < 0 || x >= maze.length || y >= maze[0].length)
-            value = true;
+        if( x < 0 || y < 0 || y >= maze.length || x >= maze[0].length)
+            return true;
+        
         /* Set finish to blank */
-        else if(x == this.maze.getExiX() && y == this.maze.getExiY())
-            value = false;
-        else
-            value = maze[x][y];
-
-
-        return value;
+        if(x == this.maze.getExiX() && y == this.maze.getExiY())
+            return false;
+        
+        return maze[x][y];
     }
 
+    // Thank to http://stackoverflow.com/questions/2799755/rotate-array-clockwise
+    private static boolean[][] rotateArray(boolean[][] mat) {
+        final int M = mat.length;
+        final int N = mat[0].length;
+        boolean[][] ret = new boolean[N][M];
+        for (int r = 0; r < M; r++) {
+            for (int c = 0; c < N; c++) {
+                ret[c][M-1-r] = mat[r][c];
+            }
+        }
+        return ret;
+    }
+
+/*
     /** Rotate array 90 degrees clockwise.
      * To all: Apologises.
      *
      * @param  array     Array to rotate.
      *
      * @return           Rotated array.
-     */
+     * /
     private boolean[][] rotateArray(boolean[][] array){
 
         boolean[][] narray = new boolean[3][3];
@@ -126,6 +135,7 @@ public final class Agent {
 
         return narray;
     }
+    */
 
     /** Rotate agent right.
      * Changes orientation.

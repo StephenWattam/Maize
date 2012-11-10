@@ -363,7 +363,7 @@ public class GraphBot implements Bot, Serializable {
         for(int i=0;i<3;i++){
             debug("     |");
             for(int j=0;j<3;j++){
-                debug( "" + viewChar(view, i, j) );
+                debug( "" + viewChar(view, j, i) );
             }
             debug( "|\n" );
         }
@@ -469,8 +469,12 @@ public class GraphBot implements Bot, Serializable {
             debug("|");
             for(int j=0;j<map.length;j++){
 
+                // Fix terminal rendering order
+                int x = j;
+                int y = i;
+
                 // output wall, bot, space
-                if(i == botY && j == botX){
+                if(y == botY && x == botX){
                     switch(o){
                         case Orientation.NORTH:
                             debug("^");
@@ -485,11 +489,11 @@ public class GraphBot implements Bot, Serializable {
                             debug("<");
                             break;
                     }
-                }else if(i == fx && j == fy)
+                }else if(x == fx && y == fy)
                     debug("F");
-                else if(route != null && route.contains(new Point(j, i)))
+                else if(route != null && route.contains(new Point(x, y)))
                     debug(".");
-                else if(map[j][i])
+                else if(map[x][y])
                     debug("#");
                 else
                     debug(" ");
