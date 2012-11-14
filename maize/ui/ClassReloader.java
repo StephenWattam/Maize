@@ -19,7 +19,8 @@ public class ClassReloader extends ClassLoader{
     public Class loadClass(String name) throws ClassNotFoundException {
 
         // Use the parent if it's not on our list of allowable classes
-        if(!className.equals(name))
+        // Also allow inner classes
+        if(!className.equals(name) || !className.startsWith(name + "$"))
             return super.loadClass(name);
 
         try {
