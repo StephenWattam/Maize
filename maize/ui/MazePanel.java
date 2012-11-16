@@ -145,7 +145,7 @@ public class MazePanel extends Canvas{
     private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
         AffineTransform transform = AffineTransform.getScaleInstance(
                 (float)targetSize.width / (float)img.getWidth(),  
-                (float)targetSize.height / (float)img.getWidth());
+                (float)targetSize.height / (float)img.getHeight());
         AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
         return op.filter(img, null);
     }

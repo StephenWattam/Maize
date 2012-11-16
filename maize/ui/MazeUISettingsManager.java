@@ -14,7 +14,7 @@ import org.json.simple.parser.*;
 // Singleton class to control settings
 public class MazeUISettingsManager{
 
-    public static final String VERSION = "0.1.4";
+    public static final String VERSION = "0.2.0";
 
 	private static MazeUISettingsManager instance = null;
 
