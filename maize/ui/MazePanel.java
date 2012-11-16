@@ -17,18 +17,18 @@ public class MazePanel extends Canvas{
     private boolean fastRender = false;
 
 	// Keep lists of stuff to render
-	private Vector<Agent> agents = new Vector<Agent>();
-	private Vector<Point> dirty_tiles = new Vector<Point>();
+	private HashMap<Agent, Integer> agents        = new HashMap<Agent, Integer>();
+	private Vector<Point> dirty_tiles                = new Vector<Point>();
 
 	// Images used to render
 	private MazeTileSet mazeTiles;
+	private MazeTileSet mazeTileCache       = null;
 	private BotTileSet[] botTileSets;
+	private BotTileSet[] botTileSetCache    = null;
 
     // Caching
-    private Dimension currentSize = null;
-	private Image bgBuffer = null;
-	private MazeTileSet mazeTileCache = null;
-	private BotTileSet[] botTileSetCache = null;
+    private Dimension currentSize           = null;
+	private Image bgBuffer                  = null;
 
 
     // Construct with maze
@@ -153,17 +153,25 @@ public class MazePanel extends Canvas{
 
 	// Add an agent to the list to render
 	public boolean addAgent(Agent a){
-		if( agents.indexOf(a) == -1){
+		if( agents.containsKey(a) == false){
             Log.log("Adding agent " + a + " to maze panel "+ this);
-			agents.add(a);
+			agents.put(a, (agents.size() + 1) % this.botTileSets.length );
 			return true;
 		}
 		return false;
 	}
 
+    // Retrieve the bot icons for a given agent.
+    public BotTileSet getTileSet(Agent a){
+        if( agents.containsKey(a) == false)
+            return null;
+
+        return this.botTileSets[agents.get(a)];
+    }
+
 	// Removes an agent from the list to simulate
 	public boolean remAgent(Agent a){
-		if(agents.indexOf(a) == -1)
+		if(agents.containsKey(a) == false)
 			return false;
         
         Log.log("Removing agent " + a + " from maze panel "+ this);
@@ -214,12 +222,10 @@ public class MazePanel extends Canvas{
 
 	// Makes the agent's trails dirty so they get refreshed
 	private void dirtyAgentAreas(){
-		Iterator<Agent> ia = agents.iterator();
-		Agent current;
-		while( ia.hasNext()){
-			current = ia.next();
-			dirty_tiles.add(new Point( current.getX(), current.getY()));
-		}
+        Set<Map.Entry<Agent, Integer>> entries = this.agents.entrySet();
+        for(Map.Entry<Agent, Integer> e : entries ){
+			dirty_tiles.add(new Point( e.getKey().getX(), e.getKey().getY()));
+        }
 	}
 
 
@@ -258,12 +264,11 @@ public class MazePanel extends Canvas{
         // Don't try to render agents if there is no tile set cache yet
         // this nicely prevents the baking of bot images onto the background
         if(this.botTileSetCache != null){
-            Iterator<Agent> ia = agents.iterator();
             Agent current;
-            int tileSetCount = 0;
-            while( ia.hasNext()){
-                int set = tileSetCount++ % this.botTileSets.length;
-                current = ia.next();
+            Set<Map.Entry<Agent, Integer>> entries = this.agents.entrySet();
+            for(Map.Entry<Agent, Integer> e : entries ){
+                current = e.getKey();
+                int set = e.getValue();
 
                 if(current.getX() == p.x && current.getY() == p.y)
                 {
