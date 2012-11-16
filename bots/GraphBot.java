@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.HashSet;
 import java.util.Vector;
 import java.util.HashMap;
+import java.awt.Dimension;
 
 /** Semi-advanced bot that learns of its surroundings, and uses a guided depth-first search algorithm to find a fairly efficient route to the finish.  It does this by constructing a graph from the tile system the maze uses, and then spidering that, sticking as close to the finish as it can.
  *
@@ -19,6 +20,7 @@ import java.util.HashMap;
  * @author Stephen Wattam <stephenwattam@gmail.com>
  */
 public class GraphBot implements Bot, Serializable {
+
 
     // ------------------------------------------------------------
     //  Configuration
@@ -30,10 +32,19 @@ public class GraphBot implements Bot, Serializable {
     //  Don't edit below this line
     //  (unless you know what you're doing)
 
+
+    // Constants to define map values
+    private static final char UNKNOWN    = '·';
+    private static final char SPACE      = ' ';
+    private static final char WALL       = '#';
+    private static final char FINISH     = 'F';
+
+
+
     // Contains instructions
-    private Vector<Integer> buffer = new Vector<Integer>();
+    private Vector<Integer> buffer      = new Vector<Integer>();
     // Holds the best route.
-    private Vector<Point> bestRoute = null;
+    private Vector<Point> bestRoute     = null;
 
     // Make a random move.
     private int daveMode(){
@@ -71,11 +82,10 @@ public class GraphBot implements Bot, Serializable {
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
         debugln("==================================================");
 
-
         // Memorise points and plot experience
         debugln("Building world model...");
         int newPoints   = rememberPoints(Orientation.rotateToNorth(view, o), x, y, fx, fy);
-        boolean[][] map = constructMap();
+        char[][] map = constructMap();
  
         // If we have new data, force the bot to compute a new route
         if(newPoints > 0 && !validateRoute(map, bestRoute))
@@ -109,7 +119,8 @@ public class GraphBot implements Bot, Serializable {
     }
 
     @Override
-    public void start(){}
+    public void start(){
+    }
 
     /* ================================================================================== */
     //  Subsystems                                                                   
@@ -302,41 +313,6 @@ public class GraphBot implements Bot, Serializable {
                 break;
         }
 
-
-        /*
-
-        // check for 270 degree left turns
-        /* debugln(Orientation.getName(current) + "->" + Orientation.getName(desired) + ":" + Math.abs(current - desired)); * /
-
-        /* // special case to prevent weird 'turning three times right to go left' * /
-        if(Math.abs(current - desired) == 1){
-    /*     /* debugln("\n####### LEFT HAND TURN"); * / 
-    buffer.add(Direction.LEFT);
-    buffer.add(Direction.FORWARD);
-    return;
-        }
-
-        /* // 180 degrees, * /
-        /* // this basically means we can just tell the bot to  * /
-        /* // go backwards * /
-        if(Math.abs(current - desired) == 2){
-        buffer.add( Direction.BACK );
-        return;
-        }
-
-        // Else go right until we meet the point we want
-        // then move forward
-        while(current != desired){
-    // Go right
-    buffer.add(Direction.RIGHT);
-    // Keep track
-    current = ((current + 1) % 4);
-        }
-        buffer.add(Direction.FORWARD);
-
-
-        return; 
-        */
     }
 
 
@@ -391,7 +367,7 @@ public class GraphBot implements Bot, Serializable {
     //     only been partially learned.
     private int[] maxXY = {0,0};
     // Keep a list of points we have seen.
-    private HashSet<Point> points = new HashSet<Point>();
+    private HashMap<Point, Character> points = new HashMap<Point, Character>();
 
     // Record the points in the view at a given X, Y.
     // Presumes the view is already the correct way up
@@ -405,27 +381,31 @@ public class GraphBot implements Bot, Serializable {
 
         // Loop through, adding absolute points
         for(int i=0;i<3;i++)
-            for(int j=0;j<3;j++)
+            for(int j=0;j<3;j++){
+                x = xBot + (i-1);
+                y = yBot + (j-1);
+
+                // see if we already have recorded this
+                if(!points.containsKey(new Point(x, y)))
+                    newPoints ++;
+
+                // Record the adjusted (real) x-y coordinates.
                 if(view[i][j]){
-                    x = xBot + (i-1);
-                    y = yBot + (j-1);
-
-                    // see if we already have recorded this
-                    if(!points.contains(new Point(x, y)))
-                        newPoints ++;
-
-                    // Record the adjusted (real) x-y coordinates.
-                    points.add(new Point(x, y));
-
-                    // count max
-                    if(x+1 > maxXY[0])
-                        maxXY[0] = x+1;
-                    if(y+1 > maxXY[1])
-                        maxXY[1] = y+1;
-
-                    // handy debug output
-                    /* debugln(i + "," + j +" => " + x + "," + y +" => "+ view[i][j]); */
+                    points.put(new Point(x, y), WALL);
+                }else{
+                    points.put(new Point(x, y), SPACE);
                 }
+
+                // count max
+                if(x+1 > maxXY[0])
+                    maxXY[0] = x+1;
+                if(y+1 > maxXY[1])
+                    maxXY[1] = y+1;
+
+                // handy debug output
+                /* debugln(i + "," + j +" => " + x + "," + y +" => "+ view[i][j]); */
+            }
+               
 
         // Add the finish
         if(fx+1 > maxXY[0])
@@ -437,20 +417,23 @@ public class GraphBot implements Bot, Serializable {
         return newPoints;
     }
 
-    // Construct a boolean[][] map out of the set of points we have memorised.
+    // Construct a char[][] map out of the set of points we have memorised.
     //
     // This basically translates the points into a more usable format, 
     // but is mainly for ease of processing later
-    private boolean[][] constructMap(){
+    private char[][] constructMap(){
         // This method should be o(n), rather than o(n^2) of the naive way
-        boolean[][] map = new boolean[maxXY[0]+1][maxXY[1]+1];
+        char[][] map = new char[maxXY[0]+1][maxXY[1]+1];
         for(int i=0;i<map.length;i++)
             for(int j=0;j<map[i].length;j++)
-                map[i][j] = false;
+                map[i][j] = UNKNOWN;
 
         // Now add all the points to the map
-        for( Point p : points)
-            map[p.x][p.y] = true;
+        Point p = null;
+        for( Map.Entry<Point, Character> e : points.entrySet()){
+            p = e.getKey();
+            map[p.x][p.y] = e.getValue();
+        }
 
         return map;
     }
@@ -459,7 +442,7 @@ public class GraphBot implements Bot, Serializable {
     //
     // This renders somewhat upside-down, so that 0,0 is in the bottom left, just like the
     // UI display in Maize
-    private void renderMap(boolean[][] map, Vector<Point> route, int botX, int botY, int fx, int fy, int o){
+    private void renderMap(char[][] map, Vector<Point> route, int botX, int botY, int fx, int fy, int o){
         // Header
         debug("+");
         for(int i=0;i<map.length;i++){ debug("-"); }
@@ -491,14 +474,11 @@ public class GraphBot implements Bot, Serializable {
                             debug("<");
                             break;
                     }
-                }else if(x == fx && y == fy)
-                    debug("F");
+                }
                 else if(route != null && route.contains(new Point(x, y)))
-                    debug(".");
-                else if(map[x][y])
-                    debug("#");
+                    debug("+");
                 else
-                    debug(" ");
+                    debug("" + map[x][y]);
                 
             }
             debug("|\n");
@@ -516,10 +496,11 @@ public class GraphBot implements Bot, Serializable {
     //  Routing system
     /* ------------------------------------------------------ */
 
-
     // Find a route from the x, y point to the fx, fy point, using
-    // the boolean map provided.
-    private Vector<Point> findRoute(boolean[][] map, int x, int y, int fx, int fy){
+    // the map provided.
+    private Vector<Point> findRoute(char[][] map, int x, int y, int fx, int fy){
+
+        // Then create a vector for the routing graph.
         HashMap<Point, Vector<Point>> nodes = new HashMap<Point, Vector<Point>>();
 
 
@@ -555,7 +536,7 @@ public class GraphBot implements Bot, Serializable {
     //       because it would be too computationall expensive.
     //       Instead it performs a directed depth-first search for the finish.
     private Vector<Point> breadthFirstSearch( 
-                    boolean[][] map,
+                    char[][] map,
                     Point position,
                     Point finish,
                     Vector<Point> route){
@@ -583,7 +564,7 @@ public class GraphBot implements Bot, Serializable {
             // Don't loop
             if(!route.contains(p)){
                 // Check if we have completed the route
-                if(p.equals(finish)){
+                if(p.equals(finish) || map[p.x][p.y] == UNKNOWN){
                     route.add(p);
                     /* debugln("<=[1]"); */
                     return route;
@@ -596,6 +577,8 @@ public class GraphBot implements Bot, Serializable {
         Point minimum = null;
         Vector<Point> remaining = (Vector<Point>)next.clone();
 
+        
+
         // Pick off the minimum each time
         // this is a poor man's sorting algorithm
         // XXX: This is O(n^2) worst case, and is only used because
@@ -604,9 +587,15 @@ public class GraphBot implements Bot, Serializable {
         //      isn't a particular issue, but it'd be nice to fix it...
         while( remaining.size() > 0 ){
             // establish minimum
-            for(Point p: remaining)
+            for(Point p: remaining){
+                /* For simple distance seeking:
                 if(minimum == null || finish.distance(minimum) > finish.distance(p))
                     minimum = p;
+                */
+                /* And for more complex finish seeking/backtrack prevention:*/
+                if(minimum == null || estimateRoutePenalty(minimum, position, finish) > estimateRoutePenalty(p, position, finish))
+                    minimum = p;
+            }
             
             // And then remove it from the list
             remaining.remove(minimum);
@@ -632,13 +621,32 @@ public class GraphBot implements Bot, Serializable {
     }
 
 
+    // Compute a routing penalty based on:
+    //  current position (current)
+    //  position of next provisional point (p)
+    //  finish position
+    private double estimateRoutePenalty(Point p, Point current, Point finish){
+
+        // Definitely go to the finish!
+        if(p == finish)
+            return Double.MIN_VALUE;
+
+        // See if the point takes us further from, or closer to, the finish
+        //
+        // Varies between -1 and 1
+        double deltaDistance  = p.distance(finish) - current.distance(finish);
+
+        return deltaDistance;
+    }   
+
+
     // Construct a list of points that are directly adjacent to x, y, and are not walls.
     // Since this is designed to map where the bot may move, it does not include diagonals.
-    private Vector<Point> createLocalRoutes(boolean[][] map, int x, int y){
+    private Vector<Point> createLocalRoutes(char[][] map, int x, int y){
         Vector<Point> routes = new Vector<Point>();
 
         // Don't count walls, to keep the volume of data down!
-        if(map[x][y])
+        if(map[x][y] == WALL)
             return routes;
 
         addPointIfSpace(routes, map, x-1, y);
@@ -657,7 +665,7 @@ public class GraphBot implements Bot, Serializable {
     }
 
     // Add a point to a route IF the point is a space, and IF it falls within bounds
-    private void addPointIfSpace(Vector<Point> routes, boolean[][] map, int x, int y){
+    private void addPointIfSpace(Vector<Point> routes, char[][] map, int x, int y){
         // Check bounds
         if(x >= map.length || x < 0 || map.length == 0)
             return;
@@ -665,20 +673,20 @@ public class GraphBot implements Bot, Serializable {
             return;
 
         // Check walls
-        if(!map[x][y])
+        if(map[x][y] != WALL)
             routes.add( new Point(x, y) );
     }
 
     // Returns false if the route tries to go over walls
     // is used to check updates to the route
-    private static boolean validateRoute( boolean[][] map, Vector<Point> route ){
+    private static boolean validateRoute( char[][] map, Vector<Point> route ){
         // Return false if no route
         if(route == null)
             return false;
 
         // Return false if the route hits a wall
         for(Point p: route)
-            if(map[p.x][p.y])
+            if(map[p.x][p.y] == WALL)
                 return false;
 
         // Else it must be valid
