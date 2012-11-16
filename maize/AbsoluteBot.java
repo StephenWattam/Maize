@@ -190,4 +190,8 @@ public class AbsoluteBot implements Bot
 
 		return Orientation.SOUTH;
 	}
+
+
+    /** Implementation of bot#start */
+    public void start(){}
 }

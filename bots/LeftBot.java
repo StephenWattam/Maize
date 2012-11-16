@@ -77,6 +77,10 @@ public class LeftBot implements Bot, Serializable {
     public String getDescription(){
         return "Follows left walls.";
     }
+
+
+    @Override
+    public void start(){}
 }
 
 

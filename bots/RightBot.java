@@ -83,6 +83,10 @@ public class RightBot implements Bot, Serializable {
     public String getDescription(){
         return "Follows right walls.";
     }
+
+
+    @Override
+    public void start(){}
 }
 
 

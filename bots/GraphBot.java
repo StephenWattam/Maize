@@ -108,6 +108,8 @@ public class GraphBot implements Bot, Serializable {
         return (int)this.buffer.remove(0);
     }
 
+    @Override
+    public void start(){}
 
     /* ================================================================================== */
     //  Subsystems                                                                   

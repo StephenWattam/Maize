@@ -29,4 +29,7 @@ public interface Bot {
     * @return           Bot Description.
     */
   public String getDescription();
+
+  /** Called when a new maze is started. */
+  public void start();
 }

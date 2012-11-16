@@ -410,4 +410,7 @@ public class Gorad implements Bot
 		}
 		return properDirections;
 	}
+
+    @Override
+    public void start(){}
 }

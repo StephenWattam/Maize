@@ -92,6 +92,7 @@ Bots are run by calling a re-entrant API on an existing instance of a class that
 \item \texttt{nextMove()}---Is called once per time tick, and returns a value from the \texttt{Direction} enumeration in order to indicate which way the bot should move.  The full format for this is listed below, in Section~\ref{section:dataformat};
 \item \texttt{getName()}---Returns a name for the bot.  Used in lists and the UI to identify your creation;
 \item \texttt{getDescription()}---Returns a sentence or two about how your bot works, and any state information you may wish to check on.
+\item \texttt{start()}---Called once each time the bot is run (regardless of whether it is being run on a new maze or not).  Can be used to clear any bot state or generate pre-computed data.
 \end{itemize}
 In addition to this simple API, there are two classes, \texttt{AdvancedBot} and \texttt{StateBot}, which add a higher level API to the above.  They are documented below in Section~\ref{section:alternativeapis}.
 
@@ -191,6 +192,14 @@ public class EmptyBot implements Bot, Serializable {
     @Override
     public String getDescription(){
         return "A quick bit of info about the bot.";
+    }
+    
+    /** Implementation of the Bot interface.
+     * @see Bot
+     */
+    @Override
+    public void start(){
+        // reset code for starting a maze
     }
 }
 \end{lstlisting}

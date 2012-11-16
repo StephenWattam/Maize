@@ -20,6 +20,7 @@ public class MazeUISettingsManager{
 
     // How long bots can work before being timed out
     public static int botWorkTimeout = 10000;
+    public static int botStartTimeout = 10000;
 
 	// Bot loading
 	public static String botDirectory;
@@ -130,6 +131,7 @@ public class MazeUISettingsManager{
             MazeUISettingsManager.logScrollbackLimit  = Integer.parseInt(((JSONObject)config.get("ui")).get("logScrollback").toString());
 
             MazeUISettingsManager.botWorkTimeout  = Integer.parseInt(((JSONObject)config.get("ui")).get("botTimeout").toString());
+            MazeUISettingsManager.botStartTimeout  = Integer.parseInt(((JSONObject)config.get("ui")).get("botStartTimeout").toString());
 
 			MazeUISettingsManager.attachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("attachIcon").toString()));
 			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));

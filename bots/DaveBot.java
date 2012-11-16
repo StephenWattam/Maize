@@ -44,5 +44,9 @@ public class DaveBot implements Bot, Serializable {
     public String getDescription(){
         return "Randomly dithers around with no real judgement, like the real dave.";
     }
+
+    @Override
+    public void start(){
+    }
 }
 

@@ -344,4 +344,8 @@ public class Gorad1 implements Bot
 		System.out.print("Gorad error "+(++logicFails)+": in checkMove(). randomising direction. \n");
 		return (int) (Math.random() * 4);
 	}
+
+
+    @Override
+    public void start(){}
 }
