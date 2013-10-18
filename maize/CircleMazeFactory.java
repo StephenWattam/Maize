@@ -45,7 +45,7 @@ public class CircleMazeFactory implements MazeFactory {
     this.createBlankCircles();
     this.createCircleExits();
 
-    return new Maze(this.data, this.width, this.height, 1, 1, width/2, height/2);
+    return new Maze(this.data, 1, 1, width/2, height/2);
   } 
 
   /** Creates a blank maze with concentric circles, no joins.

@@ -75,4 +75,7 @@ public class LeftStateBot extends StateBot implements Serializable{
     public String getDescription(){
         return "Left wall follower using StateBot.";
     }
+
+    @Override
+    public void start(){}
 }

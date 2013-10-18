@@ -68,6 +68,15 @@ public class TestThread extends Thread{
 		// update the UI
 		this.agentList = agentList;
 		agentList.setListData(agents);
+
+
+        // Call start on all bots
+        Log.log("Starting bots...");
+        for(int i=0; i<this.agents.length; i++){
+            Log.log("Calling bot.start for " + this.agents[i].bot.getName() );
+            startAgentWithTimeout( MazeUISettingsManager.botStartTimeout, this.agents[i].bot );
+        }
+
 	}	
 
     // Set the delay used when repeating
@@ -95,6 +104,33 @@ public class TestThread extends Thread{
 		pause = !pause;
 	}
 
+
+
+    // Call bot.start() asynchronously, with a given timeout (in milliseconds).
+    // This is used to limit the power bots have to starve each other.
+    private void startAgentWithTimeout(int timeout, final Bot bot){
+        final Future future = executor.submit(new Runnable(){
+            public void run(){
+                bot.start();
+            }
+        });
+
+        try{
+            future.get(timeout, TimeUnit.MILLISECONDS);
+        //ExecutionException: deliverer threw exception
+        //TimeoutException: didn't complete within downloadTimeoutSecs
+        //InterruptedException: the executor thread was interrupted
+        }catch(TimeoutException Te){
+            Log.log("Bot " + bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
+        }catch(InterruptedException Ie){
+            Log.log("Bot " + bot.getName() + " was interrupted during execution");
+        }catch(Exception e){
+            Log.log("Bot " + bot.getName() + " threw an exception: ");
+            Log.logException(e);
+        }finally{
+            future.cancel(true);
+        }
+    }
 
 
     // Call agent.agent.move() asynchronously, with a given timeout (in milliseconds).

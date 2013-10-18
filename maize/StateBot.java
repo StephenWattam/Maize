@@ -56,4 +56,8 @@ public abstract class StateBot extends AdvancedBot{
     * @return           Bot Description.
     */
   public abstract String getDescription();
+
+
+    /** Implementation of bot#start */
+    public void start(){}
 }

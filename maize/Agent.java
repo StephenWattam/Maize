@@ -1,5 +1,6 @@
 package maize;
 
+
 /** Agent class which defines the API which bots access. */
 public final class Agent {
 
@@ -49,25 +50,27 @@ public final class Agent {
         int mw = maze.getWidth();
         int mh = maze.getHeight();
 
-        boolean[][] mazedata = maze.getData();
         boolean[][] view = new boolean[3][3];
 
+
+
         /* Fill view array */
-        view[0][0] = checkMazePoint(mazedata, x-1,  y-1);
-        view[0][1] = checkMazePoint(mazedata, x-1,  y);
-        view[0][2] = checkMazePoint(mazedata, x-1,  y+1);
+        view[0][0] = checkMazePoint(x-1,  y-1);
+        view[0][1] = checkMazePoint(x-1,  y);
+        view[0][2] = checkMazePoint(x-1,  y+1);
 
-        view[1][0] = checkMazePoint(mazedata, x,  y-1);
-        view[1][1] = checkMazePoint(mazedata, x,    y);
-        view[1][2] = checkMazePoint(mazedata, x,  y+1);
+        view[1][0] = checkMazePoint(x,  y-1);
+        view[1][1] = checkMazePoint(x,    y);
+        view[1][2] = checkMazePoint(x,  y+1);
 
-        view[2][0] = checkMazePoint(mazedata, x+1,  y-1);
-        view[2][1] = checkMazePoint(mazedata, x+1,    y);
-        view[2][2] = checkMazePoint(mazedata, x+1,  y+1);
+        view[2][0] = checkMazePoint(x+1,  y-1);
+        view[2][1] = checkMazePoint(x+1,    y);
+        view[2][2] = checkMazePoint(x+1,  y+1);
+
 
 
         /* Rotate into bot view */
-        for(int i = 0; i < this.o; i++) { 
+        for(int i = this.o; i > 0; i--) { 
             view = rotateArray(view); 
         }
 
@@ -83,25 +86,21 @@ public final class Agent {
      *
      * @return           true for hedge, false for path
      */
-    private boolean checkMazePoint(boolean[][] maze, int x, int y){
-
-        boolean value = false;
-
-
+    private boolean checkMazePoint(int x, int y){
+        
         /* Bound checking */
-        if( x < 0 || y < 0 || x >= maze.length || y >= maze[0].length)
-            value = true;
+        if( x < 0 || y < 0 || y >= maze.getHeight() || x >= maze.getWidth())
+            return true;
+        
         /* Set finish to blank */
-        else if(x == this.maze.getExiX() && y == this.maze.getExiY())
-            value = false;
-        else
-            value = maze[x][y];
-
-
-        return value;
+        if(x == this.maze.getExiX() && y == this.maze.getExiY())
+            return false;
+        
+        return maze.getPoint(x, y);
     }
 
-    /** Rotate array 90 degrees clockwise.
+
+   /** Rotate array 90 degrees clockwise.
      * To all: Apologises.
      *
      * @param  array     Array to rotate.
@@ -126,6 +125,7 @@ public final class Agent {
 
         return narray;
     }
+    
 
     /** Rotate agent right.
      * Changes orientation.
@@ -156,25 +156,23 @@ public final class Agent {
      */
     private void moveForward(){
 
-        boolean[][] maze = this.maze.getData();
-
 
         switch(this.o){
 
             case Orientation.NORTH:
-                this.y = (!checkMazePoint(maze, this.x, this.y-1)) ? this.y-1 : this.y;
+                this.y = (!checkMazePoint(this.x, this.y-1)) ? this.y-1 : this.y;
                 break;
 
             case Orientation.SOUTH:
-                this.y = (!checkMazePoint(maze, this.x, this.y+1)) ? this.y+1 : this.y;
+                this.y = (!checkMazePoint(this.x, this.y+1)) ? this.y+1 : this.y;
                 break;
 
             case Orientation.EAST:
-                this.x = (!checkMazePoint(maze, this.x+1, this.y)) ? this.x+1 : this.x;
+                this.x = (!checkMazePoint(this.x+1, this.y)) ? this.x+1 : this.x;
                 break;
 
             case Orientation.WEST:
-                this.x = (!checkMazePoint(maze, this.x-1, this.y)) ? this.x-1 : this.x;
+                this.x = (!checkMazePoint(this.x-1, this.y)) ? this.x-1 : this.x;
                 break;
         }
     }
@@ -184,24 +182,22 @@ public final class Agent {
      */
     private void moveBackward(){
 
-        boolean[][] maze = this.maze.getData();
-
         switch(this.o){
 
-            case Orientation.SOUTH:
-                this.y = (!checkMazePoint(maze, this.x, this.y-1)) ? this.y-1 : this.y;
-                break;
-
             case Orientation.NORTH:
-                this.y = (!checkMazePoint(maze, this.x, this.y+1)) ? this.y+1 : this.y;
+                this.y = (!checkMazePoint(this.x, this.y+1)) ? this.y+1 : this.y;
                 break;
 
-            case Orientation.WEST:
-                this.x = (!checkMazePoint(maze, this.x+1, this.y)) ? this.x+1 : this.x;
+            case Orientation.SOUTH:
+                this.y = (!checkMazePoint(this.x, this.y-1)) ? this.y-1 : this.y;
                 break;
 
             case Orientation.EAST:
-                this.x = (!checkMazePoint(maze, this.x-1, this.y)) ? this.x-1 : this.x;
+                this.x = (!checkMazePoint(this.x-1, this.y)) ? this.x-1 : this.x;
+                break;
+
+            case Orientation.WEST:
+                this.x = (!checkMazePoint(this.x+1, this.y)) ? this.x+1 : this.x;
                 break;
         }
     }

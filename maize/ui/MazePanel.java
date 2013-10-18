@@ -17,18 +17,18 @@ public class MazePanel extends Canvas{
     private boolean fastRender = false;
 
 	// Keep lists of stuff to render
-	private Vector<Agent> agents = new Vector<Agent>();
-	private Vector<Point> dirty_tiles = new Vector<Point>();
+	private HashMap<Agent, Integer> agents        = new HashMap<Agent, Integer>();
+	private Vector<Point> dirty_tiles                = new Vector<Point>();
 
 	// Images used to render
 	private MazeTileSet mazeTiles;
+	private MazeTileSet mazeTileCache       = null;
 	private BotTileSet[] botTileSets;
+	private BotTileSet[] botTileSetCache    = null;
 
     // Caching
-    private Dimension currentSize = null;
-	private Image bgBuffer = null;
-	private MazeTileSet mazeTileCache = null;
-	private BotTileSet[] botTileSetCache = null;
+    private Dimension currentSize           = null;
+	private Image bgBuffer                  = null;
 
 
     // Construct with maze
@@ -102,6 +102,16 @@ public class MazePanel extends Canvas{
 
         // Rescale tiles from original to avoid lossiness
         this.mazeTileCache = this.mazeTiles.rescale( currentSize, maze );
+        
+		/*
+		// Scale the cache
+        this.mazeTileCache = new MazeTileSet(
+                mazeTiles.bg,
+                rescaleTile(currentSize, mazeTiles.space),
+                rescaleTile(currentSize, mazeTiles.wall),
+                rescaleTile(currentSize, mazeTiles.start),
+                rescaleTile(currentSize, mazeTiles.finish)
+        );*/
 
         // Scale the bot tile set
         this.botTileSetCache = new BotTileSet[botTileSets.length];
@@ -139,7 +149,7 @@ public class MazePanel extends Canvas{
     private BufferedImage rescaleImage(Dimension targetSize, BufferedImage img){
         AffineTransform transform = AffineTransform.getScaleInstance(
                 (float)targetSize.width / (float)img.getWidth(),  
-                (float)targetSize.height / (float)img.getWidth());
+                (float)targetSize.height / (float)img.getHeight());
         AffineTransformOp op = new AffineTransformOp(transform, AffineTransformOp.TYPE_BILINEAR);
         return op.filter(img, null);
     }
@@ -147,17 +157,25 @@ public class MazePanel extends Canvas{
 
 	// Add an agent to the list to render
 	public boolean addAgent(Agent a){
-		if( agents.indexOf(a) == -1){
+		if( agents.containsKey(a) == false){
             Log.log("Adding agent " + a + " to maze panel "+ this);
-			agents.add(a);
+			agents.put(a, (agents.size() + 1) % this.botTileSets.length );
 			return true;
 		}
 		return false;
 	}
 
+    // Retrieve the bot icons for a given agent.
+    public BotTileSet getTileSet(Agent a){
+        if( agents.containsKey(a) == false)
+            return null;
+
+        return this.botTileSets[agents.get(a)];
+    }
+
 	// Removes an agent from the list to simulate
 	public boolean remAgent(Agent a){
-		if(agents.indexOf(a) == -1)
+		if(agents.containsKey(a) == false)
 			return false;
         
         Log.log("Removing agent " + a + " from maze panel "+ this);
@@ -207,12 +225,10 @@ public class MazePanel extends Canvas{
 
 	// Makes the agent's trails dirty so they get refreshed
 	private void dirtyAgentAreas(){
-		Iterator<Agent> ia = agents.iterator();
-		Agent current;
-		while( ia.hasNext()){
-			current = ia.next();
-			dirty_tiles.add(new Point( current.getX(), current.getY()));
-		}
+        Set<Map.Entry<Agent, Integer>> entries = this.agents.entrySet();
+        for(Map.Entry<Agent, Integer> e : entries ){
+			dirty_tiles.add(new Point( e.getKey().getX(), e.getKey().getY()));
+        }
 	}
 
 
@@ -226,10 +242,9 @@ public class MazePanel extends Canvas{
 	private void drawTile(Point p, Graphics bg, Dimension planeSize)
 	{
 		//System.out.println("No. Agents on this MazePanel: " + agents.size());
-		boolean[][] mdata = maze.getData();
 		BufferedImage img = null;
 
-        if(p.x > mdata.length)
+        if( p.x > maze.getWidth() || p.y > maze.getHeight() )
             return;
 
 		// Check for maze background section
@@ -239,10 +254,15 @@ public class MazePanel extends Canvas{
 		else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
 			img = mazeTileCache.getFinish();
 		//renderTile(finish, p.x, p.y, bg);
+<<<<<<< HEAD
 		else if( mdata[p.x][p.y] ){
             if( p.y > mdata[p.x].length )
                 return;
 			img = mazeTileCache.getWall();
+=======
+		else if( maze.getPoint(p.x, p.y) ){
+			img = mazeTileCache.wall;
+>>>>>>> a5b9db0f7e49842ea9303eae1c7ce115ae4659f9
         }else
 			img = mazeTileCache.getSpace();
 
@@ -254,12 +274,11 @@ public class MazePanel extends Canvas{
         // Don't try to render agents if there is no tile set cache yet
         // this nicely prevents the baking of bot images onto the background
         if(this.botTileSetCache != null){
-            Iterator<Agent> ia = agents.iterator();
             Agent current;
-            int tileSetCount = 0;
-            while( ia.hasNext()){
-                int set = tileSetCount++ % this.botTileSets.length;
-                current = ia.next();
+            Set<Map.Entry<Agent, Integer>> entries = this.agents.entrySet();
+            for(Map.Entry<Agent, Integer> e : entries ){
+                current = e.getKey();
+                int set = e.getValue();
 
                 if(current.getX() == p.x && current.getY() == p.y)
                 {

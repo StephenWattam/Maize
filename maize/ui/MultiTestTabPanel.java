@@ -85,20 +85,20 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 		JScrollPane mazeListPanel = new JScrollPane(mazeList);
 		mazeListPanel.setMinimumSize(new Dimension(80, 80));
 
-		// Test panel
-		testList = new JList();
-		testList.setCellRenderer(new TestListCellRenderer());
-		testList.setBackground(null);
-		JScrollPane testListPanel = new JScrollPane(testList);
-		testListPanel.setMinimumSize(new Dimension(160, 150));
-		testListPanel.setBackground(null);
-		//testListPanel.setViewportBorder(null);
-
 
 		// maze panel
 		mazePanel		= new MazePanel(null, MazeUISettingsManager.mazeTiles, MazeUISettingsManager.botTileSets, MazeUISettingsManager.fastMazeRendering);
 		mazePanel.setMinimumSize(new Dimension(500,500));
 
+
+		// Test panel
+		testList = new JList();
+		testList.setCellRenderer(new TestListCellRenderer(this.mazePanel));
+		testList.setBackground(null);
+		JScrollPane testListPanel = new JScrollPane(testList);
+		testListPanel.setMinimumSize(new Dimension(160, 150));
+		testListPanel.setBackground(null);
+		//testListPanel.setViewportBorder(null);
 
 
 

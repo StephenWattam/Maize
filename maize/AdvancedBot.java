@@ -195,4 +195,7 @@ public class AdvancedBot implements Bot{
 	public String getDescription(){
 		return "Is capable of complex sequences of actions, but by default does little.";
 	}
+
+    /** Implementation of bot#start */
+    public void start(){}
 }

@@ -6,8 +6,13 @@ import java.awt.*;
 
 import maize.*;
 public class TestListCellRenderer extends JLabel implements ListCellRenderer{
-	public TestListCellRenderer(){
+
+    // The maze panel to get icons from
+    private MazePanel mazePanel;
+
+	public TestListCellRenderer(MazePanel mazePanel){
 		setOpaque(true);
+        this.mazePanel = mazePanel;
 	}
 
 
@@ -24,8 +29,29 @@ public class TestListCellRenderer extends JLabel implements ListCellRenderer{
 		}
 
 
-		// find this bot's icon from the ordering in the renderer
-		setIcon(new ImageIcon( MazeUISettingsManager.botTileSets[index % MazeUISettingsManager.botTileSets.length].botN ));
+        // Load the icon from the MazePanel
+        ImageIcon icon = null;
+        if( this.mazePanel != null ){
+            BotTileSet tiles = this.mazePanel.getTileSet( botTest.agent );
+            if(tiles != null){
+                /* icon = new ImageIcon( tiles.botN ); */
+                switch( botTest.agent.getOrientation() ){
+                    case Orientation.NORTH:
+                        icon = new ImageIcon( tiles.botN );
+                        break;
+                    case Orientation.EAST:
+                        icon = new ImageIcon( tiles.botE );
+                        break;
+                    case Orientation.SOUTH:
+                        icon = new ImageIcon( tiles.botS );
+                        break;
+                    case Orientation.WEST:
+                        icon = new ImageIcon( tiles.botW );
+                        break;
+                }
+            }
+        }
+        setIcon( icon );
 
 		return this;
 	}	
