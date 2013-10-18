@@ -60,7 +60,7 @@ public class GraphBot implements Bot, Serializable {
     /** Implementation of the Bot interface. */
     @Override
     public String getDescription(){
-        return "Builds a map of its surroundings, and uses a targeted depth-first graph traversal algorithm to find a route.  Remembered " + points.size() + " walls.";
+        return "Builds a map of its surroundings, uses a targeted depth-first graph traversal algorithm to route.  Remembered " + points.size() + " walls.";
     }
 
 
@@ -332,7 +332,6 @@ public class GraphBot implements Bot, Serializable {
         printContext(view);
         debugln("  Context (adjusted: North is up):");
         printContext(Orientation.rotateToNorth(view, o));
-
     }
 
     /** Prints a 3x3 context matrix. */
@@ -533,8 +532,9 @@ public class GraphBot implements Bot, Serializable {
     // Recursively seek the finish.
     //
     // Note: this does not actually perform a breadth first search,
-    //       because it would be too computationall expensive.
+    //       because it would be too computationally expensive.
     //       Instead it performs a directed depth-first search for the finish.
+    //       
     private Vector<Point> breadthFirstSearch( 
                     char[][] map,
                     Point position,
