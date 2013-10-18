@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
 import maize.*;
+import maize.fancy.*;
 import java.awt.geom.*;
-
 
 public class MazePanel extends Canvas{
 
@@ -247,24 +247,24 @@ public class MazePanel extends Canvas{
         if( p.x > maze.getWidth() || p.y > maze.getHeight() )
             return;
 
-		// Check for maze background section
-		if(maze.getEntX() == p.x && maze.getEntY() == p.y)
-			img = mazeTileCache.getStart();
-		//renderTile(start, p.x, p.y, bg);
-		else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
-			img = mazeTileCache.getFinish();
-		//renderTile(finish, p.x, p.y, bg);
-<<<<<<< HEAD
-		else if( mdata[p.x][p.y] ){
-            if( p.y > mdata[p.x].length )
-                return;
-			img = mazeTileCache.getWall();
-=======
-		else if( maze.getPoint(p.x, p.y) ){
-			img = mazeTileCache.wall;
->>>>>>> a5b9db0f7e49842ea9303eae1c7ce115ae4659f9
-        }else
-			img = mazeTileCache.getSpace();
+        if( maze instanceof FancyMaze )
+        {
+            img = ((FancyMaze)maze).getTile( p.x, p.y );
+        }
+        else
+        {
+            // Check for maze background section
+            if(maze.getEntX() == p.x && maze.getEntY() == p.y)
+                img = mazeTileCache.getStart();
+                //renderTile(start, p.x, p.y, bg);
+            else if(maze.getExiX() == p.x && maze.getExiY() == p.y)
+                img = mazeTileCache.getFinish();
+            //renderTile(finish, p.x, p.y, bg);
+            else if( maze.getPoint(p.x, p.y) ){
+                img = mazeTileCache.getWall();
+            }else
+                img = mazeTileCache.getSpace();
+        }
 
 
 		// Check each agent

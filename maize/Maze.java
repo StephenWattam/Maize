@@ -59,7 +59,7 @@ public class Maze implements Serializable {
         this.exiX   = exiX;
         this.exiY   = exiY;
         this.name   = this.toString();
-    } 
+    }
 
     /** Gets the maze data.
      *

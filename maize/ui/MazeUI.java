@@ -1,4 +1,5 @@
 package maize.ui;
+
 import javax.swing.*;
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +15,8 @@ import java.util.*;
 import java.lang.reflect.ReflectPermission;
 
 import maize.*;
+import maize.fancy.*;
+
 public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
     // state
@@ -192,7 +195,15 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         if(fileChooser.showOpenDialog(this) == 0){
             try{
                 Log.log("Loading maze from " + fileChooser.getSelectedFile());
-                Maze m = (Maze)ClassSerializer.load(fileChooser.getSelectedFile());
+                Maze m = null;
+
+                if( fileChooser.getSelectedFile().getName().endsWith( ".mzip" ) )
+                {
+                    m = FancyMazeLoader.load( fileChooser.getSelectedFile() );
+                }
+                else
+                    m = (Maze)ClassSerializer.load(fileChooser.getSelectedFile());
+
                 mazeTest.mazes.add(m);
                 updatePanes();
             }catch(Exception e){
