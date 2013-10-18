@@ -18,10 +18,12 @@ public class ClassReloader extends ClassLoader{
 
     public Class loadClass(String name) throws ClassNotFoundException {
 
+
         // Use the parent if it's not on our list of allowable classes
         // Also allow inner classes
-        if(!className.equals(name) || !className.startsWith(name + "$"))
+        if(!className.equals(name) && !className.startsWith(name + "$")){
             return super.loadClass(name);
+        }
 
         try {
             // Read file
@@ -44,6 +46,7 @@ public class ClassReloader extends ClassLoader{
             // Convert to a byte array
             byte[] classData = buffer.toByteArray();
 
+            Log.log("Forcing reload of class " + name + " from " + url);
 
             // Define the class
             return defineClass(name, classData, 0, classData.length);

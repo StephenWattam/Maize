@@ -49,7 +49,7 @@ public class Log{
 
     // Add something to the log, from a given component
     public static void log(String who, String str){
-        log("[" + who + "]" + str);
+        log("[" + who + "] " + str);
     }
 
     // Format the message to contain the date

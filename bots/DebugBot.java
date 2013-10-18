@@ -55,7 +55,7 @@ public class DebugBot implements Bot, Serializable {
     @Override
     public String getName(){
         debug("getName()");
-        return "DebugBot 2 (" + bot.getName() + ")";
+        return "DebugBot (" + bot.getName() + ")";
     }
 
     /** Implementation of the Bot interface.
