@@ -318,12 +318,13 @@ public class MazePanel extends Canvas{
 
 	// Update the render surface, dirties the agent's moved tiles automatically.
 	public void update(Graphics g){
-        // rebuild the cache if the window has resized
-        // FIXME: this shouldn't really be done here...
-        resizeCache();
 
 		// Else update the dirty areas
 		if(maze != null){
+            // rebuild the cache if the window has resized
+            // FIXME: this shouldn't really be done here...
+            resizeCache();
+            
 			dirtyAgentAreas();  // render agent
 			renderDirtyAreas(this.bgBuffer.getGraphics());
 			dirtyAgentAreas();  // render trails

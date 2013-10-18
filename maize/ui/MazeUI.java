@@ -119,9 +119,9 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
         JMenu botMenu = new JMenu("Bots");
         botMenu.add(buildMenuItem("Reload all bots (" + MazeUISettingsManager.botDirectory + ")","reload_bots"));
-        botMenu.add(buildMenuItem("Compile (" + MazeUISettingsManager.botDirectory + ")","compile_bot"));
-        botMenu.add(buildMenuItem("Instantiate...","inst_bot_choose"));
-        botMenu.add(buildMenuItem("Instantiate (advanced)...","inst_bot"));
+        botMenu.add(buildMenuItem("Compile/reload all (" + MazeUISettingsManager.botDirectory + ")","compile_bot"));
+        botMenu.add(buildMenuItem("Compile...","inst_bot_choose"));
+        botMenu.add(buildMenuItem("Instantiate...","inst_bot"));
         botMenu.add(buildMenuItem("Load...","load_bot"));
         menuBar.add(botMenu);
 
@@ -166,7 +166,9 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
             BotCompilerHelper.compileAllBots(MazeUISettingsManager.botDirectory); 
         }else if(Ae.getActionCommand().equals("reload_bots")){
             this.mazeTest.bots.clear();
-            BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
+            BotCompilerHelper.compileAndLoadBots(this.mazeTest, 
+                    MazeUISettingsManager.botPackageName, 
+                    MazeUISettingsManager.botDirectory);
         }else if(Ae.getActionCommand().equals("about")){
             helpAbout();
         }else if(Ae.getActionCommand().equals("attach_all")){
@@ -180,6 +182,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         updatePanes();
     }
 
+    // Display the about dialog.
     private void helpAbout(){
         new AboutDialog(mazeTest, this);
     }
@@ -235,10 +238,11 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
             }
 
             public String getDescription(){
-                return "Java source files only";
+                return "Java source files only.";
             }
         };
 
+        // Open the file and compile the bot
         fileChooser.setFileFilter(filter);
         if(fileChooser.showOpenDialog(this) == 0){
             try{
@@ -246,14 +250,17 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
                 //System.out.println("DEBUG: " + filename);
                 Log.log("Compiling bot from file: " + filename);
                 if(BotCompilerHelper.compile(MazeUISettingsManager.botDirectory + java.io.File.separator + filename)){
-                    mazeTest.bots.add(BotCompilerHelper.loadBotClass( 
+                    mazeTest.bots.add(
+                            BotCompilerHelper.loadBotClass( 
                                 MazeUISettingsManager.botPackageName + "." + 
-                                BotCompilerHelper.classNameFromBaseName(filename)));
+                                BotCompilerHelper.classNameFromBaseName(filename)
+                                )
+                            );
                     updatePanes();
                 }
             }catch(Exception e){
-                JOptionPane.showMessageDialog(this, "Error loading bot.");
-                Log.log("Error loading bot.");
+                JOptionPane.showMessageDialog(this, "Error compiling bot (see log for details).");
+                Log.log("Error compiling bot.");
                 Log.logException(e);
             }
         }

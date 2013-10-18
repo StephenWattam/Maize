@@ -9,10 +9,16 @@ public abstract class BotCompilerHelper{
     // Compileas and loads bots into a given mazeTest 
     public static void compileAndLoadBots(MazeTest mazeTest, String packageName, String dirname){
         Log.log("Compiling bots...");
-        Vector<String> bot_classes = compileAllBots(dirname); // compile
-        for(String s: bot_classes){ // and load
+        
+        // Compile bots
+        Vector<String> bot_classes = compileAllBots(dirname);
+
+        // Instantiate classes
+        for(String s: bot_classes){
             try{ 
-                mazeTest.bots.add(loadBotClass(packageName + "." + s));
+                mazeTest.bots.add(
+                        loadBotClass(packageName + "." + s)
+                        );
             }catch(Exception e){
                 Log.log("Error loading bot " + s);
                 Log.logException(e);
@@ -24,7 +30,6 @@ public abstract class BotCompilerHelper{
 
     // returns a list of class files to load as bots
     public static Vector<String> compileAllBots(String dirname){
-
 
         // Filter all .java files from the filename
         FilenameFilter filter = new FilenameFilter(){
@@ -58,9 +63,14 @@ public abstract class BotCompilerHelper{
         return compiled_bots;
     }
 
+
+
+    // Get the class name from a file basename by removing the trailing ".java"
     public static String classNameFromBaseName(String baseName){
         return baseName.replaceAll(".java$", "");
     }
+
+
 
     // Load a bot from a class name
     //
@@ -82,14 +92,17 @@ public abstract class BotCompilerHelper{
             Log.logException( err );
             throw new InstantiationException( "Bot '" +className+ "' caused a SecurityException! (" +err.getMessage()+ ")" );
         } catch( IllegalAccessError err ) {
-
             Log.logException( err );
             throw new InstantiationException( "Bot '" +className+ "' caused an IllegalAccessError! (" +err.getMessage()+ ")" );
         }
     }
 
+
+
     // Compiles a filename
     public static boolean compile(String fname){
+
+        // Check we're running within the JDK, not the standard JRE
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if(compiler == null){
             Log.log("");
@@ -102,7 +115,13 @@ public abstract class BotCompilerHelper{
             /* System.exit(1); */
         }
 
-        int compilationResult = compiler.run(null, new LogOutputStream("<stdout> "), new LogOutputStream("<stderr> "), fname);
+        // Compile, logging to stdout/stderr
+        int compilationResult = compiler.run(null, 
+                new LogOutputStream("<stdout> "), 
+                new LogOutputStream("<stderr> "), 
+                fname);
+
+        // Return true if it worked.
         return compilationResult == 0;
     }
 }

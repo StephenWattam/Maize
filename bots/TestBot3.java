@@ -9,8 +9,8 @@ import java.util.Arrays;
 /** Interface for logic and stuffs */	
 public class TestBot3 implements Bot, Serializable {
 
-	private boolean[][][] actionMap = new boolean[1][1][4];
-	private int nextMove = -1; // stores next move
+	private boolean[][][] actionMap; // initialized in start()
+	private int nextMove; // stores next move. initialized in start()
 	
     /** Implementation of the Bot interface.
      * @see Bot
@@ -26,6 +26,18 @@ public class TestBot3 implements Bot, Serializable {
      *
      * @return     Next move in form of Direction.####
      */
+	 
+	 
+    @Override
+    public void start()
+	{
+		debugLn("========START start()=======================");
+		debugLn("Initializing...");
+		actionMap = new boolean[1][1][4];
+		nextMove = -1;
+		debugLn("========END  start()========================");
+	}
+	
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy){
 	
@@ -53,19 +65,9 @@ public class TestBot3 implements Bot, Serializable {
 				}
 			}
 		}
-		
-		if (approachingFinish(x, y, fx, fy, nextMove)) //clean up for next run
-		{
-			actionMap = new boolean[1][1][4];
-			debugLn("Cleaning up for next run.");
-		}
 		debugLn("========END   nextMove()====================");
 		return returnNextOperation(o);
     }
-
-
-    @Override
-    public void start(){}
 
 	private boolean isWall(boolean[][] view, int dir){
 		
