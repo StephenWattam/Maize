@@ -28,8 +28,7 @@ public class AboutDialog extends JDialog implements ActionListener{
 
         // Fix window size
 		setSize(new Dimension(310, 160));
-		GridBagConstraints gbc = new GridBagConstraints();
-		setLayout(new GridBagLayout());
+		setLayout(new BorderLayout());
 
 
         // Icon
@@ -45,29 +44,11 @@ public class AboutDialog extends JDialog implements ActionListener{
         okayButton.addActionListener(this);
         
 
-		//this.add(new JLabel("Instatiate Class");
-		gbc.anchor = GridBagConstraints.CENTER;
+		this.add(iconPanel, BorderLayout.NORTH);
 
-        // icon
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.ipadx = 32;
-		gbc.ipady = 32;
-		this.add(iconPanel, gbc);
+		this.add(aboutText, BorderLayout.CENTER);
 
-		// about
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.ipadx = 0;
-		gbc.ipady = 20;
-		this.add(aboutText, gbc);
-
-        // okay button
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.ipady = 0;
-		gbc.anchor = GridBagConstraints.LAST_LINE_END;
-		this.add(okayButton,gbc);
+		this.add(okayButton, BorderLayout.SOUTH);
 
 
 		setVisible(true);
