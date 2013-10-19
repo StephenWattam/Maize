@@ -91,10 +91,6 @@
 
 \end{column} 
 \end{columns}
-
-\note{Here are some more insulting comments that I wish to make.  
-The class will not see them on the overhead, but I will see them on my 
-laptop.}
 }
 
 
@@ -217,7 +213,7 @@ laptop.}
 \subsection{Overview, Sensing and Actuating}
 \frame{\frametitle{Measure--Model--Respond}
 \begin{itemize}
-    \item<1-> Similar to control theory---each mouse is an `intelligent agent', judging the state of the world from its inputs
+    \item<1-> Control theory---each mouse is an `intelligent agent', judging the state of the world from its inputs
     \item<2-> Three basic stages, repeated \textsl{ad infinitum}:
         \begin{enumerate}
             \item<3-> \textbf{Measure} the world about you;
@@ -292,8 +288,9 @@ laptop.}
     \begin{itemize}
         \item<1-> Deterministic vs. Stochastic
         \begin{itemize}
-            \item<2-> DaveBot is stochastic, has no rules
+            \item<2-> DaveBot is (entirely) stochastic, has no rules
             \item<2-> LeftBot is deterministic, has only rules
+            \item<2-> Gorad (v2) makes random decisions when it has no rules to fall back on
         \end{itemize}
 
         \vspace{10pt}
@@ -308,6 +305,7 @@ laptop.}
         \begin{itemize}
             \item<6-> LeftStateBot is stateful, remembers a long sequence of actions
             \item<6-> LeftBot is not
+            \item<6-> GraphBot is \texttt{very} stateful
         \end{itemize}
     \end{itemize}
 }
@@ -316,7 +314,7 @@ laptop.}
 \frame{\frametitle{Complexity of Maze Solving}
     \begin{itemize}
         \item<1-> Algorithmically, the best solution to a maze is to choose the best right path each time:\\
-            \textcolor<2->{red}{The maze is just a big tree of choices}
+            \textcolor<2->{red}{The maze is just a big tree of right/wrong choices}
         \vspace{10pt}
         \item<3-> The best case is thus equivalent to a binary search, plus the time needed to move
         \vspace{10pt}
@@ -333,8 +331,8 @@ laptop.}
 \frame{\frametitle{Overview}
     \begin{itemize}
         \item<1-> Manages \texttt{Bot}s and \texttt{Maze}s, and simulates a virtual world
-        \item<2-> Tile-based environment
-        \item<3-> A tile can be a start, finish, space, or wall.
+        \item<2-> Tile-based discrete environment
+        \item<3-> A tile can be a start, finish, space, or wall
     \end{itemize}
 
 
@@ -353,7 +351,7 @@ laptop.}
             \end{itemize}\\
             \visible<6->{\tiny (Technically, all that's needed is the red one, but the other things make it more fun)}
         \vspace{15pt}
-        \item<7-> Bots can move only one tile per `tick', and only Left, Right, Forward and Back (like kings in chess)
+        \item<7-> Bots can move only \textbf{one tile per `tick'}, and only \textbf{Left}, \textbf{Right}, \textbf{Forward} and \textbf{Back} (like kings in chess)
     \end{itemize}
 }
 \frame{\frametitle{Bot Classes}
@@ -378,7 +376,7 @@ laptop.}
     \begin{center}
         A quick overview of the bots we have\\
         \vspace{10pt}
-        \url{http://extremetomato.com/projects/maize/}
+        \url{http://stephenwattam.com/projects/maize/}
     \end{center}
 }
 % -----------------------------------------------------------------------------------------
@@ -387,15 +385,21 @@ laptop.}
     \begin{enumerate}
         \item<1-> Beat \texttt{DaveBot} on any Maze\\
             {\small (An \texttt{EmptyMaze} might be simplest, a \texttt{ScatterMaze} might be hardest)}
-        \vspace{5pt}
+        \vspace{3pt}
         \item<2-> Solve a DFS Maze without using a wall following algorithm\\
             {\small (this requires building a model of the decision tree)}
-        \vspace{5pt}
+        \vspace{3pt}
         \item<3-> Write a wall follower that can also solve \texttt{Empty} and \texttt{Scatter} mazes.
-        \vspace{5pt}
+        \vspace{3pt}
         \item<4-> Improve an existing wall follower with heuristics
+        \vspace{3pt}
+        \item<5-> Beat Gorad or GraphBot
+        \vspace{3pt}
+        \item<6-> Beat the security manager ;-)
     \end{enumerate}
 }
+
+
 \frame{\frametitle{Getting Started (abstract)}
     \begin{itemize}
         \item<1-> Decide on a maze type to run on
@@ -411,11 +415,11 @@ laptop.}
     \begin{itemize}
         \item<1-> Create a new class in \texttt{./bots/} that \texttt{extends Bot}
         \vspace{10pt}
-        \item<2-> Start Maize.  Compiler output will be in the console.
+        \item<2-> Start Maize.  Compiler output will be in the console
         \vspace{10pt}
-        \item<3-> Edit your bot and select \texttt{Bots > Reload all Bots} or \texttt{Bots > Compile} to recompile.
+        \item<3-> Edit your bot and select \texttt{Bots > Compile...} or \texttt{Bots > Compile/reload all} to recompile.
         \vspace{10pt}
-        \item<4-> The log contains compiler output from your bots.
+        \item<4-> The log contains compiler output from your bots
     \end{itemize}
 }
 
@@ -423,7 +427,7 @@ laptop.}
     \begin{center}
         All resources available from\\
         \vspace{10pt}
-        \url{http://extremetomato.com/projects/maize/}
+        \url{http://stephenwattam.com/projects/maize/}
     \end{center}
 }
 
