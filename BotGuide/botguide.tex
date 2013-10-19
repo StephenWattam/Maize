@@ -67,7 +67,7 @@
 
 
 \section{Introduction}
-This is a rough guide on getting started with writing your own bot for Maize.  It describes the conventions and data format used in the Bot API, as well as pointing at some of the more advanced features available.
+This is a rough guide on getting started with writing your own bot for Maize.  It describes the conventions and data format used in the bot API, as well as pointing at some of the more advanced features available.
 
 As an overview, you will be writing a class that controls a virtual agent as it moves around a virtual maze.  You will be provided only with a small amount of data about the surroundings of the bot, and can only instruct it to turn left or right, and move forward or backwards.  The aim is to reach the goal (or finish).
 
@@ -82,17 +82,17 @@ The maze you are navigating is represented internally by three quantities:
 The maze is rendered on-screen using conventional display co-ordinates, \textit{not} those conventionally used for graph display.  This means that the top-left corner is $(0,0)$, and the bottom-right is $(i,j)$.
 
 
-During a test, your bot will be positioned at the start co-ordinates, and the \texttt{nextMove()} method will be called once for each time tick, unless your bot's current position is equal to the finish.  All mazes are solvable (that is, the generation algorithm generally ensures it), and static.
+During a test, your bot will be positioned at the start co-ordinates, and the \texttt{nextMove()} method will be called once for each time tick, unless your bot's current position is equal to the finish.  All mazes are solvable (that is, the generation algorithm generally ensures it), and immutable.
 
 
 
 \section{Bot API}
-Bots are run by calling a re-entrant API on an existing instance of a class that implements the \texttt{Bot} interface.  This comprises three methods, all of which must be implemented:
+Bots are run by calling a re-entrant API on an existing instance of a class that implements the \texttt{Bot} interface.  This comprises four methods, all of which must be implemented:
 \begin{itemize}
 \item \texttt{nextMove()}---Is called once per time tick, and returns a value from the \texttt{Direction} enumeration in order to indicate which way the bot should move.  The full format for this is listed below, in Section~\ref{section:dataformat};
 \item \texttt{getName()}---Returns a name for the bot.  Used in lists and the UI to identify your creation;
 \item \texttt{getDescription()}---Returns a sentence or two about how your bot works, and any state information you may wish to check on.
-\item \texttt{start()}---Called once each time the bot is run (regardless of whether it is being run on a new maze or not).  Can be used to clear any bot state or generate pre-computed data.
+\item \texttt{start()}---Called once each time the bot is run (regardless of whether it is being run on a new maze or not).  Can be used to clear any bot state or generate pre-computed data, but stateless bots won't have to do anything here and can leave it empty.
 \end{itemize}
 In addition to this simple API, there are two classes, \texttt{AdvancedBot} and \texttt{StateBot}, which add a higher level API to the above.  They are documented below in Section~\ref{section:alternativeapis}.
 
@@ -155,8 +155,8 @@ We have attempted to minimise the technical requirements for your bot, however, 
 
 \begin{itemize}
 \item In order to save/load bots, your class must implement \texttt{java.io.Serializable}.  
-\item In order to use the \texttt{Orientation} and \texttt{Direction} classes, you must import them .
-\item Your bot \textbf{must} be in the package that corresponds to its directory relative to \texttt{RunMazeUI.class}.  This is, typically, \texttt{bots} (if in doubt, check the config file).
+\item In order to use the \texttt{Orientation} and \texttt{Direction} classes, you must import them.
+\item Your bot \textbf{must} be in the package that corresponds to its directory relative to \texttt{RunMazeUI.class}.  This is, typically, \texttt{bots/} ---if in doubt, check the config file.
 \end{itemize}
 
 \pagebreak
@@ -199,7 +199,7 @@ public class EmptyBot implements Bot, Serializable {
      */
     @Override
     public void start(){
-        // reset code for starting a maze
+        // Reset code for starting a maze
     }
 }
 \end{lstlisting}
@@ -225,10 +225,10 @@ public static final int WEST = 3;
 // Get the name of an orientation as a string
 public static String getName(int o);
 
-// Rotate to fit current context
+// Rotate the view matrix so that (0,0) is northwest
 public static boolean[][] rotateToNorth(boolean[][] view, int o);
 
-// Rotate clockwise
+// Rotate the view matrix clockwise
 private static boolean[][] rotateCW(boolean[][] mat);
 \end{lstlisting}
 
