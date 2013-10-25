@@ -120,9 +120,9 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 
         JMenu botMenu = new JMenu("Bots");
-        botMenu.add(buildMenuItem("Reload all bots (" + MazeUISettingsManager.botDirectory + ")","reload_bots"));
-        botMenu.add(buildMenuItem("Compile/reload all (" + MazeUISettingsManager.botDirectory + ")","compile_bot"));
-        botMenu.add(buildMenuItem("Compile...","inst_bot_choose"));
+        botMenu.add(buildMenuItem("Recompile/load all (" + MazeUISettingsManager.botDirectory + ")","reload_bots"));
+        botMenu.add(buildMenuItem("Compile/load...","inst_bot_choose"));
+        botMenu.add(buildMenuItem("Compile all (" + MazeUISettingsManager.botDirectory + ")","compile_bot"));
         botMenu.add(buildMenuItem("Instantiate...","inst_bot"));
         botMenu.add(buildMenuItem("Load...","load_bot"));
         menuBar.add(botMenu);
@@ -305,6 +305,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         }
     }
 
+    // Compile all bots in a directory and import into the mazeTest object
     public void compileAndLoadBots(String packageName, String dirname){
         Vector<Bot> bots = BotCompilerHelper.compileAndLoadBots(packageName, dirname);
 

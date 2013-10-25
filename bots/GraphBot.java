@@ -26,7 +26,7 @@ public class GraphBot implements Bot, Serializable {
     //  Configuration
     //
     // Turn debug on/off
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     // ------------------------------------------------------------
     //  Don't edit below this line
@@ -48,7 +48,7 @@ public class GraphBot implements Bot, Serializable {
 
     // Make a random move.
     private int daveMode(){
-        return 0;// (int)(Math.random() * 4);
+        return (int)(Math.random() * 4);
     }
 
     /** Implementation of the Bot interface. */
@@ -113,6 +113,7 @@ public class GraphBot implements Bot, Serializable {
         displayView(view, bestRoute, x, y, o, fx, fy);
         renderMap(map, bestRoute, x, y, fx, fy, o);
         debugln("==================================================");
+
 
         // Then follow anything in the buffer
         return (int)this.buffer.remove(0);

@@ -16,8 +16,8 @@ public class RunMazeTest{
     // TODO: Move into config file
     public static final boolean INSTANTIATE_EVERY_RUN   = false;
     public static final boolean INSTANTIATE_EVERY_MAZE  = true;
-    public static final int TESTS_PER_FACTORY           = 10;
-    public static final int TESTS_PER_MAZE              = 10;
+    public static final int TESTS_PER_FACTORY           = 5;
+    public static final int TESTS_PER_MAZE              = 5;
     public static final Dimension MAZE_SIZE             = new Dimension(20, 20);
     public static final int BOT_START_TIMEOUT           = 100;
     public static final int BOT_WORK_TIMEOUT            = 10;

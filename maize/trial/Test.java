@@ -100,6 +100,9 @@ public class Test{
             Log.log("Bot " + bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
         }catch(InterruptedException Ie){
             Log.log("Bot " + bot.getName() + " was interrupted during execution");
+        }catch(ExecutionException Ee){
+            Log.log("Bot " + bot.getName() + " threw an exception (nested): ");
+            Log.logException(Ee.getCause());
         }catch(Exception e){
             Log.log("Bot " + bot.getName() + " threw an exception: ");
             Log.logException(e);
@@ -132,15 +135,19 @@ public class Test{
             //TimeoutException: didn't complete within downloadTimeoutSecs
             //InterruptedException: the executor thread was interrupted
         }catch(TimeoutException Te){
-            Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
-            agent.seqTimeouts ++;
-
-            // Set stuck if over the limit
-            if(agent.seqTimeouts > seqTimeoutLimit)
-                agent.isStuck = true;
-
+            increaseFailureCount(agent);
         }catch(InterruptedException Ie){
             Log.log("Bot " + agent.bot.getName() + " was interrupted during execution");
+        }catch(ExecutionException Ee){
+            Log.log("Bot " + agent.bot.getName() + " threw an exception (nested): ");
+           
+            if(Ee.getCause().getClass().getName() == "java.lang.RuntimeException"){
+                Log.log("This exception was thrown by the bot itself:");
+                Log.logException(Ee.getCause().getCause());
+                increaseFailureCount(agent);
+            }else{
+                Log.logException(Ee.getCause());
+            }
         }catch(Exception e){
             Log.log("Bot " + agent.bot.getName() + " threw an exception: ");
             Log.logException(e);
@@ -148,6 +155,19 @@ public class Test{
             future.cancel(true);
             executor.shutdownNow();
         }
+    }
+
+    // Increase seqTimeouts and count sequential timeout count,
+    // Will cause the bot to register as stuck if it hits the limit.
+    private void increaseFailureCount(BotTest agent){
+        agent.seqTimeouts ++;
+
+        Log.log("Bot " + agent.bot.getName() + " Failed (" + agent.seqTimeouts + "/" + seqTimeoutLimit + ", " + botWorkTimeout + "ms)");
+
+        // Set stuck if over the limit
+        if(agent.seqTimeouts > seqTimeoutLimit)
+            agent.isStuck = true;
+
     }
 
 

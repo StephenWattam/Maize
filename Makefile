@@ -5,7 +5,8 @@ CC=javac
 #CC=/usr/libexec/java_home -v 1.7.0_09 --exec javac
 
 # Use 1.6 language features only.
-CFLAGS=-cp ./lib/json-simple-1.1.1.jar:./lib/javacsv.jar -source 1.6 
+CFLAGS=-cp ./lib/json-simple-1.1.1.jar:./lib/javacsv.jar
+	#-source 1.6 
 #-Xlint:unchecked
 
 JAVA=java
