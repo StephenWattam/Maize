@@ -13,7 +13,14 @@ import javax.imageio.*;
 
 
 import maize.*;
-public class MultiTestTabPanel extends TabPanel implements ActionListener, ChangeListener, ListSelectionListener, MouseWheelListener{
+import maize.trial.*;
+public class MultiTestTabPanel extends TabPanel implements 
+    ActionListener, 
+    ChangeListener, 
+    ListSelectionListener, 
+    MouseWheelListener,
+    TestListener
+{
 
     private static final int SPEED_SCROLL_AMOUNT            = 1;
 	private static final int MAX_DELAY                      = 750;
@@ -41,12 +48,14 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 	private JList testList;
 
 
-
 	// Current running things.
 	// Holds selected bots
 	private Vector<Bot> selectedBots                        = new Vector<Bot>();
 	private Maze maze                                       = null;
 	private TestThread test                                 = null; 
+
+    // Used to maintain testList
+    private Vector<BotTest> runningAgents                   = new Vector<BotTest>();
 
 
     public MultiTestTabPanel(MazeTest mazeTest, JTabbedPane tabContainer, String name){
@@ -92,12 +101,13 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 
 
 		// Test panel
-		testList = new JList();
+		testList = new JList(runningAgents);
 		testList.setCellRenderer(new TestListCellRenderer(this.mazePanel));
 		testList.setBackground(null);
 		JScrollPane testListPanel = new JScrollPane(testList);
 		testListPanel.setMinimumSize(new Dimension(160, 150));
 		testListPanel.setBackground(null);
+
 		//testListPanel.setViewportBorder(null);
 
 
@@ -379,11 +389,22 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 	private void newTest(){
 		if(this.selectedBots.size() == 0)
 			return;
-			
+
         Log.log("Creating new test.");
+        
+        // Clear the current 'running' list.
+        runningAgents.clear();
+        testList.setListData(runningAgents);
+
 		// Create a test thread
 		Bot[] bots = (Bot[])this.selectedBots.toArray(new Bot[this.selectedBots.size()]);
-		this.test = new TestThread(this.maze, bots, mazePanel, MAX_DELAY - speedSlider.getValue(), this.testList);
+		this.test = new TestThread(this.maze, 
+                bots,
+                this, 
+                MAX_DELAY - speedSlider.getValue(), 
+                MazeUISettingsManager.botStartTimeout,
+                MazeUISettingsManager.botWorkTimeout
+                );
 	}
 
 	//called to regtresjh state changes
@@ -411,6 +432,39 @@ public class MultiTestTabPanel extends TabPanel implements ActionListener, Chang
 			mazeNameLabel.setText(name);
 		}
 	}
+
+    /* ---------- Callbacks for TestListener interface ---------- */
+
+
+    /** Called when a new bot is added to the test. */
+    public void addAgent(BotTest bt){
+        if(this.mazePanel != null)
+            mazePanel.addAgent(bt.agent);
+        
+        runningAgents.add(bt);
+        testList.setListData(runningAgents);
+    }
+
+
+    /** Called when an agent is removed from the running test. */
+    public void remAgent(BotTest bt){
+        if(this.mazePanel != null)
+            mazePanel.remAgent(bt.agent);
+
+        // Don't remove from the list so that people can see
+        // the results.
+    }
+    
+    /** Called when the simulation ticks and updates info. */
+    public void updateAgents(){
+        // Redraw the maze
+        if(this.mazePanel != null){
+            mazePanel.repaint();
+        }
+
+        // Repaint the list of bots to keep the move count moving
+        this.testList.repaint();
+    }
 
 
 }

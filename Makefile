@@ -19,10 +19,10 @@ JAVADOC=javadoc
 DOCFLAGS=-d Docs -classpath ./lib/json-simple-1.1.1.jar
 
 all:
-	$(CC) $(CFLAGS) maize/ui/*.java maize/*.java *.java
+	$(CC) $(CFLAGS) maize/*/*.java maize/*.java *.java
 
 docs:
-	$(JAVADOC) $(DOCFLAGS) maize/ui/*.java maize/*.java *.java
+	$(JAVADOC) $(DOCFLAGS) maize/*/*.java maize/*.java *.java
 
 run:
 	$(JAVA) $(RUNFLAGS)  RunMazeUI

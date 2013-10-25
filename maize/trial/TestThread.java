@@ -1,4 +1,4 @@
-package maize.ui;
+package maize.trial;
 
 import maize.*;
 import javax.swing.*;
@@ -23,12 +23,15 @@ public class TestThread extends Thread{
     // Keep a timeout
     private ExecutorService executor = Executors.newFixedThreadPool(1);
 
-	// store state on one run
-	public MazePanel panel;
+	// UI to update via callback
+	public TestListener panel;
+
+    // State
 	public BotTest[] agents;
 
-	// ui to update
-	public Component agentList;
+    // How long the bots have to run before being killed
+    public int botStartTimeout;
+    public int botWorkTimeout;
 
 	// flipped when the bot hits the end
 	public boolean isDone = false;
@@ -41,18 +44,25 @@ public class TestThread extends Thread{
 	// pause indefinitely
 	private boolean pause = false;
 
-	public TestThread(Maze m, Bot[] bs, MazePanel mp, int delayms, JList agentList){
+	public TestThread(Maze m, Bot[] bs, 
+            TestListener client, 
+            int delayms, int botStartTimeout, 
+            int botWorkTimeout 
+            ){   // FIXME: remove requirement for agentlist!
+
 		if(m==null) return;
 		AgentFactory af     = new AgentFactory();
 
 		this.agents         = new BotTest[bs.length];
 		this.delayms        = delayms;
-		this.panel          = mp;
+		this.panel          = client;
+        this.botStartTimeout  = botStartTimeout;
+        this.botWorkTimeout   = botWorkTimeout;
 
 
 		// Add each bot
 		for(int i=0; i<bs.length; i++){
-            Log.log("Building runtime environment for bot " + (i+1) + "/" + bs.length);
+            /* Log.log("Building runtime environment for bot " + (i+1) + "/" + bs.length); */
 
             // Create a bot test
 			agents[i]       = new BotTest();
@@ -61,20 +71,16 @@ public class TestThread extends Thread{
 			agents[i].moves = 0;
 
             // Add to the maze panel
-			panel.addAgent(agents[i].agent);
+			panel.addAgent(agents[i]);
 		}
 
 
-		// update the UI
-		this.agentList = agentList;
-		agentList.setListData(agents);
-
-
         // Call start on all bots
-        Log.log("Starting bots...");
+        /* Log.log("Starting bots..."); */
         for(int i=0; i<this.agents.length; i++){
-            Log.log("Calling bot.start for " + this.agents[i].bot.getName() );
-            startAgentWithTimeout( MazeUISettingsManager.botStartTimeout, this.agents[i].bot );
+            /* Log.log("Calling bot.start for " + this.agents[i].bot.getName() ); */
+            /* startAgentWithTimeout( MazeUISettingsManager.botStartTimeout, this.agents[i].bot ); */
+            startAgentWithTimeout( botStartTimeout, this.agents[i].bot );
         }
 
 	}	
@@ -90,7 +96,7 @@ public class TestThread extends Thread{
     // the agents from the panel
 	public void quit(){
 		for(int i=0;i<agents.length;i++)
-			panel.remAgent(agents[i].agent);
+			panel.remAgent(agents[i]);
 		quit = true;
 	}
 
@@ -121,12 +127,12 @@ public class TestThread extends Thread{
         //TimeoutException: didn't complete within downloadTimeoutSecs
         //InterruptedException: the executor thread was interrupted
         }catch(TimeoutException Te){
-            Log.log("Bot " + bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
+            /* Log.log("Bot " + bot.getName() + " timed out (took more than " + timeout + "ms to respond)"); */
         }catch(InterruptedException Ie){
-            Log.log("Bot " + bot.getName() + " was interrupted during execution");
+            /* Log.log("Bot " + bot.getName() + " was interrupted during execution"); */
         }catch(Exception e){
-            Log.log("Bot " + bot.getName() + " threw an exception: ");
-            Log.logException(e);
+            /* Log.log("Bot " + bot.getName() + " threw an exception: "); */
+            /* Log.logException(e); */
         }finally{
             future.cancel(true);
         }
@@ -152,12 +158,12 @@ public class TestThread extends Thread{
         //TimeoutException: didn't complete within downloadTimeoutSecs
         //InterruptedException: the executor thread was interrupted
         }catch(TimeoutException Te){
-            Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
+            /* Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)"); */
         }catch(InterruptedException Ie){
-            Log.log("Bot " + agent.bot.getName() + " was interrupted during execution");
+            /* Log.log("Bot " + agent.bot.getName() + " was interrupted during execution"); */
         }catch(Exception e){
-            Log.log("Bot " + agent.bot.getName() + " threw an exception: ");
-            Log.logException(e);
+            /* Log.log("Bot " + agent.bot.getName() + " threw an exception: "); */
+            /* Log.logException(e); */
         }finally{
             future.cancel(true);
         }
@@ -181,7 +187,8 @@ public class TestThread extends Thread{
 
 
 				// move the agent with a timeout
-                moveAgentWithTimeout(MazeUISettingsManager.botWorkTimeout , agent);
+                /* moveAgentWithTimeout(MazeUISettingsManager.botWorkTimeout , agent); */
+                moveAgentWithTimeout(botWorkTimeout , agent);
 				/* agent.agent.move(); */
 
 
@@ -195,11 +202,11 @@ public class TestThread extends Thread{
         // so we don't have to.
         for(int i=0;i<agents.length;i++)
             if(agents[i].isFinished)
-                this.panel.remAgent(agents[i].agent);
+                this.panel.remAgent(agents[i]);
             
         
 
-		panel.repaint();
+		this.panel.updateAgents();
 		return keepRunning;
 	}
 
@@ -208,15 +215,15 @@ public class TestThread extends Thread{
 		while(iterate() == true){
 
 			//update ui
-			this.agentList.repaint();
+			this.panel.updateAgents();
 
 			try{ Thread.currentThread().sleep(delayms); }catch(java.lang.InterruptedException ie){ }
 
 			// exit without completion
 			if( quit ){
 				for(int i=0;i<agents.length;i++)
-					panel.remAgent(agents[i].agent);
-				panel.repaint();
+					panel.remAgent(agents[i]);
+				panel.updateAgents();
 				return;
 			} 
 
@@ -226,7 +233,7 @@ public class TestThread extends Thread{
 		}
 		isDone = true;
 		//update ui
-		this.agentList.repaint();
+		this.panel.updateAgents();
 	}
 }
 

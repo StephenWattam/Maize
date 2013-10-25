@@ -5,6 +5,7 @@ import java.awt.*;
 
 
 import maize.*;
+import maize.trial.BotTest;
 public class TestListCellRenderer extends JLabel implements ListCellRenderer{
 
     // The maze panel to get icons from
