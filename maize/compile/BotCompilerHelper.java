@@ -80,9 +80,11 @@ public abstract class BotCompilerHelper{
     // Note that THIS ONLY WORKS BECAUSE BOT IS AN INTERFACE!
     public static Bot loadBotClass(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
 
+        Log.log("Loading bot class: " + className);
+
         // Pass the current ClassLoader to the BotClassLoader
         ClassLoader parentClassLoader   = ClassReloader.class.getClassLoader();
-        ClassReloader classLoader    = new ClassReloader(parentClassLoader, className);
+        ClassReloader classLoader       = new ClassReloader(parentClassLoader, className);
 
         // Then load the desired bot with it
         Class myObjectClass             = classLoader.loadClass(className);

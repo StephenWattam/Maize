@@ -1,6 +1,7 @@
 package maize.trial;
 
 import maize.*;
+import maize.log.*;
 
 import java.util.concurrent.*;
 
@@ -52,7 +53,7 @@ public class TestThread extends Thread{
 
 		// Add each bot
 		for(int i=0; i<bs.length; i++){
-            /* Log.log("Building runtime environment for bot " + (i+1) + "/" + bs.length); */
+            Log.log("Building runtime environment for bot " + (i+1) + "/" + bs.length);
 
             // Create a bot test
 			agents[i]       = new BotTest();
@@ -66,12 +67,13 @@ public class TestThread extends Thread{
 
 
         // Call start on all bots
-        /* Log.log("Starting bots..."); */
+        Log.log("Starting bots... (timeout: " + botStartTimeout + ")");
         for(int i=0; i<this.agents.length; i++){
-            /* Log.log("Calling bot.start for " + this.agents[i].bot.getName() ); */
+            Log.log("Calling bot.start for " + this.agents[i].bot.getName());
             /* startAgentWithTimeout( MazeUISettingsManager.botStartTimeout, this.agents[i].bot ); */
             startAgentWithTimeout( botStartTimeout, this.agents[i].bot );
         }
+        Log.log("Bots started.");
 
 	}	
 
@@ -117,12 +119,12 @@ public class TestThread extends Thread{
         //TimeoutException: didn't complete within downloadTimeoutSecs
         //InterruptedException: the executor thread was interrupted
         }catch(TimeoutException Te){
-            /* Log.log("Bot " + bot.getName() + " timed out (took more than " + timeout + "ms to respond)"); */
+            Log.log("Bot " + bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
         }catch(InterruptedException Ie){
-            /* Log.log("Bot " + bot.getName() + " was interrupted during execution"); */
+            Log.log("Bot " + bot.getName() + " was interrupted during execution");
         }catch(Exception e){
-            /* Log.log("Bot " + bot.getName() + " threw an exception: "); */
-            /* Log.logException(e); */
+            Log.log("Bot " + bot.getName() + " threw an exception: ");
+            Log.logException(e);
         }finally{
             future.cancel(true);
         }
@@ -148,12 +150,12 @@ public class TestThread extends Thread{
         //TimeoutException: didn't complete within downloadTimeoutSecs
         //InterruptedException: the executor thread was interrupted
         }catch(TimeoutException Te){
-            /* Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)"); */
+            Log.log("Bot " + agent.bot.getName() + " timed out (took more than " + timeout + "ms to respond)");
         }catch(InterruptedException Ie){
-            /* Log.log("Bot " + agent.bot.getName() + " was interrupted during execution"); */
+            Log.log("Bot " + agent.bot.getName() + " was interrupted during execution");
         }catch(Exception e){
-            /* Log.log("Bot " + agent.bot.getName() + " threw an exception: "); */
-            /* Log.logException(e); */
+            Log.log("Bot " + agent.bot.getName() + " threw an exception: ");
+            Log.logException(e);
         }finally{
             future.cancel(true);
         }
