@@ -21,11 +21,23 @@ public class TestListCellRenderer extends JLabel implements ListCellRenderer{
 
 		// PRint the bot's name
 		BotTest botTest = (BotTest)value;
-		setText(botTest.bot.getName() + "(" + botTest.moves + " moves, finished? " + botTest.isFinished + ")");
+
+        String msg = "[" + botTest.moves + "] " + botTest.bot.getName();
+        if(botTest.isFinished)
+            msg = "[F]" + msg;
+        if(botTest.isStuck)
+            msg = "[S]" + msg;
+
+		setText(msg);
+            //botTest.bot.getName() + "(m:" + botTest.moves + " f?:" + botTest.isFinished + ", to: " + botTest.seqTimeouts + ")");
 
 		if(botTest.isFinished){
 			setBackground(Color.GREEN);
-		}else{
+		}else if(botTest.isStuck){
+			setBackground(Color.RED);
+        }else if(botTest.seqTimeouts > 0){
+            setBackground(Color.GRAY);
+        }else{
 			setBackground(null);
 		}
 

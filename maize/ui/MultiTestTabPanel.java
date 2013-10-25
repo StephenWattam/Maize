@@ -371,7 +371,7 @@ public class MultiTestTabPanel extends TabPanel implements
 	private void loadMazeFromUI(){
 		//System.out.println("maze: " + maze + ", bot size: " + this.selectedBots.size() + ", test: " + test);
 		// New test if one is running
-		if(this.test != null && this.test.isDone == false){
+		if(this.test != null && this.test.isDone() == false){
 			this.test.quit();
 		}
 
@@ -399,13 +399,15 @@ public class MultiTestTabPanel extends TabPanel implements
 
 		// Create a test thread
 		Bot[] bots = (Bot[])this.selectedBots.toArray(new Bot[this.selectedBots.size()]);
-		this.test = new TestThread(this.maze, 
+		this.test = new TestThread(
+                this.maze, 
                 bots,
                 this, 
                 MAX_DELAY - speedSlider.getValue(), 
                 MazeUISettingsManager.botStartTimeout,
-                MazeUISettingsManager.botWorkTimeout
-                );
+                MazeUISettingsManager.botWorkTimeout,
+                MazeUISettingsManager.seqTimeoutLimit
+            );
 	}
 
 	//called to regtresjh state changes

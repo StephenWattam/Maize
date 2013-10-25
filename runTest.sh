@@ -1,3 +1,3 @@
 #!/bin/sh
 
-java RunMazeTest $@
+java -cp .:./lib/javacsv.jar RunMazeTest $@

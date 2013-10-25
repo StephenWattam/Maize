@@ -23,6 +23,10 @@ public class MazeUISettingsManager{
     public static int botWorkTimeout = 10000;
     public static int botStartTimeout = 10000;
 
+    // If a bot times out more than 100 times in a row,
+    // set it as stuck and stop simulating it.
+    public static int seqTimeoutLimit = 100;
+
 	// Bot loading
 	public static String botDirectory;
 	public static String botPackageName;
@@ -133,6 +137,8 @@ public class MazeUISettingsManager{
 
             MazeUISettingsManager.botWorkTimeout  = Integer.parseInt(((JSONObject)config.get("ui")).get("botTimeout").toString());
             MazeUISettingsManager.botStartTimeout  = Integer.parseInt(((JSONObject)config.get("ui")).get("botStartTimeout").toString());
+            
+            MazeUISettingsManager.seqTimeoutLimit  = Integer.parseInt(((JSONObject)config.get("ui")).get("seqTimeoutLimit").toString());
 
 			MazeUISettingsManager.attachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("attachIcon").toString()));
 			MazeUISettingsManager.detachIcon = ImageIO.read(new File(((JSONObject)config.get("ui")).get("detachIcon").toString()));

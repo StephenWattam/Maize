@@ -10,4 +10,8 @@ public class BotTest{
 	public int moves;
 	public int index;
 	public boolean isFinished = false;
+
+    // Sequential timeouts since last success
+    public int seqTimeouts = 0; 
+    public boolean isStuck = false;
 }
