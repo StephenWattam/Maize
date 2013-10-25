@@ -38,7 +38,7 @@ public class TestThread extends Thread{
             TestListener client, 
             int delayms, int botStartTimeout, 
             int botWorkTimeout 
-            ){   // FIXME: remove requirement for agentlist!
+            ){
 
 		if(m==null) return;
 		AgentFactory af     = new AgentFactory();

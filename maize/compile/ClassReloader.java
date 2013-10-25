@@ -1,4 +1,4 @@
-package maize.ui;
+package maize.compile;
 
 import java.io.*;
 import java.net.*;
@@ -46,19 +46,19 @@ public class ClassReloader extends ClassLoader{
             // Convert to a byte array
             byte[] classData = buffer.toByteArray();
 
-            Log.log("Forcing reload of class " + name + " from " + url);
+            /* Log.log("Forcing reload of class " + name + " from " + url); */
 
             // Define the class
             return defineClass(name, classData, 0, classData.length);
 
         } catch (MalformedURLException e) {
-            Log.log("Error forcing reload of bot class: " + name);
-            Log.logException(e);
-            /* e.printStackTrace(); */
+            /* Log.log("Error forcing reload of bot class: " + name); */
+            /* Log.logException(e); */
+            e.printStackTrace();
         } catch (IOException e) {
-            Log.log("Error forcing reload of bot class: " + name);
-            Log.logException(e);
-            /* e.printStackTrace();  */
+            /* Log.log("Error forcing reload of bot class: " + name); */
+            /* Log.logException(e); */
+            e.printStackTrace(); 
         }
 
         return null;

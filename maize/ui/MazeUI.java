@@ -14,6 +14,7 @@ import java.util.*;
 import java.lang.reflect.ReflectPermission;
 
 import maize.*;
+import maize.compile.*;
 public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
     // state
@@ -49,7 +50,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 
         this.mazeTest = mazeTest;
-        BotCompilerHelper.compileAndLoadBots(this.mazeTest, MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
+        compileAndLoadBots(MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
         constructDefaultMazes();
 
 
@@ -166,9 +167,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
             BotCompilerHelper.compileAllBots(MazeUISettingsManager.botDirectory); 
         }else if(Ae.getActionCommand().equals("reload_bots")){
             this.mazeTest.bots.clear();
-            BotCompilerHelper.compileAndLoadBots(this.mazeTest, 
-                    MazeUISettingsManager.botPackageName, 
-                    MazeUISettingsManager.botDirectory);
+            compileAndLoadBots(MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
         }else if(Ae.getActionCommand().equals("about")){
             helpAbout();
         }else if(Ae.getActionCommand().equals("attach_all")){
@@ -303,6 +302,13 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
             if(tp.isAttached())
                 tp.detach();
         }
+    }
+
+    public void compileAndLoadBots(String packageName, String dirname){
+        Vector<Bot> bots = BotCompilerHelper.compileAndLoadBots(packageName, dirname);
+
+        for(Bot b: bots)
+            this.mazeTest.bots.add( b );
     }
 
     // WindowListener
