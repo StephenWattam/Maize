@@ -1,4 +1,4 @@
-package maize.ui;
+package maize.log;
 import java.io.*;
 
 public  class LogOutputStream extends OutputStream{

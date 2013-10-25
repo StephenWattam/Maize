@@ -4,11 +4,12 @@ import java.util.*;
 import java.io.*;
 import maize.*;
 
+import maize.log.*;
 public abstract class BotCompilerHelper{
 
     // Compileas and loads bots into a given mazeTest 
     public static Vector<Bot> compileAndLoadBots(String packageName, String dirname){
-        /* Log.log("Compiling bots..."); */
+        Log.log("Compiling bots...");
         
         // Compile bots
         Vector<String> bot_classes = BotCompilerHelper.compileAllBots(dirname);
@@ -19,8 +20,8 @@ public abstract class BotCompilerHelper{
             try{ 
                 bots.add(BotCompilerHelper.loadBotClass(packageName + "." + s));
             }catch(Exception e){
-                /* Log.log("Error loading bot " + s); */
-                /* Log.logException(e); */
+                Log.log("Error loading bot " + s);
+                Log.logException(e);
                 System.out.println("Error loading bot class: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -47,16 +48,16 @@ public abstract class BotCompilerHelper{
 
         // check through the list and compile stuff
         if(children == null){
-            /* Log.log("No bots found!"); */
+            Log.log("No bots found!");
         }else{
             for(int i=0; i<children.length; i++){
-                /* Log.log("Compiling bot " + children[i] + "..."); */
+                Log.log("Compiling bot " + children[i] + "...");
                 if(compile(dirname + java.io.File.separator + children[i])){
-                    /* Log.log(children[i] + " compiled successfully!"); */
+                    Log.log(children[i] + " compiled successfully!");
                     compiled_bots.add(classNameFromBaseName(children[i]));
                     //compiled_bots.add(children[i].replaceAll(".java$", ".class"));
                 }else{
-                    /* Log.log("Failed to compile " + children[i]); */
+                    Log.log("Failed to compile " + children[i]);
                 }
             }
         }
@@ -90,11 +91,11 @@ public abstract class BotCompilerHelper{
         try {
             return (Bot) myObjectClass.newInstance();
         } catch( SecurityException err ) {
-            /* Log.log( "Security Error!" ); */
-            /* Log.logException( err ); */
+            Log.log( "Security Error!" );
+            Log.logException( err );
             throw new InstantiationException( "Bot '" +className+ "' caused a SecurityException! (" +err.getMessage()+ ")" );
         } catch( IllegalAccessError err ) {
-            /* Log.logException( err ); */
+            Log.logException( err );
             throw new InstantiationException( "Bot '" +className+ "' caused an IllegalAccessError! (" +err.getMessage()+ ")" );
         }
     }
@@ -107,22 +108,20 @@ public abstract class BotCompilerHelper{
         // Check we're running within the JDK, not the standard JRE
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         if(compiler == null){
-            /* Log.log(""); */
-            /* Log.log("IMPORTANT: No compiler is available on this platform."); */
-            /* Log.log("           Maize requires the java compiler to run bots, meaning you must"); */
-            /* Log.log("           install the JDK, rather than the JRE."); */
-            /* Log.log("           If you already have both installed, check your classpath."); */
-            /* Log.log(""); */
+            Log.log("");
+            Log.log("IMPORTANT: No compiler is available on this platform.");
+            Log.log("           Maize requires the java compiler to run bots, meaning you must");
+            Log.log("           install the JDK, rather than the JRE.");
+            Log.log("           If you already have both installed, check your classpath.");
+            Log.log("");
             return false;
             /* System.exit(1); */
         }
 
         // Compile, logging to stdout/stderr
         int compilationResult = compiler.run(null, 
-                System.out,
-                System.err,
-                /* new LogOutputStream("<stdout> "),  */
-                /* new LogOutputStream("<stderr> "),  */
+                new LogOutputStream("<stdout> "), 
+                new LogOutputStream("<stderr> "), 
                 fname);
 
         // Return true if it worked.

@@ -1,4 +1,5 @@
 package maize.ui;
+import maize.log.*;
 import java.awt.image.*;
 
 import javax.swing.UIManager;

@@ -11,6 +11,7 @@ import java.util.*;
 
 
 import maize.*;
+import maize.log.*;
 public class NewBotDialog extends JDialog implements ActionListener{
 	MazeTest mazeTest;
 	MazeUI parent;

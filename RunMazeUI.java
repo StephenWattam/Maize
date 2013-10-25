@@ -7,6 +7,9 @@ import java.io.*;
 import java.awt.image.*;
 import javax.imageio.*;
 import java.util.*;
+
+
+import maize.log.*;
 public class RunMazeUI{
 
     // config file

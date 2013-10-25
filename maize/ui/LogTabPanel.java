@@ -1,4 +1,5 @@
 package maize.ui;
+import maize.log.*;
 
 import javax.swing.*;
 import java.awt.*;

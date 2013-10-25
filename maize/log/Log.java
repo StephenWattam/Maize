@@ -1,4 +1,4 @@
-package maize.ui;
+package maize.log;
 
 import java.text.*;
 import java.util.*;

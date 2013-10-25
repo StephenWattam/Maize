@@ -15,6 +15,7 @@ import java.lang.reflect.ReflectPermission;
 
 import maize.*;
 import maize.compile.*;
+import maize.log.*;
 public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
     // state

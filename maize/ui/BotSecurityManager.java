@@ -1,4 +1,5 @@
 package maize.ui;
+import maize.log.*;
 
 import java.security.*;
 import java.io.FileDescriptor;
