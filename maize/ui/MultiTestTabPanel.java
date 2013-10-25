@@ -440,7 +440,8 @@ public class MultiTestTabPanel extends TabPanel implements
     public void addAgent(BotTest bt){
         if(this.mazePanel != null)
             mazePanel.addAgent(bt.agent);
-        
+       
+        // Add to the list we show to people.
         runningAgents.add(bt);
         testList.setListData(runningAgents);
     }

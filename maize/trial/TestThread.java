@@ -1,16 +1,6 @@
 package maize.trial;
 
 import maize.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.awt.image.BufferedImage;
-import javax.swing.event.*;
-import java.awt.geom.*;
-import java.util.Vector;
-import java.io.*;
-import javax.imageio.*;
 
 import java.util.concurrent.*;
 
