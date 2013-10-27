@@ -44,17 +44,20 @@ public class DFSMazeFactory implements MazeFactory {
      */
     public Maze getMaze(int width, int height){
 
-        width = Math.max(width, 7);
-        height = Math.max(height, 7);
+        // Min size of 7x7
+        width   = Math.max(width, 7);
+        height  = Math.max(height, 7);
 
         // Ensure the dimensions are odd
-        width = ((int)(width/2)) * 2 + 1;
-        height = ((int)(height/2)) * 2 + 1;
+        width   = ((int)(width/2))  * 2 + 1;
+        height  = ((int)(height/2)) * 2 + 1;
 
-        this.width = width;
+        // Set w, h
+        this.width  = width;
         this.height = height;
 
-        this.start = new Point();
+        // Set start
+        this.start  = new Point();
 
         /* Build maze */
         this.buildMazeData();
@@ -119,10 +122,10 @@ public class DFSMazeFactory implements MazeFactory {
     */
     protected void buildVisitorNeighbour(){
 
-        this.visited = new boolean[(this.width-1)/2+1][(this.height-1)/2+1];
-        this.neighbour = new boolean[(this.width-1)/2+1][(this.height-1)/2+1];
-        this.notNeighbour = new Vector<Integer>();
-        this.neighbourV = new Vector<Integer>();
+        this.visited        = new boolean[(this.width-1)/2+1][(this.height-1)/2+1];
+        this.neighbour      = new boolean[(this.width-1)/2+1][(this.height-1)/2+1];
+        this.notNeighbour   = new Vector<Integer>();
+        this.neighbourV     = new Vector<Integer>();
 
         /*Adds all the rooms to the notNeighbour list */
         for( int i = 0; i< this.width; i++){

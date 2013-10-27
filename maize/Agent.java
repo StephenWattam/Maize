@@ -19,7 +19,7 @@ public final class Agent {
     /** Agent Orientation */
     private int o = 0;
 
-    /** Agent Constructor closed off tot he public */
+    /** Agent Constructor closed off to the public */
     private Agent() {}
 
     /** Agent Constructor to only be called by the AgentFactory.

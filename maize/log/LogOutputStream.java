@@ -1,16 +1,23 @@
 package maize.log;
 import java.io.*;
 
+/** OutputStream that can be used to send messages through the log.
+ */
 public  class LogOutputStream extends OutputStream{
-// Writer interface
+    // Writer interface
     // 'The only methods that a subclass must implement are write(char[], int, int), flush(), and close().' from the API
-    private String writeBuffer = "";
-    private String prefix = "";
+    private String writeBuffer  = "";
+    private String prefix       = "";
 
+    /** Create a LogOutputStream with a given prefix.
+     *
+     * @param prefix The string to add to all messages.
+     */
     public LogOutputStream(String prefix){
         this.prefix = prefix;
     }
 
+    /** Create a LogOutputStream without a prefix.*/
     public LogOutputStream(){
     }
 
@@ -53,6 +60,7 @@ public  class LogOutputStream extends OutputStream{
         // Do nothing!
     }
 
+    /** Append a character to the buffer. */
     private void appendChar(char c){
         if(c == '\n'){
             Log.log(prefix + writeBuffer);

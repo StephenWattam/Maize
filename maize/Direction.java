@@ -15,7 +15,12 @@ public abstract class Direction{
     /** LEFT move */
     public static final int LEFT = 3;
 
-
+    /** Return a string representing the direction.
+     *
+     * @param d The direction, as a value from one of the direction enumerations in this class.
+     * @return A string corresponding to a direction, named after the enumeration value variables, or null
+     * if the direction is not in the class.
+     */
     public static String getName(int d){
         switch(d){
             case 0: return "FORWARD";

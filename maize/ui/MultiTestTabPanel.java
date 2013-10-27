@@ -351,7 +351,6 @@ public class MultiTestTabPanel extends TabPanel implements
 			return;
 		}
 
-		//this.test = new TestThread(maze, bot, mazePanel, MAX_DELAY - speedSlider.getValue());
         Log.log("Starting maze test: maze: " + maze + ", bots: " + this.selectedBots.size());
 		this.test.start();
 	}
@@ -400,13 +399,15 @@ public class MultiTestTabPanel extends TabPanel implements
 		// Create a test thread
 		Bot[] bots = (Bot[])this.selectedBots.toArray(new Bot[this.selectedBots.size()]);
 		this.test = new TestThread(
-                this.maze, 
-                bots,
-                this, 
-                MAX_DELAY - speedSlider.getValue(), 
-                MazeUISettingsManager.botStartTimeout,
-                MazeUISettingsManager.botWorkTimeout,
-                MazeUISettingsManager.seqTimeoutLimit
+                new Test(
+                    this.maze, 
+                    bots,
+                    this, 
+                    MazeUISettingsManager.botStartTimeout,
+                    MazeUISettingsManager.botWorkTimeout,
+                    MazeUISettingsManager.seqTimeoutLimit
+                ),
+                MAX_DELAY - speedSlider.getValue()  // Delay in ms
             );
 	}
 

@@ -6,28 +6,47 @@ import maize.log.*;
 
 import java.util.concurrent.*;
 
+/** Runs Bot objects over a Maze using Agents to control movement and using BotTests to maintain score/state for each.
+ *
+ * Enforces timeouts and consistency of BotTest object scores.
+ */
 public class Test{
 
 
-    // Thanks to http://blog.smartkey.co.uk/2011/09/adding-a-thread-timeout-to-methods-in-java/
-    // Keep a timeout
-    /* private ExecutorService executor = Executors.newFixedThreadPool(1); */
-
-    // State
+    /** State of all agents as they run. 
+     *
+     * This variable is confusingly named. */
 	public BotTest[] agents;
 
-    // How long the bots have to run before being killed
+    /** Time in ms the bot may run start() before being killed. */
     public int botStartTimeout;
+    /** Time in ms the bot may run nextMove() before being killed. */
     public int botWorkTimeout;
 
-	// flipped when the bot hits the end
+	/** Set to true when all bots complete the maze.
+     * May be used to check if the test is done. */
 	public boolean isDone = false;
 
-    // Listener to notify of things
+    /** Listener to notify of BotTests being added or removed
+     * from the test.
+     */
     private TestListener listener;
 
+    /** The number of times a bot may fail to successfully move before it is counted as
+     * stuck and removed from the test. 
+     */
     private int seqTimeoutLimit;
 
+    /** Create a new Test for a given maze and bot combination.
+     *
+     * @param m The maze to run bots on.
+     * @param bs An array of bots to run on this maze.
+     * @param listener A callback object to be notified of all bot progress during the test.
+     * @param botStartTimeout the number of milliseconds each bot may run start() before being killed.
+     * @param botWorkTimeout the number of milliseconds each bot may run nextMove() before being killed.
+     * @param seqTimeoutLimit The number of sequential failures to move each bot may incur before being counted as stuck and
+     * removed from the test.
+     */
 	public Test(
             Maze m, 
             Bot[] bs, 
@@ -73,15 +92,21 @@ public class Test{
 
 	}	
 
-    
+   
+    /** Cancel the test, and unload all bots.
+     */
     public void cancel(){
 		for(int i=0;i<agents.length;i++)
 			listener.remAgent(agents[i]);
     }
 
 
-    // Call bot.start() asynchronously, with a given timeout (in milliseconds).
-    // This is used to limit the power bots have to starve each other.
+    /** Call bot.start() asynchronously, with a given timeout (in milliseconds).
+    * This is used to limit the power bots have to starve each other.
+    *
+    * @param timeout The timeout in ms
+    * @param bot The bot itself
+    */
     private void startAgentWithTimeout(int timeout, final Bot bot){
         final ExecutorService executor = Executors.newFixedThreadPool(1);
 
@@ -113,8 +138,15 @@ public class Test{
     }
 
 
-    // Call agent.agent.move() asynchronously, with a given timeout (in milliseconds).
-    // This is used to limit the power bots have to starve each other.
+    /** Call agent.agent.move() asynchronously, with a given timeout (in milliseconds).
+    * This is used to limit the power bots have to starve each other.
+    *
+    * When bots fail, their seqTimeout properties are incremented.
+    * 
+    * @param timeout The timeout in ms
+    * @param agent The BotTest to maintain.
+    *
+    */
     private void moveAgentWithTimeout(int timeout, final BotTest agent){
         final ExecutorService executor = Executors.newFixedThreadPool(1);
 
@@ -157,8 +189,11 @@ public class Test{
         }
     }
 
-    // Increase seqTimeouts and count sequential timeout count,
-    // Will cause the bot to register as stuck if it hits the limit.
+    /** Increase seqTimeouts and count sequential timeout count. 
+    * Will cause the bot to register as stuck if it hits the limit.
+    *
+    * @param agent The BotTest object that has failed to execute.
+    */
     private void increaseFailureCount(BotTest agent){
         agent.seqTimeouts ++;
 
@@ -171,7 +206,10 @@ public class Test{
     }
 
 
-    // Perform one move for all bots.
+    /** Perform one move for all bots.
+     * 
+     * @return false if the simulation has ended, or true if there is still work to be done.
+     */
     public boolean iterate(){
         BotTest agent;
         boolean keepRunning = false;
