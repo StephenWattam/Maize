@@ -103,6 +103,35 @@ public abstract class BotCompilerHelper{
     }
 
 
+    // Load a maze factory from a class name from the current ClassLoader's set of loaded classes (i.e. merely instantiate a new one,
+    // don't compile it)
+    //
+    // Note that THIS ONLY WORKS BECAUSE BOT IS AN INTERFACE!
+    public static Object loadClass(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
+
+        Log.log("Loading class: " + className);
+
+        // Pass the current ClassLoader to the BotClassLoader
+        ClassLoader parentClassLoader   = ClassReloader.class.getClassLoader();
+        ClassReloader classLoader       = new ClassReloader(parentClassLoader, className);
+
+        // Then load the desired bot with it
+        Class myObjectClass             = classLoader.loadClass(className);
+
+        // And return
+        try {
+            return myObjectClass.newInstance();
+        } catch( SecurityException err ) {
+            Log.log( "Security Error!" );
+            Log.logException( err );
+            throw new InstantiationException( "Class '" +className+ "' caused a SecurityException! (" +err.getMessage()+ ")" );
+        } catch( IllegalAccessError err ) {
+            Log.logException( err );
+            throw new InstantiationException( "Class '" +className+ "' caused an IllegalAccessError! (" +err.getMessage()+ ")" );
+        }
+    }
+
+
 
     // Compiles a filename
     public static boolean compile(String fname){

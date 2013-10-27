@@ -1,7 +1,13 @@
+
+// Maze components
 import maize.*;
 import maize.log.*;
 import maize.trial.*;
 
+// For compiling maze factories
+import maize.compile.*;
+
+// Test running
 import java.util.*;
 import java.io.*;
 import java.awt.Dimension;
@@ -11,22 +17,27 @@ import java.nio.charset.Charset;
 // see http://javacsv.sourceforge.net/
 import com.csvreader.CsvWriter;
 
+// Settings loading
+import org.json.simple.*;
+import org.json.simple.parser.*;
+
+
 public class RunMazeTest{
-
-    // TODO: Move into config file
-    public static final boolean INSTANTIATE_EVERY_RUN   = false;
-    public static final boolean INSTANTIATE_EVERY_MAZE  = true;
-    public static final int TESTS_PER_FACTORY           = 5;
-    public static final int TESTS_PER_MAZE              = 5;
-    public static final Dimension MAZE_SIZE             = new Dimension(20, 20);
-    public static final int BOT_START_TIMEOUT           = 100;
-    public static final int BOT_WORK_TIMEOUT            = 10;
-    public static final String BOT_PACKAGE              = "bots";
-    public static final int TICK_LIMIT                  = 5000;
-
-    // If the bot times out over this number of times on a maze,
-    // kill it.
-    public static final int BOT_STUCK_LIMIT             = 50;
+/*  */
+/*     // TODO: Move into config file */
+/*     public static final boolean INSTANTIATE_EVERY_RUN   = false; */
+/*     public static final boolean INSTANTIATE_EVERY_MAZE  = true; */
+/*     public static final int TESTS_PER_FACTORY           = 5; */
+/*     public static final int TESTS_PER_MAZE              = 5; */
+/*     public static final Dimension MAZE_SIZE             = new Dimension(20, 20); */
+/*     public static final int BOT_START_TIMEOUT           = 100; */
+/*     public static final int BOT_WORK_TIMEOUT            = 10; */
+/*     public static final String BOT_PACKAGE              = "bots"; */
+/*     public static final int TICK_LIMIT                  = 5000; */
+/*  */
+/*     // If the bot times out over this number of times on a maze, */
+/*     // kill it. */
+/*     public static final int BOT_STUCK_LIMIT             = 50; */
 
     public static void main(String[] argv){
 
@@ -37,27 +48,100 @@ public class RunMazeTest{
         }
 
 
-		// Construct a series of maze factories
-        // TODO: load from config file
-        Vector<MazeFactory> mfs = new Vector<MazeFactory>();
-		mfs.add( new FullDFSMazeFactory() );
-		mfs.add( new CircleMazeFactory() );
-		mfs.add( new ScatterMazeFactory() );
-		mfs.add( new RandomScatterMazeFactory() );
-		mfs.add( new LineMazeFactory() );
-		mfs.add( new EmptyMazeFactory() );
-		//mfs.add( new ());
+        /* --------------------------------------------------------- */
+
+        // To any purists.  I'm aware these are uppercase and are actually not
+        // constants, but they are de-facto constants with constant defaults...
+        boolean INSTANTIATE_EVERY_RUN   = false;
+        boolean INSTANTIATE_EVERY_MAZE  = true;
+        int TESTS_PER_FACTORY           = 5;
+        int TESTS_PER_MAZE              = 5;
+        Dimension MAZE_SIZE             = new Dimension(20, 20);
+        int BOT_START_TIMEOUT           = 100;
+        int BOT_WORK_TIMEOUT            = 10;
+        String BOT_PACKAGE              = "bots";
+        String FACTORY_PACKAGE          = "maize";
+        int TICK_LIMIT                  = 5000;
+        int BOT_STUCK_LIMIT             = 50;
+        Vector<MazeFactory> MFS         = new Vector<MazeFactory>();
+
+
+        // Load the config file
+        try{
+            
+            // Load config object
+            JSONLoader jl = new JSONLoader(argv[0]);
+
+            // Read a fuckton of variables from it
+            INSTANTIATE_EVERY_RUN   = jl.getBool(new String[]{"tests", "instantiate_every_run"}, INSTANTIATE_EVERY_RUN);
+            INSTANTIATE_EVERY_MAZE  = jl.getBool(new String[]{"tests", "instantiate_every_maze"}, INSTANTIATE_EVERY_MAZE);
+
+            TESTS_PER_FACTORY       = jl.getInt(new String[]{"tests", "mazes_per_factory"}, TESTS_PER_FACTORY);
+            TESTS_PER_MAZE          = jl.getInt(new String[]{"tests", "tests_per_maze"}, TESTS_PER_MAZE);
+
+            MAZE_SIZE               = new Dimension( jl.getInt(new String[]{"test_parameters", "maze_width"}, new Integer((int)MAZE_SIZE.getWidth())),
+                                                     jl.getInt(new String[]{"test_parameters", "maze_height"}, new Integer((int)MAZE_SIZE.getHeight()))
+                                                   );
+
+            BOT_START_TIMEOUT       = jl.getInt(new String[]{"test_parameters", "bot_start_timeout"}, BOT_START_TIMEOUT);
+            BOT_WORK_TIMEOUT        = jl.getInt(new String[]{"test_parameters", "bot_work_timeout"}, BOT_WORK_TIMEOUT);
+            BOT_PACKAGE             = jl.getString(new String[]{"test_parameters", "bot_package"}, BOT_PACKAGE);
+            FACTORY_PACKAGE         = jl.getString(new String[]{"test_parameters", "maze_factory_package"}, FACTORY_PACKAGE);
+            TICK_LIMIT              = jl.getInt(new String[]{"test_parameters", "tick_limit"}, TICK_LIMIT);
+            BOT_STUCK_LIMIT         = jl.getInt(new String[]{"test_parameters", "stuck_limit"}, BOT_STUCK_LIMIT);
+            /* X = jl.getBool(new String[]{"tests", ""}, X); */
+
+            
+            // Read array of maze factories to instantiate
+            JSONArray maze_factories = (JSONArray)jl.get(new String[]{"maze_factories"}, new JSONArray());
+            for(int i=0; i<maze_factories.size(); i++){
+                MazeFactory mf = (MazeFactory)BotCompilerHelper.loadClass(FACTORY_PACKAGE + "." + maze_factories.get(i));
+                MFS.add(mf);
+            }
+
+
+        // This lot thrown when instantiating the maze factories
+        }catch(ClassNotFoundException CNFe){
+            Log.log("Class not found: " + CNFe.getMessage());
+            Log.logException(CNFe);
+            System.exit(1);
+        }catch(InstantiationException Ie){
+            Log.log("Instantiation exception: " + Ie.getMessage());
+            Log.logException(Ie);
+            System.exit(1);
+        }catch(IllegalAccessException IAe){
+            Log.log("Illegal access exception: " + IAe.getMessage());
+            Log.logException(IAe);
+            System.exit(1);
+        
+        // And this lot when parsing JSON
+        }catch(FileNotFoundException FNFe){
+            Log.log("Could not find config file: " + argv[0]);
+            Log.logException(FNFe);
+            System.exit(1);
+        }catch(IOException IOe){
+            Log.log("There was an error reading the config file.");
+            Log.logException(IOe);
+            System.exit(1);
+        }catch(ParseException pe){
+            Log.log("Failed to read config file at position: " + pe.getPosition());
+            Log.logException(pe);
+            System.exit(1);
+        }
+        
+        
+        /* --------------------------------------------------------- */
 
 
         // Construct a list of bots from the command line
         Vector<BotFactory> bfs = new Vector<BotFactory>();
-        for(int i=0; i<argv.length - 1; i++){
+        for(int i=1; i<argv.length - 1; i++){
             bfs.add(new BotFactory(new File(argv[i]), BOT_PACKAGE));
         }
         
         // Run the actual thing!
         new RunMazeTest(
-                mfs,  
+                MFS,  
                 bfs,
                 new File(argv[argv.length-1]),
                 INSTANTIATE_EVERY_RUN,
@@ -73,9 +157,79 @@ public class RunMazeTest{
 
     }
 
+    // Print usage to stderr
     private static void printUsage(){
-        System.out.println("USAGE INFO HERE: [BOTFILE [BOTFILE [ ...]]] OUTCSVFILE");
+        System.err.println("USAGE: RunTest CONFIG.json BOT.java [BOT2.java [ ...]] OUT.csv");
+        System.err.println("");
     }
+
+
+    // Class to load config neatly
+    private static class JSONLoader{
+
+        // JSON parser and the "top level" object
+        JSONParser parser = new JSONParser();
+        JSONObject config = null;
+
+        // Construct a JSON loading object from a filename.
+        public JSONLoader(String filename) throws 
+            FileNotFoundException,
+            IOException,
+            ParseException
+        {
+
+            config = (JSONObject) parser.parse(new FileReader(filename));
+
+            // Check we loaded something
+            if(config == null)
+                throw new ParseException(0);
+        }
+
+
+        // Convenience method to get an integer from a JSON key
+        public int getInt(String[] keys, Integer defaultValue){
+            return ((Long)get(keys, defaultValue)).intValue();
+        }
+
+        // Convenience method wrapping get() to return a Boolean from a JSON key.
+        public boolean getBool(String[] keys, Boolean defaultValue){
+            return (Boolean)get(keys, defaultValue);
+        }
+
+        // Convenience method to get a string from a JSON key.
+        public String getString(String[] keys, String defaultValue){
+            return (String)get(keys, defaultValue);
+        }
+
+        // Return an object from the JSON set.  Must be cast to its desired type.
+        // Returns defaultValue on failure.
+        public Object get(String keys[], Object defaultValue){
+
+            try{
+                // Get first item from config
+                Object obj = config.get(keys[0]);
+                
+                // Read the keychain down
+                for(int i=1; i<keys.length; i++){
+                    obj = ((JSONObject)obj).get(keys[i]);
+                }
+
+                return obj;
+
+            // If it fails, log but continue
+            // on to return the default value
+            }catch(NullPointerException NPe){
+                Log.log("Missing config key.");
+                Log.logException(NPe);
+            }
+
+            // Failure if this point is reached: return default value
+            return defaultValue;
+
+        }
+        
+    }
+
 
     // ----------------------------------------------------------------------------------------
 
@@ -445,8 +599,4 @@ public class RunMazeTest{
     }
 
 }
-
-
-
-
 
