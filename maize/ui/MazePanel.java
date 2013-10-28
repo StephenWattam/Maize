@@ -170,6 +170,17 @@ public class MazePanel extends Canvas{
         return this.botTileSets[agents.get(a)];
     }
 
+    // Retrieve the scaled bot icons for a given agent
+    public BotTileSet getScaledTileSet(Agent a){
+        if( agents.containsKey(a) == false)
+            return null;
+
+        if( this.botTileSetCache == null )
+            resizeCache();
+
+        return this.botTileSetCache[agents.get(a)];
+    }
+
 	// Removes an agent from the list to simulate
 	public boolean remAgent(Agent a){
 		if(agents.containsKey(a) == false)

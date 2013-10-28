@@ -45,7 +45,7 @@ public class TestListCellRenderer extends JLabel implements ListCellRenderer{
         // Load the icon from the MazePanel
         ImageIcon icon = null;
         if( this.mazePanel != null ){
-            BotTileSet tiles = this.mazePanel.getTileSet( botTest.agent );
+            BotTileSet tiles = this.mazePanel.getScaledTileSet( botTest.agent );
             if(tiles != null){
                 /* icon = new ImageIcon( tiles.botN ); */
                 switch( botTest.agent.getOrientation() ){
