@@ -2,6 +2,7 @@ package maize;
 
 import java.io.*;
 import java.awt.Point;
+import java.util.*;
 
 /** The Maze model. */
 public class Maze implements Serializable {
@@ -33,6 +34,9 @@ public class Maze implements Serializable {
     /** Map instance name */
     private String name = "";
 
+    /** Route information. */
+    private Vector<Point> route = null;
+
     /** Remove default constructor from default scope. */
     private Maze(){}
 
@@ -60,6 +64,46 @@ public class Maze implements Serializable {
         this.exiY   = exiY;
         this.name   = this.toString();
     } 
+
+    /** Solve the maze using MazeSolver.  The route is accessible using getRoute().
+     */
+    public void solve(){
+       MazeSolver solver = new MazeSolver(this);
+       this.route = solver.solve();
+    }
+
+    /** If a route is set, returns true if the Point given is on the route.
+     *
+     * @param p The point to query
+     * @return True if the co-ordinates given are on the route.
+     */
+    public boolean getIsOnRoute(Point p){
+        if(this.route == null || this.route.size() == 0)
+            return false;
+
+        // Match any in the route list
+        for(Point r: route)
+            if(r.equals(p))
+                return true;
+
+        return false;
+    }
+
+    /** If a route is set, returns true if the Point given is on the route.
+     *
+     * @param x The x co-ordinate
+     * @param y The y co-ordinate
+     * @return True if the co-ordinates given are on the route.
+     */
+    public boolean getIsOnRoute(int x, int y){
+        return getIsOnRoute(new Point(x, y));
+    }
+
+    /** Returns the current route, or null if one is not set.
+     */
+    public Vector<Point> getRoute(){
+        return this.route;
+    }
 
     /** Gets the maze data.
      *

@@ -15,7 +15,12 @@ public class MazeListCellRenderer extends JLabel implements ListCellRenderer{
 
 		// PRint the bot's name
 		Maze maze = (Maze)value;
-		setText(maze.getWidth() + "x" + maze.getHeight() + " " + maze.getName() + "(" + maze.toString() + ")");
+
+        String str = "" + maze.getWidth() + "x" + maze.getHeight() + " " + maze.getName() + "(" + maze.toString() + ")";
+        if(maze.getRoute() != null)
+            str = "[" + maze.getRoute().size() + "] " + str;
+
+		setText(str);
 
 
 

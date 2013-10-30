@@ -19,6 +19,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
     private JList mazeList;
     private JButton deleteButton    = new JButton("Delete");
     private JButton saveButton      = new JButton("Save...");
+    private JButton solveButton     = new JButton("Solve");
 
     private MazePanel mazePanel;
 
@@ -38,6 +39,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
 
         deleteButton.addActionListener(this);
         saveButton.addActionListener(this);
+        solveButton.addActionListener(this);
 
 
         ////symbol list
@@ -56,7 +58,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
         gbc.gridy = 0;
         gbc.ipadx = 500;
         gbc.ipady = 500;
-        gbc.gridheight = 2;
+        gbc.gridheight = 3;
         gbc.fill    = GridBagConstraints.BOTH;
         gbc.weightx = 1;
         gbc.weighty = 1;
@@ -66,7 +68,7 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
         //list
 		gbc.anchor = GridBagConstraints.LINE_END;
         gbc.fill    = GridBagConstraints.VERTICAL;
-        gbc.gridwidth = 3;
+        gbc.gridwidth = 4;
         gbc.gridheight = 1;
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -77,8 +79,8 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
         this.add(mazeListPanel,gbc);
 
         //button
-		gbc.anchor = GridBagConstraints.LINE_START;
-        gbc.gridwidth = 1;
+		gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridwidth = 2;
         gbc.ipadx = 100;
         gbc.ipady = 20;
         gbc.fill    = GridBagConstraints.NONE;
@@ -86,11 +88,17 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
         gbc.gridy = 1;
         gbc.weightx = 0;
         gbc.weighty = 0;
+        this.add(solveButton,gbc);
+
+		gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.gridwidth = 1;
+        gbc.gridx = 2;
+        gbc.gridy = 2;
         this.add(saveButton,gbc);
 
 		gbc.anchor = GridBagConstraints.LINE_END;
         gbc.gridx = 3;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         this.add(deleteButton,gbc);
 
 
@@ -105,9 +113,22 @@ public class MazeTabPanel extends TabPanel implements ActionListener, ListSelect
             saveMaze((Maze)mazeList.getSelectedValue());
         }else if(Ae.getSource() == deleteButton){
             deleteMaze((Maze)mazeList.getSelectedValue());
+        }else if(Ae.getSource() == solveButton){
+            solveMaze((Maze)mazeList.getSelectedValue());
         }
 
         //System.out.println("number of mazes: " + mazeTest.mazes.size());
+    }
+
+
+    public void solveMaze(Maze m){
+        if(m == null)
+            return;
+
+        m.solve();
+        mazePanel.setMaze(m);
+        mazePanel.repaint();
+        mazeList.repaint();
     }
 
     //called to regtresjh state changes

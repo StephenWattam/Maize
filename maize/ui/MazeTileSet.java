@@ -8,13 +8,21 @@ public class MazeTileSet{
 	public BufferedImage start;
 	public BufferedImage finish;
     public BufferedImage bg;
+    public BufferedImage route;
 
-	public MazeTileSet(BufferedImage bg, BufferedImage space, BufferedImage wall, BufferedImage start, BufferedImage finish){
+	public MazeTileSet(BufferedImage bg, 
+            BufferedImage space, 
+            BufferedImage wall, 
+            BufferedImage start, 
+            BufferedImage finish, 
+            BufferedImage route){
+
         this.bg     = bg;
 		this.space  = space;
 		this.wall   = wall;
 		this.start  = start;
 		this.finish = finish;
+        this.route  = route;
 	}
 
 	// Tile dimensions.

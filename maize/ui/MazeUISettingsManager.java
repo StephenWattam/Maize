@@ -100,8 +100,9 @@ public class MazeUISettingsManager{
 			BufferedImage start	    = ImageIO.read(new File(mazeTilePrefix + "/" + "start.png"));
 			BufferedImage finish	= ImageIO.read(new File(mazeTilePrefix + "/" + "finish.png"));
 			BufferedImage bg        = ImageIO.read(new File(mazeTilePrefix + "/" + "bg.png"));
+			BufferedImage route     = ImageIO.read(new File(mazeTilePrefix + "/" + "route.png"));
             // then the maze tilesets
-			mazeTiles = new MazeTileSet(bg, space, wall, start, finish);
+			mazeTiles = new MazeTileSet(bg, space, wall, start, finish, route);
 
 
 			// Load a series of bot tile-sets, up to 99

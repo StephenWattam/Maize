@@ -18,8 +18,8 @@ public class MazePanel extends Canvas{
     private boolean fastRender = false;
 
 	// Keep lists of stuff to render
-	private HashMap<Agent, Integer> agents        = new HashMap<Agent, Integer>();
-	private Vector<Point> dirty_tiles                = new Vector<Point>();
+	private HashMap<Agent, Integer> agents      = new HashMap<Agent, Integer>();
+	private Vector<Point> dirty_tiles           = new Vector<Point>();
 
 	// Images used to render
 	private MazeTileSet mazeTiles;
@@ -107,7 +107,8 @@ public class MazePanel extends Canvas{
                 rescaleTile(currentSize, mazeTiles.space),
                 rescaleTile(currentSize, mazeTiles.wall),
                 rescaleTile(currentSize, mazeTiles.start),
-                rescaleTile(currentSize, mazeTiles.finish)
+                rescaleTile(currentSize, mazeTiles.finish),
+                rescaleTile(currentSize, mazeTiles.route)
         );
 
         // Scale the bot tile set
@@ -268,6 +269,10 @@ public class MazePanel extends Canvas{
         }else
 			img = mazeTileCache.space;
 
+        // Check for any route
+        if(maze.getRoute() != null && maze.getIsOnRoute(p)){
+            img = mazeTileCache.route;
+        }
 
 		// Check each agent
 		//hopefully now renders last agent in the vector in blue.
