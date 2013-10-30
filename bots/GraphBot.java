@@ -26,7 +26,7 @@ public class GraphBot implements Bot, Serializable {
     //  Configuration
     //
     // Turn debug on/off
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     // ------------------------------------------------------------
     //  Don't edit below this line
@@ -38,7 +38,6 @@ public class GraphBot implements Bot, Serializable {
     private static final char SPACE      = ' ';
     private static final char WALL       = '#';
     private static final char FINISH     = 'F';
-
 
 
     // Contains instructions
@@ -60,7 +59,7 @@ public class GraphBot implements Bot, Serializable {
     /** Implementation of the Bot interface. */
     @Override
     public String getDescription(){
-        return "Builds a map of its surroundings, uses a targeted depth-first graph traversal algorithm to route.  Remembered " + points.size() + " walls.";
+        return "Builds a map of its surroundings.  Remembered " + points.size() + " walls.";
     }
 
 
