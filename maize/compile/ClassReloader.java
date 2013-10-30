@@ -21,8 +21,6 @@ public class ClassReloader extends ClassLoader{
     public Class loadClass(String name) throws ClassNotFoundException {
 
 
-        System.out.println("\n\n== ==== ===== " + className + " == " + name + "\n\n");
-
         // Use the parent if it's not on our list of allowable classes
         // Also allow inner classes
         if(!className.equals(name) || !name.startsWith(className + "$")){
