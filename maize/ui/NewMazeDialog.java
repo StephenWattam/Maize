@@ -44,17 +44,12 @@ public class NewMazeDialog extends JDialog implements ActionListener{
 		cancelButton.addActionListener(this);
 
 		// Set the layout for the dialog
-		setSize(new Dimension(600, 150));
+		setSize(new Dimension(620, 180));
 		GridBagConstraints gbc = new GridBagConstraints();
 		setLayout(new GridBagLayout());
 
 		// Create a combo box with all the factories in it
 		factoryCombo = new JComboBox( mazeTest.factories);
-
-
-
-
-
 
 		// type
 		gbc.gridx = 0;

@@ -84,8 +84,6 @@ public class MazeSolver{
 
         HashSet<Point> fringe = new HashSet<Point>();
         fringe.add(start);
-        HashMap<Point, Point> route = new HashMap<Point, Point>();
-
 
         while( fringe.size() > 0 ){
             
