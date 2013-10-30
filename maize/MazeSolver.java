@@ -42,10 +42,10 @@ public class MazeSolver{
     public Vector<Point> solve(){
 
         // DEBUG
-        /* shadow.renderToTerminal( */
-        /*        new Point(maze.getEntX(), maze.getEntY()), */
-        /*        new Point(maze.getExiX(), maze.getExiY()) */
-        /*         ); */
+        shadow.renderToTerminal(
+               new Point(maze.getEntX(), maze.getEntY()),
+               new Point(maze.getExiX(), maze.getExiY())
+                );
 
         route = aStar( 
                new Point(maze.getEntX(), maze.getEntY()),
@@ -53,10 +53,10 @@ public class MazeSolver{
              );
 
         // DEBUG from hereon in
-        /* shadow.renderToTerminal( */
-        /*        new Point(maze.getEntX(), maze.getEntY()), */
-        /*        new Point(maze.getExiX(), maze.getExiY()) */
-        /*         ); */
+        shadow.renderToTerminal(
+               new Point(maze.getEntX(), maze.getEntY()),
+               new Point(maze.getExiX(), maze.getExiY())
+                );
 
         return route;
     }
@@ -89,7 +89,7 @@ public class MazeSolver{
 
         while( fringe.size() > 0 ){
             
-            Point current = findLowestManhattanDistance(fringe, goal);
+            Point current = findLowestHeuristic(fringe, start, goal);
             fringe.remove(current);            // Accept it 
             shadow.setPoint(current, true);   // Keep track of no-go areas with the shadow model
            
@@ -156,13 +156,14 @@ public class MazeSolver{
     }
 
 
-    /** Return the point from a set with lowest manhattan distance to another.
+    /** Return the point from a set with lowest distance heuristic between from and to.
      *
      * @param set A set of points to compare against the 'to' point.
-     * @param to A single point to compare to each in the set
+     * @param from A point to route from
+     * @param to A single point to route to
      * @return The point from the set with the lowest Manhattan distance
      */
-    private Point findLowestManhattanDistance(Collection<Point> set, Point to){
+    private Point findLowestHeuristic(Collection<Point> set, Point from, Point to){
         if(set.size() == 0)
             return null;
 
@@ -172,7 +173,7 @@ public class MazeSolver{
 
         // Iterate over them
         for(Point p: set){
-            double distance = manhattanDistance(p, to);
+            double distance = computeHeuristic(from, to, p);
             if(bestPoint == null || distance < bestDistance){
                 bestPoint = p;
                 bestDistance = distance;
@@ -180,6 +181,20 @@ public class MazeSolver{
         }
 
         return bestPoint;
+    }
+
+   
+    /** Compute the A* distance heuristic.
+     *
+     * @param from The start point.
+     * @param to The end point
+     * @param p The point to score.
+     */
+    private double computeHeuristic(Point from, Point to, Point p){
+        double distanceTo = manhattanDistance(p, to);
+        double distanceFrom = shadow.getRouteLength(p);
+
+        return distanceFrom + distanceTo;
     }
 
 
@@ -230,12 +245,12 @@ public class MazeSolver{
                 throw new IllegalArgumentException("mapData length does not match provided width and height");
 
             // Width and height
-            this.width = width;
+            this.width  = width;
             this.height = height;
 
             // Place for state
-            grid = mapData;
-            route = new Point[ width * height ];
+            grid        = mapData;
+            route       = new Point[ width * height ];
 
         }
 
@@ -251,8 +266,8 @@ public class MazeSolver{
             this.height = m.getHeight();
 
             // Store state
-            grid    = new boolean[ width * height ];
-            route   = new Point[ width * height ];
+            grid            = new boolean[ width * height ];
+            route           = new Point[ width * height ];
 
             // Copy the maze
             for(int i=0; i<width; i++){
@@ -435,6 +450,50 @@ public class MazeSolver{
         public Point getRoutePointer(Point p){
             return getRoutePointer(p.x, p.y);
         }
+
+
+        /* -- */
+
+        /** Return the route length from this point until the next null one.
+         *
+         * Warning: does not fix loops, and thus can run infinitely if you
+         * have set route pointers foolishly.
+         *
+         * @param x The x co-ordinate.
+         * @param y The y co-ordinate.
+         * @return The length of the path from x, y to the next null item
+         */
+        public int getRouteLength(int x, int y){
+            // FIXME The complexity of this class is higher than the rest of the system,
+            // as it does not use space/time tradeoffs.  Improve it to work with larger mazes
+            // by caching.
+
+            int length = 0;
+            Point next = getRoutePointer(x, y);
+
+            if(next == null)
+                return 0;
+
+            // Follow route back
+            while((next = getRoutePointer(next)) != null)
+                length ++;
+            
+
+            return length;
+        }
+
+        /** Return the route length from this point until the next null one.
+         *
+         * Warning: does not fix loops, and thus can run infinitely if you
+         * have set route pointers foolishly.
+         *
+         * @param p The point to start tracing from.
+         * @return The length of the path from x, y to the next null item
+         */
+        public int getRouteLength(Point p){
+            return getRouteLength(p.x, p.y);
+        }
+
     }
 
 }
