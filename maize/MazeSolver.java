@@ -42,10 +42,10 @@ public class MazeSolver{
     public Vector<Point> solve(){
 
         // DEBUG
-        shadow.renderToTerminal(
-               new Point(maze.getEntX(), maze.getEntY()),
-               new Point(maze.getExiX(), maze.getExiY())
-                );
+        /* shadow.renderToTerminal( */
+        /*        new Point(maze.getEntX(), maze.getEntY()), */
+        /*        new Point(maze.getExiX(), maze.getExiY()) */
+        /*         ); */
 
         route = aStar( 
                new Point(maze.getEntX(), maze.getEntY()),
@@ -53,10 +53,10 @@ public class MazeSolver{
              );
 
         // DEBUG from hereon in
-        shadow.renderToTerminal(
-               new Point(maze.getEntX(), maze.getEntY()),
-               new Point(maze.getExiX(), maze.getExiY())
-                );
+        /* shadow.renderToTerminal( */
+        /*        new Point(maze.getEntX(), maze.getEntY()), */
+        /*        new Point(maze.getExiX(), maze.getExiY()) */
+        /*         ); */
 
         return route;
     }
