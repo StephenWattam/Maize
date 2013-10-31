@@ -30,9 +30,6 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
 	private JButton deleteButton	= new JButton(DELETE_BUTTON_LABEL);
 	private JButton saveButton		= new JButton(SAVE_BUTTON_LABEL);
 
-    // When this number of messages have been seen, kill the top line when adding a new one
-    private int scrollbackLimit = SCROLLBACK_LIMIT;
-
     public LogTabPanel(MazeTest mazeTest, JTabbedPane tabContainer, String name){
         super(mazeTest, tabContainer, name);
 		GridBagConstraints gbc = new GridBagConstraints();
@@ -46,6 +43,8 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
         log = new JTextArea();
         Font font = new Font("Courier", 0, 11);
         log.setFont(font);
+        log.setLineWrap(true);
+        log.setWrapStyleWord(true);
 
 
 		logScrollPane = new JScrollPane(log);
@@ -90,8 +89,6 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
             saveLog();
 		}else if(Ae.getSource() == deleteButton){
             log.setText("");
-            // reset line counter
-            scrollbackLimit = SCROLLBACK_LIMIT;
         }
 
 	}
@@ -120,37 +117,30 @@ public class LogTabPanel extends TabPanel implements ActionListener, LogListener
     private String getInfo(){
         String datetime = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
         
-        String str = "Maize " + MazeUISettingsManager.VERSION + "\n";
-        str += "Log written at " + datetime + "\n";
-        str += "\n";
+        String str =  "Maize " + MazeUISettingsManager.VERSION + "\n";
+               str += "Log written at " + datetime + "\n";
+               str += "\n";
 
         return str;
     }
 
     public void logEvent(String str){
-        scrollbackLimit -= 1;
 
-        if(scrollbackLimit == 0){
-            // reset by one line
-            scrollbackLimit += 1;
+        // Add a line and subtract one from the scrollback
+        log.append( str + "\n" );
 
-            // delete top line of text and add new one
-            log.setText( log.getText().substring( log.getText().indexOf('\n') + 1 ) + str + "\n" );
-        }else{
-            log.setText( log.getText() + str + "\n" );
+        if(log.getLineCount() > SCROLLBACK_LIMIT){
+            // delete top line of text
+            log.setText( log.getText().substring( log.getText().indexOf('\n') + 1 ) + "\n" );
         }
 
         // scroll to bottom
         JScrollBar vertical = logScrollPane.getVerticalScrollBar();
         if(vertical != null)
             vertical.setValue( vertical.getMaximum() );
+            
     
     }
-
-	/* //called to regtresjh state changes */
-	/* public void update(){ */
-	/* 	botList.setListData(mazeTest.bots); */
-	/* } */
 
 }
 
