@@ -347,6 +347,14 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
      * @param dirname The name of the directory where bots are to be found.
      */
     public void compileAndLoadBots(String packageName, String dirname){
+
+        if(!BotCompilerHelper.isCompilerAvailable()){
+            JOptionPane.showMessageDialog(this, 
+                    "<html>No compiler is available.<br>Please ensure you have installed the JDK (not the JRE) and<br>are using that version of Java to run Maize.<br><br>If you have both, you may have to update your PATH.</html>", 
+                    "JDK Required", JOptionPane.ERROR_MESSAGE);
+            quit();
+        }
+
         Vector<Bot> bots = BotCompilerHelper.compileAndLoadBots(packageName, dirname);
 
         for(Bot b: bots)

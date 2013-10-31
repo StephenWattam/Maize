@@ -132,6 +132,14 @@ public abstract class BotCompilerHelper{
     }
 
 
+    /** Check if the current instance of java has access to a compiler.
+     *
+     * @return true if a compiler is available, false otherwise.
+     */
+    public static boolean isCompilerAvailable(){
+        return ToolProvider.getSystemJavaCompiler() != null;
+    }
+
 
     // Compiles a filename
     public static boolean compile(String fname){
