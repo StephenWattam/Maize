@@ -44,7 +44,7 @@ public class DebugBot implements Bot, Serializable {
 
         // Get the next move
         int nextMove = bot.nextMove(view, x, y, o, fx, fy);
-        debug("Bot instructs us to move " + nextMove); // TODO: look up direction from enum
+        debug("Bot instructs us to move " + Direction.getName(nextMove) + " (" + nextMove + ")");
         return nextMove;
     }
 
