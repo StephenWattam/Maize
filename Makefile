@@ -24,7 +24,7 @@ all:
 	jar cfm Maize.jar Maize.mf  maize/*/*.class maize/*.class *.class
 
 docs:
-	$(JAVADOC) $(DOCFLAGS) maize/*/*.java maize/*.java *.java bots/*.java
+	$(JAVADOC) $(DOCFLAGS) maize/*/*.java maize/*.java *.java
 
 run:
 	$(JAVA) $(RUNFLAGS)  RunMazeUI
