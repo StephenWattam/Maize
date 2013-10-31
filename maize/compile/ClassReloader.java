@@ -23,13 +23,13 @@ public class ClassReloader extends ClassLoader{
 
         // Use the parent if it's not on our list of allowable classes
         // Also allow inner classes
-        if(!className.equals(name) || !name.startsWith(className + "$")){
+        if(!className.equals(name) && !name.startsWith(className + "$")){
             return super.loadClass(name);
         }
 
         try {
             // Read file
-            String url                      = "file:" + className.replace(".", "/") + ".class";
+            String url                      = "file:" + name.replace(".", "/") + ".class";
             URL myUrl                       = new URL(url);
             URLConnection connection        = myUrl.openConnection();
             InputStream input               = connection.getInputStream();
@@ -53,6 +53,9 @@ public class ClassReloader extends ClassLoader{
             // Define the class
             return defineClass(name, classData, 0, classData.length);
 
+        } catch (NoClassDefFoundError e) {
+            Log.log("Error forcing reload of bot class: " + name);
+            Log.logException(e);
         } catch (MalformedURLException e) {
             Log.log("Error forcing reload of bot class: " + name);
             Log.logException(e);

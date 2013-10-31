@@ -48,6 +48,7 @@ public class DebugBot implements Bot, Serializable {
         return nextMove;
     }
 
+    
     /** Implementation of the Bot interface.
      *
      * @return           Bot name.
