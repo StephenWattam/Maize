@@ -54,7 +54,6 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         compileAndLoadBots(MazeUISettingsManager.botPackageName, MazeUISettingsManager.botDirectory);
         constructDefaultMazes();
 
-
         //menu
         menuBar = buildMenu();
         this.setJMenuBar(menuBar);
@@ -88,10 +87,14 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         this.pack();
         setVisible(true);
 
+
+
+
         Log.log("Maize UI running.");
     }
 
-    // Create a set of default mazes, one for each factory
+    /** Create a set of default mazes, one for each factory.
+     */
     private void constructDefaultMazes(){
         Log.log("Constructing default mazes");
         for(MazeFactory mf : this.mazeTest.factories){
@@ -101,7 +104,12 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         }
     }
 
-    // Builds a single menu item
+    /** Build a single menu item.
+     *
+     * @param label The text shown to users
+     * @param actionCommand The command sent to the action system when the entry is selected.
+     * @return The menu item with the label and action requested.
+     */
     private JMenuItem buildMenuItem(String label, String actionCommand){
         JMenuItem menuItem = new JMenuItem(label);
         menuItem.setActionCommand(actionCommand);
@@ -109,11 +117,14 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         return menuItem;
     }
 
-    // Builds the whole drop-down menu
+    /** Build the whole drop-down menu. 
+     *
+     * @return The menu bar to add to the window.
+     */
     private JMenuBar buildMenu(){
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu("Maize");
         /*fileMenu.add(buildMenuItem("Analyse","analyse"));*/
         fileMenu.add(buildMenuItem("Exit","exit_all"));
         menuBar.add(fileMenu);
@@ -130,6 +141,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         JMenu mazeMenu = new JMenu("Mazes");
         mazeMenu.add(buildMenuItem("New...","new_maze"));
         mazeMenu.add(buildMenuItem("Load...","load_maze"));
+        mazeMenu.add(buildMenuItem("Solve all","solve_all"));
         menuBar.add(mazeMenu);
         
         JMenu tabMenu = new JMenu("Panels");
@@ -148,8 +160,9 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
     }
 
 
-    /**fired when a component performs an action whilst this class is listening to it.
-      @param Ae the action even generated
+    /** fired when a component performs an action whilst this class is listening to it.
+     *
+     * @param Ae the action even generated
      */
     public void actionPerformed(ActionEvent Ae){
         if(Ae.getActionCommand().equals("exit_all")){
@@ -158,6 +171,8 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
             new NewMazeDialog(mazeTest, this);
         }else if(Ae.getActionCommand().equals("load_maze")){
             loadMaze();
+        }else if(Ae.getActionCommand().equals("solve_all")){
+            solveAllMazes();
         }else if(Ae.getActionCommand().equals("load_bot")){
             loadBot();
         }else if(Ae.getActionCommand().equals("inst_bot")){
@@ -182,12 +197,14 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         updatePanes();
     }
 
-    // Display the about dialog.
+    /** Display the about dialog.
+     */
     private void helpAbout(){
         new AboutDialog(mazeTest, this);
     }
 
-    // Load a maze from a serialised file
+    /** Load a maze from a serialised file, as selected by the user using a FileChooser. 
+     */
     private void loadMaze(){
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(false);
@@ -206,7 +223,8 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         }
     }
 
-    // Load a bot from a serialised file
+    /** Load a bot from a serialised file, as selected by the user using a FileChooser.
+     */
     private void loadBot(){
         final JFileChooser fileChooser = new JFileChooser();
         fileChooser.setMultiSelectionEnabled(false);
@@ -225,7 +243,21 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         }
     }
 
+    /** Solve all mazes.
+     */
+    private void solveAllMazes(){
+        // Solve any unsolved mazes.
+        for(Maze m : mazeTest.mazes){
+            if(m.getRoute() == null)
+                m.solve();
+        }
 
+        // Ensure they are repainted.
+        this.mazeTab.repaint();
+    }
+
+    /** Compile a bot, as selected by the user using a FileChooser.
+     */
     private void compileBot(){
         final JFileChooser fileChooser = new JFileChooser(MazeUISettingsManager.botDirectory);
         fileChooser.setMultiSelectionEnabled(false);
@@ -269,7 +301,8 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
 
 
 
-    // Quit
+    /** Quit cleanly.
+     */
     private void quit(){
         Log.removeLogListener(logTab);
 
@@ -284,13 +317,15 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         System.exit(0);
     }
 
-    // Update all of the panes
+    /** Update all of the panes.
+     */
     public void updatePanes(){
         this.mazeTab.update();
         this.botTab.update();
         this.multiTestTab.update();
     }
 
+    /** Reattach all tabs to the main window. */
     private void attachTabs(){
         for(TabPanel tp : panels){
             if(!tp.isAttached())
@@ -298,6 +333,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         }
     }
 
+    /** Detach all tabs from the main window. */
     private void detachTabs(){
         for(TabPanel tp : panels){
             if(tp.isAttached())
@@ -305,7 +341,11 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         }
     }
 
-    // Compile all bots in a directory and import into the mazeTest object
+    /** Compile all bots in a directory and import into the mazeTest object.
+     *
+     * @param packageName The name of the package in which the classes reside, without trailing dot.
+     * @param dirname The name of the directory where bots are to be found.
+     */
     public void compileAndLoadBots(String packageName, String dirname){
         Vector<Bot> bots = BotCompilerHelper.compileAndLoadBots(packageName, dirname);
 

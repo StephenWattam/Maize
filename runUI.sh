@@ -1,3 +1,4 @@
 #!/bin/sh
 
-java -cp .:lib/json-simple-1.1.1.jar RunMazeUI
+java -jar Maize.jar
+# java -cp .:lib/json-simple-1.1.1.jar RunMazeUI
