@@ -40,7 +40,7 @@ public class MultiTestTabPanel extends TabPanel implements
 	private MazePanel mazePanel;
 
 	// Controls
-	private JButton startButton                             = new JButton("Start");
+	private JButton startButton                             = new JButton("(Re)Start");
 	private JButton pauseButton                             = new JButton("Pause/play");
 	private JButton stopButton                              = new JButton("Stop");
 	private JButton refreshButton                           = new JButton("New Test");
@@ -211,7 +211,7 @@ public class MultiTestTabPanel extends TabPanel implements
     private void enableTheRightButtons(){
         if(test == null){
             refreshButton.setEnabled(true);
-            startButton.setEnabled(false);
+            startButton.setEnabled(true);
             stopButton.setEnabled(false);
             pauseButton.setEnabled(false);
         }else{
@@ -221,7 +221,7 @@ public class MultiTestTabPanel extends TabPanel implements
                 startButton.setEnabled(true);
                 stopButton.setEnabled(false);
             }else{
-                startButton.setEnabled(false);
+                startButton.setEnabled(true);
                 stopButton.setEnabled(true);
                 pauseButton.setEnabled(true);
             }
@@ -235,6 +235,7 @@ public class MultiTestTabPanel extends TabPanel implements
 			reset();
 			mazePanel.repaint();
 		}else if(Ae.getSource() == startButton){
+
 			start();
 		}else if(Ae.getSource() == stopButton){
 			stop();
@@ -335,21 +336,23 @@ public class MultiTestTabPanel extends TabPanel implements
 
 	private void start(){
 		//System.out.println("maze: " + maze + ", bot size: " + this.selectedBots.size() + ", test: " + test);
-		if(this.test == null){
-			JOptionPane.showMessageDialog(this, "You must first select a maze and some bots and click \"New Test\".");
-			return;
 
         // Restart if someone clicks start whilst the test is open, but complete
-        //
-		/* }else if(this.test.isDone){ */
-		/* 	this.test.quit(); */
-        /*    this.test = null; */
-		/* 	loadMazeFromUI(); */
-		/* 	newTest(); */
-		}else if(this.test.getState() != Thread.State.NEW){
-			JOptionPane.showMessageDialog(this, "Please stop the current test and create a new one.");
-			return;
+		if(this.test != null && this.test.getState() != Thread.State.NEW){
+            stop();
+			// JOptionPane.showMessageDialog(this, "Please stop the current test and create a new one.");
+			// return;
 		}
+
+        // Try to restart if possible
+		if(this.test == null){
+            reset();
+            mazePanel.repaint();
+        }
+		
+        // If still null, bail
+        if(this.test == null)
+            return;
 
         Log.log("Starting maze test: maze: " + maze + ", bots: " + this.selectedBots.size());
 		this.test.start();
