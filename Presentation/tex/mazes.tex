@@ -332,14 +332,16 @@
 \frame{\frametitle{Overview}
     \begin{itemize}
         \item<1-> Manages \texttt{Bot}s and \texttt{Maze}s, and simulates a virtual world
+        \vspace{5pt}
         \item<2-> Tile-based discrete environment
+        \vspace{5pt}
         \item<3-> A tile can be a start, finish, space, or wall
     \end{itemize}
 
-
-\begin{center}
-    \includegraphics[width=3cm]{mazepic1}
-\end{center}
+    \vspace{5pt}
+    \begin{center}
+        \includegraphics[width=7cm]{mazepic1}
+    \end{center}
 }
 \frame{\frametitle{The Life of a Bot}
     \begin{itemize}
@@ -351,8 +353,10 @@
                 \item<5-> \textcolor<6->{gray}{Finish point co-ordinates}
             \end{itemize}\\
             \visible<6->{\tiny (Technically, all that's needed is the red one, but the other things make it more fun)}
-        \vspace{15pt}
-        \item<7-> Bots can move only \textbf{one tile per `tick'}, and only \textbf{Left}, \textbf{Right}, \textbf{Forward} and \textbf{Back} (like kings in chess)
+        \vspace{7pt}
+        \item<7-> Bots can move only \textbf{one tile per `tick'}, and only \textbf{Left}, \textbf{Right}, \textbf{Forward} and \textbf{Back}
+        \vspace{7pt}
+        \item<8-> Each move has a time limit (bots are considered `stuck' if they hit this a lot)
     \end{itemize}
 }
 \frame{\frametitle{Bot Classes}
@@ -364,11 +368,17 @@
                 \item<4-> Simply return a direction to move.
             \end{itemize}
         
-        \vspace{10pt}
+        \vspace{6pt}
         \item<5-> \textbf{AdvancedBot}\\
             \begin{itemize}
                 \item<6-> Like \texttt{Bot}, but only requests a move when it has emptied its queue
                 \item<7-> Has a queue commands can be added to, and a more powerful high-level API (\texttt{moveLeft()}, \texttt{turnRight()} etc)
+            \end{itemize}
+        \vspace{6pt}
+        \item<8-> \textbf{AbsoluteBot}\\
+            \begin{itemize}
+                \item<9-> Moves North/South instead of Back/Forward
+                \item<10-> Always virtually points north, saves the effort of rotating the viewport
             \end{itemize}
     \end{itemize}
 }
