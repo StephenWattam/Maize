@@ -16,9 +16,22 @@ public class MazeListCellRenderer extends JLabel implements ListCellRenderer{
 		// PRint the bot's name
 		Maze maze = (Maze)value;
 
+
+        // Find route length and compute elitism if possible
+        String routeLengthStr = null;
+
+        if(maze.getRoute() != null){
+            int routeSize = maze.getRoute().size();
+            float elitism = (float)routeSize / (float)maze.getTotalPathLength();
+
+            routeLengthStr = String.format("%d][%.3f", routeSize, elitism);
+        }else{
+            routeLengthStr = "" + maze.getTotalPathLength();
+        }
+        
+
         String str = "" + maze.getWidth() + "x" + maze.getHeight() + " " + maze.getName() + "(" + maze.toString() + ")";
-        if(maze.getRoute() != null)
-            str = "[" + maze.getRoute().size() + "] " + str;
+            str = "[" + routeLengthStr + "] " + str;
 
 		setText(str);
 

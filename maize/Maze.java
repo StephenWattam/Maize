@@ -37,6 +37,9 @@ public class Maze implements Serializable {
     /** Route information. */
     private Vector<Point> route = null;
 
+    /** Total path length cache */
+    private int pathLength = 0;
+
     /** Remove default constructor from default scope. */
     private Maze(){}
 
@@ -63,6 +66,15 @@ public class Maze implements Serializable {
         this.exiX   = exiX;
         this.exiY   = exiY;
         this.name   = this.toString();
+
+        // Count path length, i.e. all of the un-wall squares
+        this.pathLength = 0;
+        for(int i=0; i<this.width; i++){
+            for(int j=0; j<this.height; j++){
+                this.pathLength += this.data[i][j] ? 0 : 1;
+            }
+        }
+
     } 
 
     /** Solve the maze using MazeSolver.  The route is accessible using getRoute().
@@ -98,6 +110,13 @@ public class Maze implements Serializable {
     public boolean getIsOnRoute(int x, int y){
         return getIsOnRoute(new Point(x, y));
     }
+
+    /** Return the total path length of the maze.
+     */
+    public int getTotalPathLength(){
+        return pathLength;
+    }
+        
 
     /** Returns the current route, or null if one is not set.
      */
