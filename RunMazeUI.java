@@ -36,6 +36,7 @@ public class RunMazeUI{
 		mt.factories.add( new RandomScatterMazeFactory() );
 		mt.factories.add( new LineMazeFactory() );
 		mt.factories.add( new EmptyMazeFactory() );
+		mt.factories.add( new BaffleMazeFactory() );
 		//mt.factories.add( new ());
 
         if(!MazeUISettingsManager.loadConfig(CONFIG_LOCATION)){
