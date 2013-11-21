@@ -1,5 +1,7 @@
 package maize;
 
+import java.util.Random;
+
 /** Creates an empty maze for the purposes of testing */
 public class LineMazeFactory implements MazeFactory {
 
@@ -46,6 +48,10 @@ public class LineMazeFactory implements MazeFactory {
     int starty = 2 + (int)(Math.random() * ((this.height/2)-2)) ;
     int finishx = this.width/2 + 1 + ((int)(Math.random() * ((this.width/2)-3)));
     int finishy = this.height/2 + 2 + ((int)(Math.random() * ((this.height/2)-3)));
+
+    // Randomly swap start/finish
+    if(new Random().nextBoolean())
+        return new Maze(data, finishx, finishy, startx, starty);
 
     return new Maze(data, startx, starty, finishx, finishy);
   } 
