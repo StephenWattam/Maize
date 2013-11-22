@@ -42,7 +42,7 @@ public class CircleMazeFactory implements MazeFactory {
         this.createBlankCircles();
         this.createCircleExits();
 
-        return new Maze(this.data, 1, 1, width/2, height/2);
+        return new Maze(this.data, 1, 1, width/2, height/2, this.getName());
     } 
 
     /** Creates a blank maze with concentric circles, no joins.
@@ -63,6 +63,11 @@ public class CircleMazeFactory implements MazeFactory {
                 }
             }
         }
+    }
+    
+
+    public String getName(){
+        return "Circle";
     }
 
     /** Creates exits between the circles.

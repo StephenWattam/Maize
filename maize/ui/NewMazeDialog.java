@@ -49,7 +49,8 @@ public class NewMazeDialog extends JDialog implements ActionListener{
 		setLayout(new GridBagLayout());
 
 		// Create a combo box with all the factories in it
-		factoryCombo = new JComboBox( mazeTest.factories);
+		factoryCombo = new JComboBox(mazeTest.factories);
+        factoryCombo.setRenderer(new MazeFactoryListCellRenderer());
 
 		// type
 		gbc.gridx = 0;

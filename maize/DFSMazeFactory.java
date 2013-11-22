@@ -63,8 +63,12 @@ public class DFSMazeFactory implements MazeFactory {
         this.buildMazeData();
 
         /* Encapsulate */
-        return new Maze(this.mazedata, this.start.x, this.start.y, width-3, height-3);
+        return new Maze(this.mazedata, this.start.x, this.start.y, width-3, height-3, this.getName());
 
+    }
+
+    public String getName(){
+        return "Depth First Search";
     }
 
     /** Main logic loop for Maze building.

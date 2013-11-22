@@ -99,7 +99,7 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
         Log.log("Constructing default mazes");
         for(MazeFactory mf : this.mazeTest.factories){
             Maze m = mf.getMaze(MazeUISettingsManager.defaultMazeWidth, MazeUISettingsManager.defaultMazeHeight);
-            m.setName("Default " + mf.getClass().getName());
+            m.setName("Default " + mf.getName());
             mazeTest.mazes.add( m );
         }
     }

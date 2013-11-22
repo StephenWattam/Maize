@@ -54,7 +54,7 @@ public class Maze implements Serializable {
      * @param  exiX      Exit X coord
      * @param  exiY      Exit Y coord
      */
-    public Maze(boolean[][] data, int entX, int entY, int exiX, int exiY){
+    public Maze(boolean[][] data, int entX, int entY, int exiX, int exiY, String name){
         this.data   = data;
         this.width  = data.length;
         this.height = data[0].length;
@@ -203,7 +203,7 @@ public class Maze implements Serializable {
      * @return           Maze's instance name
      */
     public String getName(){
-        return this.name;
+        return this.name + "(" + this.toString() + ")";
     }
 
     /** Sets the maze's instance name.

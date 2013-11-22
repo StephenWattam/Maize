@@ -44,8 +44,14 @@ public class ScatterMazeFactory implements MazeFactory {
 
     this.buildBlankMaze();
 
-    return new Maze(this.data, 1, 1, width-3, height-3);
+    return new Maze(this.data, 1, 1, width-3, height-3, this.getName());
   } 
+
+
+
+    public String getName(){
+        return "Regular Scatter";
+    }
 
   /** Creates a maze with scattered walls.
    */

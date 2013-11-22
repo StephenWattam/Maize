@@ -41,23 +41,14 @@ public class BaffleMazeFactory implements MazeFactory {
             end = new Point(width - 2, height - 2);
         Point start = new Point(1, 1);
 
-
-        // Randomly rotate
-        if(new Random().nextBoolean()){
-            // Swap width, height
-            int temp = height;
-            width = height;
-            height = temp;
-
-            data = rotateCW(data);
-            end = new Point(end.y, end.x);
-            start = new Point(start.y, start.x);
-        }
        
         // Create maze
-        return new Maze(data, start.x, start.y, end.x, end.y);
+        return new Maze(data, start.x, start.y, end.x, end.y, this.getName());
     }
 
+    public String getName(){
+        return "Baffle";
+    }
   
     // Generate a baffle structure with the given spacing
     private boolean[][] generate(int width, int height, int baffle_width){
@@ -83,18 +74,5 @@ public class BaffleMazeFactory implements MazeFactory {
         data[xpos][cutPos] = false;
 
         return data;
-    }
-
-    // Rotate a matrix clockwise.
-    private static boolean[][] rotateCW(boolean[][] mat) {
-        final int M = mat.length;
-        final int N = mat[0].length;
-        boolean[][] ret = new boolean[N][M];
-        for (int r = 0; r < M; r++) {
-            for (int c = 0; c < N; c++) {
-                ret[c][M-1-r] = mat[r][c];
-            }
-        }
-        return ret;
     }
 }

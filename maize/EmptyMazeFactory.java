@@ -36,6 +36,10 @@ public class EmptyMazeFactory implements MazeFactory {
         }
        
         // Create maze
-        return new Maze(data, start.x, start.y, end.x, end.y);
+        return new Maze(data, start.x, start.y, end.x, end.y, this.getName());
     } 
+
+    public String getName(){
+        return "Empty";
+    }
 }

@@ -43,8 +43,12 @@ public class RandomScatterMazeFactory implements MazeFactory {
 
         this.buildBlankMaze();
 
-        return new Maze(this.data, start.x, start.y, finish.x, finish.y);
+        return new Maze(this.data, start.x, start.y, finish.x, finish.y, this.getName());
     } 
+
+    public String getName(){
+        return "Random Scatter";
+    }
 
     /** Creates a maze with scattered walls.
     */
