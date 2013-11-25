@@ -45,6 +45,7 @@ public class RunMazeUI{
 		mt.factories.add( new LineMazeFactory() );
 		mt.factories.add( new EmptyMazeFactory() );
 		mt.factories.add( new BaffleMazeFactory() );
+        mt.factories.add( new PrimMazeFactory() );
 
         if(!MazeUISettingsManager.loadConfig(CONFIG_LOCATION)){
             Log.log("Error loading resources.  Please attend to your config file, to be found at " + CONFIG_LOCATION);
