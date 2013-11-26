@@ -32,8 +32,8 @@ public class RunMazeUI{
 		MazeTest mt = new MazeTest();
         mt.factories.add( new BaffleMazeFactory() );
         mt.factories.add( new CircleMazeFactory() );
-        mt.factories.add( new EmptyMazeFactory() );
         mt.factories.add( new FullDFSMazeFactory() );
+        mt.factories.add( new EmptyMazeFactory() );
         mt.factories.add( new LineMazeFactory() );
         mt.factories.add( new PrimMazeFactory() );
         mt.factories.add( new RandomScatterMazeFactory() );
@@ -42,8 +42,8 @@ public class RunMazeUI{
         //mt.factories.add( new ());
         mt.factories.add( new RandomTransformMazeFactory( new BaffleMazeFactory() ) );
         mt.factories.add( new RandomTransformMazeFactory( new CircleMazeFactory() ) );
+        mt.factories.add( new RandomTransformMazeFactory( new FullDFSMazeFactory() ) );
         mt.factories.add( new RandomTransformMazeFactory( new EmptyMazeFactory() ) );
-		mt.factories.add( new RandomTransformMazeFactory( new FullDFSMazeFactory() ) );
         mt.factories.add( new RandomTransformMazeFactory( new LineMazeFactory() ) );
         mt.factories.add( new RandomTransformMazeFactory( new PrimMazeFactory() ) );
 		mt.factories.add( new RandomTransformMazeFactory( new RandomScatterMazeFactory() ) );
