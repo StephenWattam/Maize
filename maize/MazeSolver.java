@@ -205,9 +205,9 @@ public class MazeSolver{
             if(prevPrev != null){
                 // Build deltas without caring about 180 turns (which are free)
                 Point prevDelta = new Point( Math.abs(prev.x - prevPrev.x), 
-                        Math.abs(prev.y - prevPrev.y));
+                                             Math.abs(prev.y - prevPrev.y));
                 Point delta     = new Point( Math.abs(p.x - prev.x),
-                        Math.abs(p.y - prev.y));
+                                             Math.abs(p.y - prev.y));
 
                 if(!prevDelta.equals(delta))
                     cornerPenalty += CORNER_PENALTY;
