@@ -37,6 +37,7 @@ public class RunMazeUI{
 		mt.factories.add( new RandomTransformMazeFactory( new LineMazeFactory() ) );
 		mt.factories.add( new RandomTransformMazeFactory( new EmptyMazeFactory() ) );
 		mt.factories.add( new RandomTransformMazeFactory( new BaffleMazeFactory() ) );
+        mt.factories.add( new RandomTransformMazeFactory( new PrimMazeFactory() ) );
 		//mt.factories.add( new ());
 		mt.factories.add( new FullDFSMazeFactory() );
 		mt.factories.add( new CircleMazeFactory() );
