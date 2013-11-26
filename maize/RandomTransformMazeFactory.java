@@ -37,7 +37,7 @@ public class RandomTransformMazeFactory implements MazeFactory {
 
         // Randomly rotate up to 3 times, possibly flipping each time
         boolean alreadyFlipped = false;
-        for(int i=0; i<random.nextInt(4); i++){
+        for(int i=1; i<random.nextInt(4); i++){
             if(!alreadyFlipped && random.nextBoolean()){
                 alreadyFlipped = true;
                 flipMazeV(m);
@@ -73,7 +73,7 @@ public class RandomTransformMazeFactory implements MazeFactory {
                 newData[j][i] = m.getPoint(i, j);
 
         /* Return a new maze object, rotated. */
-        return new Maze(newData, newStart.x, newStart.y, newEnd.x, newEnd.y, this.getName());
+        return new Maze(newData, newStart.y, newStart.x, newEnd.y, newEnd.x, this.getName());
     }
 
 
@@ -85,8 +85,8 @@ public class RandomTransformMazeFactory implements MazeFactory {
         int height = m.getHeight();
 
         // Read start/end
-        Point newStart = new Point(m.getEntX(), height - m.getEntY() - 1);
-        Point newEnd   = new Point(m.getExiX(), height - m.getExiY() - 1);
+        Point newStart = new Point(m.getEntX(), height - m.getEntY());
+        Point newEnd   = new Point(m.getExiX(), height - m.getExiY());
 
         // Randomly swap start/end
         if(random.nextBoolean()){
@@ -98,11 +98,11 @@ public class RandomTransformMazeFactory implements MazeFactory {
         // Rotate the data 
         boolean[][] newData = new boolean[width][height];
         for(int i=0; i<width; i++)
-            for(int j=height-1; j<=0; j--)
-                newData[i][j] = m.getPoint(i, height - j - 1);
+            for(int j=0; j<height; j++)
+                newData[i][j] = m.getPoint(i, height - j);
 
-        /* Return a new maze object, rotated. */
-        return new Maze(newData, newStart.x, newStart.y, newEnd.x, newEnd.y, this.getName());
+        /* Return a new maze object, flipped. */
+        return new Maze(newData, newStart.x, height - newStart.y, newEnd.x, height - newEnd.y, this.getName());
     }
 
 }

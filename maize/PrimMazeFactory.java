@@ -136,18 +136,12 @@ public class PrimMazeFactory implements MazeFactory
         start = new Point( Math.min(Math.max(start.x, 1), width), Math.min(Math.max(start.y, 1), height) );
 
         if( this.data[start.y][start.x] )
-        {
-            System.out.println( "Start is a space!" );
             return start;
-        }
 
         for( int y=0; y<2; y+=2)
             for( int x=0; x<2; x+=2)
-                if( this.data[start.y+y][start.x+x] )
-                {
-                    System.out.println( "Found a surrounding space!" );
+                if( this.data[Math.min(Math.max(y, 1), width)][Math.min(Math.max(x, 1), height)] )
                     return new Point( start.x+x, start.y+y );
-                }
 
         return null;
     }
