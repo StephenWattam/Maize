@@ -42,17 +42,15 @@ public class RandomTransformMazeFactory implements MazeFactory {
                 alreadyFlipped = true;
                 flipMazeV(m);
             }
-            m = rotateMazeCW(m);
+            m = rotateMazeCCW( m );
         }
 
         return m;
     }
 
-    /** Rotate a maze 90 degrees clockwise.
+    /** Rotate a maze 90 degrees counter clockwise.
      */
-    private Maze rotateMazeCW(Maze m){
-        System.out.println("Rotating maze CW...");
-
+    private Maze rotateMazeCCW( Maze m ){
         // Load width/height 'backwards'
         int newWidth = m.getHeight();
         int newHeight = m.getWidth();
@@ -72,7 +70,7 @@ public class RandomTransformMazeFactory implements MazeFactory {
         boolean[][] newData = new boolean[newWidth][newHeight];
         for(int i=0; i<newHeight; i++)
             for(int j=0; j<newWidth; j++)
-                newData[j][newHeight - 1 - i] = m.getPoint(i, j);
+                newData[j][i] = m.getPoint(i, j);
 
         /* Return a new maze object, rotated. */
         return new Maze(newData, newStart.x, newStart.y, newEnd.x, newEnd.y, this.getName());
@@ -82,8 +80,6 @@ public class RandomTransformMazeFactory implements MazeFactory {
     /** Flip a maze vertically. 
      */
     private Maze flipMazeV(Maze m){
-        System.out.println("Flipping maze vertically...");
-
         // Load width/height 'backwards'
         int width = m.getWidth();
         int height = m.getHeight();
