@@ -101,7 +101,8 @@ public class PrimMazeFactory implements MazeFactory
                 Point passage = randomWall.position;
                 Point opposite = randomWall.opposite;
 
-                endPoint = new Point( opposite.x, opposite.y );
+                // Clamp the end point to within the bounds of the maze
+                endPoint = new Point( Math.min(Math.max(opposite.x, 1), width), Math.min(Math.max(opposite.y, 1), height) );
 
                 this.data[passage.y][passage.x] = false;
                 this.data[opposite.y][opposite.x] = false;
