@@ -16,6 +16,9 @@ import java.util.*;
  */
 public class MazeSolver{
 
+    /** How much each turn is penalised. */
+    private static final double CORNER_PENALTY = 1.5;
+
     /** The maze object to be solves. */
     private Maze maze;
 
@@ -107,8 +110,8 @@ public class MazeSolver{
 
                     // If it's in the fringe, check to see if our route is better (from start to parent)
                     // than the current route.  If so, set ourselves as the back route instead.
-                    if( manhattanDistance(start, current) < 
-                        manhattanDistance(start, shadow.getRoutePointer(p)) ){
+                    if( movementDistance(start, current) < 
+                        movementDistance(start, shadow.getRoutePointer(p)) ){
                         shadow.setRoutePointer(p, current);
                     }
                 }else{
@@ -181,7 +184,8 @@ public class MazeSolver{
         return bestPoint;
     }
 
-   
+
+
     /** Compute the A* distance heuristic.
      *
      * @param from The start point.
@@ -189,22 +193,57 @@ public class MazeSolver{
      * @param p The point to score.
      */
     private double computeHeuristic(Point from, Point to, Point p){
-        double distanceTo = manhattanDistance(p, to);
+        double distanceTo   = movementDistance(p, to);
         double distanceFrom = shadow.getRouteLength(p);
 
-        return distanceFrom + distanceTo;
+        // Penalty for turning corners unnecessarily
+        double cornerPenalty = 0.0;
+        if(shadow.getRoutePointer(p) != null){
+            Point prev     = shadow.getRoutePointer(p);
+            Point prevPrev = shadow.getRoutePointer(prev);
+
+            if(prevPrev != null){
+                // Build deltas without caring about 180 turns (which are free)
+                Point prevDelta = new Point( Math.abs(prev.x - prevPrev.x), 
+                        Math.abs(prev.y - prevPrev.y));
+                Point delta     = new Point( Math.abs(p.x - prev.x),
+                        Math.abs(p.y - prev.y));
+
+                if(!prevDelta.equals(delta))
+                    cornerPenalty += CORNER_PENALTY;
+                // }else{
+                // At the start of a route we don't know which way up the 
+                // bot is, so we can't penalise it.
+            }
+
+
+        }
+
+
+        return distanceFrom + distanceTo + cornerPenalty;
     }
 
 
-    /** Compute manhattan distance between two points.  Commutative.
+    /** Compute movement distance between two points.  Commutative.
+     *
+     * Uses a modified version of manhattan distance that penalises diagonal motion.
      *
      * @param a One of the points
      * @param b The other one of the points.
      * @return The Manhattan distance between each point.
      */
-    private double manhattanDistance(Point a, Point b){
-        return Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+    private double movementDistance(Point a, Point b){
+
+        double manhattan = Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+        double euclidean = a.distance(b);
+
+        // The difference between manhattan and euclidean distances is 
+        // a measure of the diagonality.  As a rule, prefer non-diagonal paths
+        // since they require less turning (which is expensive)
+
+        return manhattan + (manhattan - euclidean);
     }
+
 
     /* --------------------------------------------------------------------- */
 
