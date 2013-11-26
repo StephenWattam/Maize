@@ -39,12 +39,6 @@ public class PrimMazeFactory implements MazeFactory
             this.width = 7;
             this.height = 7;
         }
-        if ( (width >> 1 << 1) == width ){
-            this.width = width+1;
-        }
-        if ( (height >> 1 << 1) == height ){
-            this.height = height+1;
-        }
 
         this.width = (this.width == 0) ? width : this.width;
         this.height = (this.height == 0) ? height : this.height;
@@ -137,6 +131,9 @@ public class PrimMazeFactory implements MazeFactory
 
     protected Point findNearbySpace( Point start )
     {
+        // Clamp the endpoint to 1 wall inside the field.
+        start = new Point( Math.min(Math.max(start.x, 1), width), Math.min(Math.max(start.y, 1), height) );
+
         if( this.data[start.y][start.x] )
         {
             System.out.println( "Start is a space!" );
