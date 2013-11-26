@@ -29,7 +29,7 @@ public class EmptyMazeFactory implements MazeFactory {
                 data[i][j] = (i == 0 || j == 0 || i == width-1 || j == height-1)? true : false;
   */          
 
-        Point end = new Point(width - 2, height - 2);
+        Point end = new Point(1 + (int)(Math.random() * width-3), 1 + (int)(Math.random() * height-3));
         Point start = null;
         while(start == null || start.equals(end)){
             start = new Point(1 + (int)(Math.random() * width-3), 1 + (int)(Math.random() * height-3));
