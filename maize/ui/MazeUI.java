@@ -320,6 +320,9 @@ public class MazeUI extends JFrame implements ActionListener, WindowListener{
     /** Update all of the panes.
      */
     public void updatePanes(){
+        this.mazeTest.sortMazes();
+        this.mazeTest.sortBots();
+        this.mazeTest.sortFactories();
         this.mazeTab.update();
         this.botTab.update();
         this.multiTestTab.update();
