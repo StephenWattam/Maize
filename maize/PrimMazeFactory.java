@@ -85,6 +85,8 @@ public class PrimMazeFactory implements MazeFactory
         wallList.add( new Wall(new Point(start.x, start.y - 1), new Point(start.x, start.y - 2)) );
         wallList.add( new Wall(new Point(start.x, start.y + 1), new Point(start.x, start.y + 2)) );
 
+        Point endPoint = null;
+
         // While we have walls...
         while( wallList.size() > 1 )
         {
@@ -105,6 +107,8 @@ public class PrimMazeFactory implements MazeFactory
                 Point passage = randomWall.position;
                 Point opposite = randomWall.opposite;
 
+                endPoint = new Point( opposite.x, opposite.y );
+
                 this.data[passage.y][passage.x] = false;
                 this.data[opposite.y][opposite.x] = false;
 
@@ -121,11 +125,33 @@ public class PrimMazeFactory implements MazeFactory
         }
 
         Wall end = wallList.get( 0 );
-        this.data[end.position.y][end.position.x] = false;
-
         wallList.clear();
+        this.data[end.position.y][end.position.x] = true; // Mark this as a wall
 
-        return new Maze( this.data, start.x, start.y, end.position.x, end.position.y, this.getName() );
+        endPoint = findNearbySpace( endPoint );
+        if( endPoint == null )
+            endPoint = end.opposite;
+
+        return new Maze( this.data, start.x, start.y, endPoint.x, endPoint.y, this.getName() );
+    }
+
+    protected Point findNearbySpace( Point start )
+    {
+        if( this.data[start.y][start.x] )
+        {
+            System.out.println( "Start is a space!" );
+            return start;
+        }
+
+        for( int y=0; y<2; y+=2)
+            for( int x=0; x<2; x+=2)
+                if( this.data[start.y+y][start.x+x] )
+                {
+                    System.out.println( "Found a surrounding space!" );
+                    return new Point( start.x+x, start.y+y );
+                }
+
+        return null;
     }
 
     protected boolean isValidPosition( Point point )
