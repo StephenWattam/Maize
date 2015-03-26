@@ -40,7 +40,7 @@ public class AbsoluteBot implements Bot
 		if(nextMove == -1)
 		{
 			boolean[][] correctedView = Orientation.rotateToNorth(view, o);
-			int nextMoveVal = calculateMove(correctedView, x, y, 0, fx, fy);
+			int nextMoveVal = calculateMove(correctedView, x, y, o, fx, fy);
 			int r = -1;
 
 			switch(o)
