@@ -25,6 +25,7 @@ public class JFlapBot extends JFrame implements Bot {
 	public class Transition {
 		State mFrom;
 		State mTo;
+		Character mRead = null;
 		ArrayList<Character> mPush = new ArrayList<>();
 		ArrayList<Character> mPop = new ArrayList<>();
 	}
@@ -103,6 +104,9 @@ public class JFlapBot extends JFrame implements Bot {
 
 					transition.mFrom = graph.mStates.get( Integer.parseInt( getNodeValue( arcs.item(i), "from", "-1" ) ) );
 
+					String readLine = getNodeValue( arcs.item(i), "read", null );
+					transition.mRead = (readLine.length() > 0?readLine.charAt(0):null);
+
 					System.out.println( transition );
 					System.out.println( transition.mFrom );
 					System.out.println( transition.mFrom.mArcs );
@@ -166,7 +170,22 @@ public class JFlapBot extends JFrame implements Bot {
 	Graph mCurrentGraph = null;
 	State mCurrentState = null;
 	Stack<Character> mStack = null;
+	ArrayList<Character> mInputTape = null;
+	int mInputCursor = 0;
 
+	public Character readTape()
+	{
+		if( mInputCursor > -1 && mInputCursor < mInputTape.size() )
+			return mInputTape.get(mInputCursor++);
+		return ' ';
+	}
+
+	public Character peekTape()
+	{
+		if( mInputCursor > -1 && mInputCursor < mInputTape.size() )
+			return mInputTape.get(mInputCursor);
+		return ' ';
+	}
 
 	/** Implementation of the Bot interface.
      * @see Bot
@@ -189,38 +208,54 @@ public class JFlapBot extends JFrame implements Bot {
 
     	if( mCurrentGraph != null )
     	{
-    		System.out.println( "[START] -> " );
+    		System.out.print( "[START] -> " );
 
     		do {
     			System.out.print( mCurrentState.mName + " -> " );
 
-	    		// Load sensor data //
-	    		ArrayList<Character> mInputTape = new ArrayList<>();
-
-
+	    		// Load sensor data  - Note: These may need to be rearranged! //
+	    		mInputTape = new ArrayList<>();
+	    		mInputCursor = 0;
+	    		mInputTape.add( (view[1][0]?'1':'0') );
+	    		mInputTape.add( (view[2][0]?'1':'0') );
+	    		mInputTape.add( (view[2][1]?'1':'0') );
+	    		mInputTape.add( (view[2][2]?'1':'0') );
+	    		mInputTape.add( (view[1][2]?'1':'0') );
+	    		mInputTape.add( (view[0][2]?'1':'0') );
+	    		mInputTape.add( (view[0][1]?'1':'0') );
+	    		mInputTape.add( (view[0][0]?'1':'0') );
 
 	    		// Reset stack //
 	    		mStack = new Stack<>();
 
-
+	    		// Match any rules on this state //
 	    		ArrayList<Transition> matches = new ArrayList<>();
 	    		for( Transition t : mCurrentState.mArcs ) {
-	    			if( t.mPop.size() == 0 )
+
+	    			if( t.mRead == peekTape() )
 	    				matches.add( t );
+
+	    			if( t.mRead == null && t.mPop.size() == 0 )
+	    				matches.add( t );
+
 	    		}
 
 	    		int index = (int)(Math.random() * (matches.size()-1));
 	    		Transition action = matches.get( index );
 
+	    		if( action.mRead != null )
+	    			System.out.print( "Read() = " +readTape()+ ", " );
+
 	    		for( Character c : action.mPop ) {
 	    			if( !(""+c).equalsIgnoreCase( ""+mStack.peek()) )
 	    				System.out.println( "SANITY CHECK FAIL: " +c+ " IS NOT " + mStack.peek() );
 
-	    			mStack.pop();
+	    			System.out.print( "Pop() = " +mStack.pop()+ ", " );
 	    		}
 
 	    		for( Character c : action.mPush ) {
 	    			mStack.push( c );
+	    			System.out.print( "Push(" +c+ "), " );
 	    		}
 
 	    		while( mStack.size() > 0 )
