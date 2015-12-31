@@ -708,4 +708,8 @@ public class GraphBot implements Bot, Serializable {
             System.out.print(str);
     }
     
+    @Override
+    public void destroy() {
+        /* stub */
+    }
 }

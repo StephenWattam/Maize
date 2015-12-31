@@ -32,4 +32,7 @@ public interface Bot {
 
     /** Called when a new maze is started. */
     public void start();
+
+    /** Called when a bot is about to be destroyed */
+    public void destroy();
 }

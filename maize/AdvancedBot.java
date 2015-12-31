@@ -198,4 +198,9 @@ public class AdvancedBot implements Bot{
 
     /** Implementation of bot#start */
     public void start(){}
+
+    @Override
+    public void destroy() {
+    	/* stub */
+    }
 }

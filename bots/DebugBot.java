@@ -80,6 +80,10 @@ public class DebugBot implements Bot, Serializable {
     private void debug(String msg){
         System.out.println("DBGBOT: " + msg);
     }
+
+    public void destroy() {
+        /* stub */
+    }
 }
 
 

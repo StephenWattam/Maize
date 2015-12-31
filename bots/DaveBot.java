@@ -48,5 +48,9 @@ public class DaveBot implements Bot, Serializable {
     @Override
     public void start(){
     }
+
+    public void destroy() {
+        /* stub */
+    }
 }
 

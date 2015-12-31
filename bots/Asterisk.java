@@ -745,6 +745,10 @@ public class Asterisk extends AbsoluteBot implements Serializable {
 
     }
 
+    public void destroy() {
+        /* stub */
+    }
+
 }
 
 

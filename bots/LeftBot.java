@@ -81,6 +81,11 @@ public class LeftBot implements Bot, Serializable {
 
     @Override
     public void start(){}
+
+    @Override
+    public void destroy() {
+        /* stub */
+    }
 }
 
 

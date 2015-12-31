@@ -348,4 +348,9 @@ public class Gorad1 implements Bot
 
     @Override
     public void start(){}
+
+    @Override
+    public void destroy() {
+        /* stub */
+    }
 }

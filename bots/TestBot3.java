@@ -427,6 +427,11 @@ public class TestBot3 implements Bot, Serializable {
     public String getDescription(){
         return "It tries its best, and that's all you can really ask for.";
     }
+
+    @Override
+    public void destroy() {
+        /* stub */
+    }
 }
 
 

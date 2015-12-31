@@ -78,4 +78,9 @@ public class LeftStateBot extends StateBot implements Serializable{
 
     @Override
     public void start(){}
+
+    @Override
+    public void destroy() {
+        /* stub */
+    }
 }
