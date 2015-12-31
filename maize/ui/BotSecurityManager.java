@@ -205,10 +205,6 @@ public class BotSecurityManager extends SecurityManager {
         checkPermission(new PropertyPermission( key, BotSecurityConstants.PROPERTY_READ_ACTION) );
     }
 
-    public boolean checkTopLevelWindow(Object window) {
-        return super.checkTopLevelWindow( window );
-    }
-
     public void checkPrintJobAccess() {
         checkPermission(new RuntimePermission("queuePrintJob"));
     }
@@ -312,10 +308,6 @@ public class BotSecurityManager extends SecurityManager {
 
     public void checkSetFactory() {
         checkPermission(new RuntimePermission("setFactory"));
-    }
-
-    public void checkMemberAccess(Class<?> clazz, int which) {
-        super.checkMemberAccess( clazz, which );
     }
 
     public void checkSecurityAccess(String target) {
