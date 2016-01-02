@@ -25,15 +25,35 @@ public class JFlapBot extends JFrame implements Bot {
 	public class Transition {
 		State mFrom;
 		State mTo;
-		Character mRead = null;
+		ArrayList<Character> mRead = new ArrayList<>();
 		ArrayList<Character> mPush = new ArrayList<>();
 		ArrayList<Character> mPop = new ArrayList<>();
+
+		@Override
+		public String toString()
+		{
+			return "{" +mFrom.mName+ "}\t" +listJoin(mRead, "")+ "\t/\t" +listJoin(mPop, "")+ "\t/\t" +listJoin(mPush, "")+ "\t{" +mTo.mName+ "}";
+		}
 	}
 
 	public class State {
 		ArrayList<Transition> mArcs = new ArrayList<>();
 		int mID = -1;
 		String mName = null;
+	}
+
+	public String listJoin( java.util.List<?> list, String sep )
+	{
+		StringBuffer buffer = new StringBuffer();
+
+		for( int i=0; i<list.size(); i++ )
+		{
+			buffer.append( list.get(i) );
+			if( i<list.size() )
+				buffer.append( sep );
+		}
+
+		return buffer.toString();
 	}
 
 	private String getNodeValue_r( Node root, ArrayList<String> nodespec, String _default ) {
@@ -75,6 +95,12 @@ public class JFlapBot extends JFrame implements Bot {
 			DocumentBuilder        db  = dbf.newDocumentBuilder();
 			Document               doc = db.parse( file );
 
+			String type = getNodeValue( doc, "structure.type", null );
+
+			// Only bother loading PDA type automata
+			if( type == null || !type.equalsIgnoreCase( "pda" ) )
+				return null;
+
 			NodeList states = doc.getElementsByTagName( "state" );
 			NodeList arcs = doc.getElementsByTagName( "transition" );
 
@@ -104,12 +130,9 @@ public class JFlapBot extends JFrame implements Bot {
 
 					transition.mFrom = graph.mStates.get( Integer.parseInt( getNodeValue( arcs.item(i), "from", "-1" ) ) );
 
-					String readLine = getNodeValue( arcs.item(i), "read", null );
-					transition.mRead = (readLine.length() > 0?readLine.charAt(0):null);
-
-					System.out.println( transition );
-					System.out.println( transition.mFrom );
-					System.out.println( transition.mFrom.mArcs );
+					transition.mRead = new ArrayList<Character>();
+					for( char c : getNodeValue( arcs.item(i), "read", null ).toCharArray() )
+						transition.mRead.add( c );
 
 					transition.mFrom.mArcs.add( transition );
 
@@ -139,6 +162,7 @@ public class JFlapBot extends JFrame implements Bot {
 	public JFlapBot()
 	{
 		super( "JFlap Interpreter" );
+		setLayout( new BorderLayout() );
 		
     	final JFileChooser fc = new JFileChooser();
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff", "jflap" );
@@ -153,10 +177,13 @@ public class JFlapBot extends JFrame implements Bot {
 		            
 		            System.out.println( "Opening: " + file.getName() + ".\n" );
 		            mCurrentGraph = loadJFlapFile( file );
+
+		            if( mCurrentGraph == null )
+		            	JOptionPane.showMessageDialog(null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE);
 		        }
     		}
     	} );
-    	add( openBtn );
+    	add( openBtn, BorderLayout.CENTER );
 
         pack();
 		setVisible( true );
@@ -173,18 +200,23 @@ public class JFlapBot extends JFrame implements Bot {
 	ArrayList<Character> mInputTape = null;
 	int mInputCursor = 0;
 
-	public Character readTape()
+	private Character readTape()
 	{
 		if( mInputCursor > -1 && mInputCursor < mInputTape.size() )
 			return mInputTape.get(mInputCursor++);
 		return ' ';
 	}
 
-	public Character peekTape()
+	private Character peekTape( int offset )
 	{
 		if( mInputCursor > -1 && mInputCursor < mInputTape.size() )
-			return mInputTape.get(mInputCursor);
+			return mInputTape.get(mInputCursor+offset);
 		return ' ';
+	}
+
+	private int remainingTape()
+	{
+		return mInputTape.size() - mInputCursor;
 	}
 
 	/** Implementation of the Bot interface.
@@ -203,60 +235,106 @@ public class JFlapBot extends JFrame implements Bot {
      */
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
+    	System.out.println( "\n" );
+
     	if( mActionList.size() > 0 )
-    		return mActionList.remove();
+    	{
+    		int action = mActionList.remove();
+
+    		switch( action )
+    		{
+    			case Direction.FORWARD: System.out.println( "Action: FORWARD" ); break;
+    			case Direction.BACK:    System.out.println( "Action: BACK" );    break;
+    			case Direction.LEFT:    System.out.println( "Action: LEFT" );    break;
+    			case Direction.RIGHT:   System.out.println( "Action: RIGHT" );   break;
+    		}
+
+    		return action;
+    	}
 
     	if( mCurrentGraph != null )
     	{
-    		System.out.print( "[START] -> " );
+    		// Load sensor data  - Note: These may need to be rearranged! //
+    		mInputTape = new ArrayList<>();
+    		mInputCursor = 0;
+    		mInputTape.add( (view[0][0]?'1':'0') );
+    		mInputTape.add( (view[1][0]?'1':'0') );
+    		mInputTape.add( (view[2][0]?'1':'0') );
+    		mInputTape.add( (view[2][1]?'1':'0') );
+    		mInputTape.add( (view[2][2]?'1':'0') );
+    		mInputTape.add( (view[1][2]?'1':'0') );
+    		mInputTape.add( (view[0][2]?'1':'0') );
+    		mInputTape.add( (view[0][1]?'1':'0') );
+
+			// Reset stack //
+	    	mStack = new Stack<>();
 
     		do {
-    			System.out.print( mCurrentState.mName + " -> " );
+    			System.out.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
 
-	    		// Load sensor data  - Note: These may need to be rearranged! //
-	    		mInputTape = new ArrayList<>();
-	    		mInputCursor = 0;
-	    		mInputTape.add( (view[1][0]?'1':'0') );
-	    		mInputTape.add( (view[2][0]?'1':'0') );
-	    		mInputTape.add( (view[2][1]?'1':'0') );
-	    		mInputTape.add( (view[2][2]?'1':'0') );
-	    		mInputTape.add( (view[1][2]?'1':'0') );
-	    		mInputTape.add( (view[0][2]?'1':'0') );
-	    		mInputTape.add( (view[0][1]?'1':'0') );
-	    		mInputTape.add( (view[0][0]?'1':'0') );
+    			System.out.println( "STACK: " +listJoin(mStack, "") );
 
-	    		// Reset stack //
-	    		mStack = new Stack<>();
+    			System.out.println( "TAPE:  " +listJoin(mInputTape, "") );
+    			System.out.print(   "       " );
+    			for( int i=0; i<mInputCursor; i++ )
+    				System.out.print( " " );
+    			System.out.println( "^" );
 
 	    		// Match any rules on this state //
 	    		ArrayList<Transition> matches = new ArrayList<>();
 	    		for( Transition t : mCurrentState.mArcs ) {
 
-	    			if( t.mRead == peekTape() )
-	    				matches.add( t );
+	    			System.out.print( "\nMatching " + t );
 
-	    			if( t.mRead == null && t.mPop.size() == 0 )
-	    				matches.add( t );
+	    			// Does this rule require a read?
+	    			if( t.mRead.size() > 0 )
+	    			{
+	    				// Is there enough data to make this possible on the tape?
+		    			if( t.mRead.size() > remainingTape() )
+		    				continue;
 
+		    			// Does it all match?
+		    			boolean readOK = true;
+		    			for( int i=0; i<t.mRead.size(); i++ )
+		    			{
+		    				if( t.mRead.get(i) != '?' && (int)t.mRead.get(i) != (int)peekTape(i) )
+		    				{
+		    					readOK = false;
+		    					break;
+		    				}
+		    			}
+		    			if( !readOK )
+		    				continue;
+		    		}
+	    			
+	    			// Does this rule require a stack pop?
+	    			if( t.mPop.size() > 0 )
+	    			{
+	    				// Does the request fit?
+	    				if( t.mPop.size() > mStack.size() )
+	    					continue;
+	    			}
+
+	    			System.out.print( " <-- MATCH!" );
+	    			matches.add( t );
 	    		}
+	    		System.out.println( "" );
 
 	    		int index = (int)(Math.random() * (matches.size()-1));
 	    		Transition action = matches.get( index );
 
-	    		if( action.mRead != null )
-	    			System.out.print( "Read() = " +readTape()+ ", " );
+	    		System.out.println( "Performing: " + action );
+
+	    		for( Character c : action.mRead )
+	    			readTape();
 
 	    		for( Character c : action.mPop ) {
 	    			if( !(""+c).equalsIgnoreCase( ""+mStack.peek()) )
 	    				System.out.println( "SANITY CHECK FAIL: " +c+ " IS NOT " + mStack.peek() );
-
-	    			System.out.print( "Pop() = " +mStack.pop()+ ", " );
 	    		}
 
-	    		for( Character c : action.mPush ) {
+	    		for( Character c : action.mPush )
 	    			mStack.push( c );
-	    			System.out.print( "Push(" +c+ "), " );
-	    		}
 
 	    		while( mStack.size() > 0 )
 	    		{
