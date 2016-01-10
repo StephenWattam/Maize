@@ -379,7 +379,7 @@ public class PDABot extends JFrame implements Bot {
 	    			{
 	    				case 'f':
 	    					mActionList.add( Direction.FORWARD );
-	    					mWinOut.println( "Moving FOREWARD!" );
+	    					mWinOut.println( "Moving FORWARD!" );
 	    					break;
 
 	    				case 'b':
