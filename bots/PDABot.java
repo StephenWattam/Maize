@@ -10,10 +10,24 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
+import javax.swing.text.*;
 import javax.xml.parsers.*;
 import javax.xml.parsers.*;
 
 public class PDABot extends JFrame implements Bot {
+
+	private static final String mAnimalNames[] = new String[]{ "Aardvark", "Albatross", "Alligator", "Alpaca", "Ant", "Anteater", "Antelope", "Ape", "Armadillo", "Donkey", "Baboon", "Badger", "Barracuda", "Bat", "Bear", "Beaver", "Bee", "Bison", "Boar", "Buffalo", "Butterfly", "Camel", "Capybara", "Caribou", "Cassowary", "Cat", "Caterpillar", "Cattle", "Chamois", "Cheetah", "Chicken", "Chimpanzee", "Chinchilla", "Clam", "Coati", "Cobra", "Cockroach", "Cod", "Cormorant", "Coyote", "Crab", "Crane", "Crocodile", "Crow", "Curlew", "Deer", "Dinosaur", "Dog", "Dogfish", "Dolphin", "Donkey", "Dotterel", "Dove", "Dragonfly", "Duck", "Dugong", "Dunlin", "Eagle", "Echidna", "Eel", "Eland", "Elephant", "Elk", "Emu", "Falcon", "Ferret", "Finch", "Fish", "Flamingo", "Fly", "Fox", "Frog", "Gaur", "Gazelle", "Gerbil", "Giraffe", "Gnat", "Gnu", "Goat", "Goose", "Goldfinch", "Goldfish", "Gorilla", "Goshawk", "Grasshopper", "Grouse", "Guanaco", "GuineaPig", "Gull", "Hamster", "Hare", "Hawk", "Hedgehog", "Heron", "Herring", "Hippopotamus", "Hornet", "Horse", "Hummingbird", "Hyena", "Ibex", "Ibis", "Jackal", "Jaguar", "Jay", "Jellyfish", "Kangaroo", "Kingfisher", "Kinkajou", "Koala", "Kookabura", "Kouprey", "Kudu", "Lapwing", "Lark", "Lemur", "Leopard", "Lion", "Llama", "Lobster", "Locust", "Loris", "Louse", "Lyrebird", "Magpie", "Mallard", "Manatee", "Mandrill", "Mantis", "Marten", "Meerkat", "Mink", "Mole", "Mongoose", "Monkey", "Moose", "Mouse", "Mosquito", "Mule", "Narwhal", "Newt", "Nightingale", "Octopus", "Okapi", "Opossum", "Oryx", "Ostrich", "Otter", "Owl", "Oyster", "Panther", "Parrot", "Panda", "Partridge", "Peafowl", "Pelican", "Penguin", "Pheasant", "Pig", "Pigeon", "PolarBear", "Pony", "Porcupine", "Porpoise", "PrairieDog", "Quail", "Quelea", "Quetzal", "Rabbit", "Raccoon", "Rail", "Ram", "Rat", "Raven", "Reindeer", "Rhinoceros", "Rook", "Salamander", "Salmon", "Sandpiper", "Sardine", "Scorpion", "Seahorse", "Seal", "Shark", "Sheep", "Shrew", "Skunk", "Sloth", "Snail", "Snake", "Sparrow", "Spider", "Spoonbill", "Squid", "Squirrel", "Starling", "Stingray", "Stinkbug", "Stork", "Swallow", "Swan", "Tapir", "Tarsier", "Termite", "Tiger", "Toad", "Trout", "Turkey", "Turtle", "Vicuna", "Viper", "Vulture", "Wallaby", "Walrus", "Wasp", "Weasel", "Whale", "Wildcat", "Wolf", "Wolverine", "Wombat", "Woodcock", "Woodpecker", "Worm", "Wren", "Yak", "Zebra" };
+	private static final String mColourNames[] = new String[]{ "White", "Silver", "Gray", "Black", "Navy", "Blue", "Cerulean", "Turquoise", "Azure", "Teal", "Cyan", "Green", "Lime", "Olive", "Yellow", "Gold", "Amber", "Orange", "Brown", "Red", "Maroon", "Rose", "Pink", "Magenta", "Purple", "Indigo", "Violet", "Peach", "Apricot", "Ochre", "Plum" };
+	private static final String mAdjectives[]  = new String[]{ "Adorable", "Agreeable", "Alive", "Angry", "Beautiful", "Better", "Bewildered", "Big", "Boiling", "Brave", "Breezy", "Broken", "Bumpy", "Calm", "Careful", "Chilly", "Clean", "Clever", "Clumsy", "Cold", "Colossal", "Cool", "Creepy", "Crooked", "Cuddly", "Curly", "Damaged", "Damp", "Dead", "Defeated", "Delightful", "Dirty", "Drab", "Dry", "Dusty", "Eager", "Easy", "Elegant", "Embarrassed", "Faithful", "Famous", "Fancy", "Fat", "Fierce", "Filthy", "Flaky", "Fluffy", "Freezing", "Gentle", "Gifted", "Gigantic", "Glamorous", "Great", "Grumpy", "Handsome", "Happy", "Helpful", "Helpless", "Hot", "Huge", "Immense", "Important", "Inexpensive", "Itchy", "Jealous", "Jolly", "Kind", "Large", "Lazy", "Little", "Lively", "Long", "Magnificent", "Mammoth", "Massive", "Miniature", "Mushy", "Mysterious", "Nervous", "Nice", "Obedient", "Obnoxious", "Odd", "Panicky", "Petite", "Plain", "Powerful", "Proud", "Puny", "Quaint", "Relieved", "Repulsive", "Rich", "Scary", "Scrawny", "Short", "Shy", "Silly", "Small", "Sparkling", "Tall", "Tender", "Thankful", "Thoughtless", "Tiny", "Ugliest", "Unsightly", "Uptight", "Vast", "Victorious", "Warm", "Wet", "Witty", "Worried", "Wrong", "Zealous" };
+
+	private String getNewRandomName()
+	{
+		int animal    = (int)(Math.random() * (double)mAnimalNames.length);
+		int colour    = (int)(Math.random() * (double)mColourNames.length);
+		int adjective = (int)(Math.random() * (double)mAdjectives.length);
+
+		return mAdjectives[adjective] +" "+ mColourNames[colour] +" "+ mAnimalNames[colour];
+	}
 
 	public class Graph {
 		public State mStart;
@@ -96,7 +110,7 @@ public class PDABot extends JFrame implements Bot {
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder        db  = dbf.newDocumentBuilder();
-			Document               doc = db.parse( file );
+			org.w3c.dom.Document   doc = db.parse( file );
 
 			String type = getNodeValue( doc, "structure.type", null );
 
@@ -163,6 +177,7 @@ public class PDABot extends JFrame implements Bot {
 	}
 
 	/* UI variables */
+	private final String mInstanceName = getNewRandomName();
 	private final ByteArrayOutputStream mWinBuffer;
 	private final PrintStream mWinOut;
 	private final JTextPane mWinLogPane;
@@ -185,6 +200,8 @@ public class PDABot extends JFrame implements Bot {
 		super( "PDA JFlap Interpreter" );
 		setLayout( new BorderLayout() );
 		setMinimumSize( new Dimension(640, 480) );
+
+		setTitle( "PDA JFlap Interpreter (" +mInstanceName+ ")" );
 		
 		// Buffers
 		mWinBuffer = new ByteArrayOutputStream();
@@ -194,6 +211,8 @@ public class PDABot extends JFrame implements Bot {
 		mWinLogPane = new JTextPane();
 		mWinLogPane.setFont( new Font(Font.MONOSPACED, Font.PLAIN, 10) );
 		mWinLogPane.setEditable( false );
+		DefaultCaret caret = (DefaultCaret)mWinLogPane.getCaret();
+		caret.setUpdatePolicy( DefaultCaret.ALWAYS_UPDATE );
 		add( mWinLogPane, BorderLayout.CENTER );
 
     	final JFileChooser fc = new JFileChooser();
@@ -347,6 +366,11 @@ public class PDABot extends JFrame implements Bot {
 	    				// Does the request fit?
 	    				if( t.mPop.size() > mStack.size() )
 	    					continue;
+
+	    				ListIterator<Character> stackIter = (ListIterator<Character>)mStack.listIterator();
+	    				for( Character c : t.mPop )
+	    					if( !(""+c).equalsIgnoreCase( ""+stackIter.next() ) )
+	    						continue;
 	    			}
 
 	    			mWinOut.print( " <-- MATCH!" );
@@ -358,7 +382,7 @@ public class PDABot extends JFrame implements Bot {
 	    		Transition action = matches.get( index );
 
 	    		mWinOut.println( "\nPushing Command: " +action );
-	    		mWinOut.println( (matches.size() > 0?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
+	    		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
 
 	    		for( Character c : action.mRead )
 	    			readTape();
@@ -371,40 +395,40 @@ public class PDABot extends JFrame implements Bot {
 	    		for( Character c : action.mPush )
 	    			mStack.push( c );
 
-	    		while( mStack.size() > 0 )
-	    		{
-	    			char c = Character.toLowerCase( mStack.pop() );
-
-	    			switch( c )
-	    			{
-	    				case 'f':
-	    					mActionList.add( Direction.FORWARD );
-	    					mWinOut.println( "Moving FORWARD!" );
-	    					break;
-
-	    				case 'b':
-	    					mActionList.add( Direction.BACK );
-	    					mWinOut.println( "Moving BACK!" );
-	    					break;
-
-	    				case 'l':
-	    					mActionList.add( Direction.LEFT );
-	    					mWinOut.println( "Moving LEFT!" );
-	    					break;
-
-	    				case 'r':
-	    					mActionList.add( Direction.RIGHT );
-	    					mWinOut.println( "Moving RIGHT!" );
-	    					break;
-
-	    				default:
-	    					mWinOut.println( "Invalid action: '" +c+ "'" );
-	    			}
-	    		}
-
 	    		mCurrentState = action.mTo;
 	    	} while( !mCurrentGraph.mFinish.contains( mCurrentState ) );
 	    	mCurrentState = mCurrentGraph.mStart;
+
+	    	while( mStack.size() > 0 )
+    		{
+    			char c = Character.toLowerCase( mStack.pop() );
+
+    			switch( c )
+    			{
+    				case 'f':
+    					mActionList.add( Direction.FORWARD );
+    					mWinOut.println( "Moving FORWARD!" );
+    					break;
+
+    				case 'b':
+    					mActionList.add( Direction.BACK );
+    					mWinOut.println( "Moving BACK!" );
+    					break;
+
+    				case 'l':
+    					mActionList.add( Direction.LEFT );
+    					mWinOut.println( "Moving LEFT!" );
+    					break;
+
+    				case 'r':
+    					mActionList.add( Direction.RIGHT );
+    					mWinOut.println( "Moving RIGHT!" );
+    					break;
+
+    				default:
+    					//mWinOut.println( "Invalid action: '" +c+ "'" );
+    			}
+    		}
 
 	    	mWinOut.println( "[FINISH]" );
 	    	updateWinLog( false );
@@ -418,7 +442,7 @@ public class PDABot extends JFrame implements Bot {
      */
     @Override
     public String getName(){
-        return "JFlapBot";
+        return "JFlapBot - " +mInstanceName;
     }
 
     /** Implementation of the Bot interface.
@@ -427,7 +451,7 @@ public class PDABot extends JFrame implements Bot {
      */
     @Override
     public String getDescription(){
-        return "A bot using logic from a JFlap graph";
+        return mInstanceName + ", a bot using logic from a JFlap graph";
     }
 
 
