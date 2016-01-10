@@ -364,8 +364,8 @@ public class PDABot extends JFrame implements Bot {
 	    			readTape();
 
 	    		for( Character c : action.mPop ) {
-	    			if( !(""+c).equalsIgnoreCase( ""+mStack.peek()) )
-	    				mWinOut.println( "SANITY CHECK FAIL: " +c+ " IS NOT " + mStack.peek() );
+	    			if( (""+c).equalsIgnoreCase( ""+mStack.pop()) )
+	    				mWinOut.println( "Bad stack pop, something is very wrong!" );
 	    		}
 
 	    		for( Character c : action.mPush )

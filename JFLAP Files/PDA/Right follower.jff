@@ -26,6 +26,27 @@
 		</state>
 		<!--The list of transitions.-->
 		<transition>
+			<from>1</from>
+			<to>2</to>
+			<read>0</read>
+			<pop/>
+			<push/>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>2</to>
+			<read>1</read>
+			<pop/>
+			<push/>
+		</transition>
+		<transition>
+			<from>0</from>
+			<to>1</to>
+			<read>1</read>
+			<pop/>
+			<push/>
+		</transition>
+		<transition>
 			<from>4</from>
 			<to>3</to>
 			<read>1</read>
@@ -33,9 +54,9 @@
 			<push>F</push>
 		</transition>
 		<transition>
-			<from>1</from>
-			<to>2</to>
-			<read>1</read>
+			<from>0</from>
+			<to>1</to>
+			<read>0</read>
 			<pop/>
 			<push/>
 		</transition>
@@ -51,33 +72,12 @@
 			<to>3</to>
 			<read>0</read>
 			<pop/>
-			<push>RF</push>
-		</transition>
-		<transition>
-			<from>1</from>
-			<to>2</to>
-			<read>0</read>
-			<pop/>
-			<push/>
+			<push>FR</push>
 		</transition>
 		<transition>
 			<from>2</from>
 			<to>4</to>
 			<read>0</read>
-			<pop/>
-			<push/>
-		</transition>
-		<transition>
-			<from>0</from>
-			<to>1</to>
-			<read>0</read>
-			<pop/>
-			<push/>
-		</transition>
-		<transition>
-			<from>0</from>
-			<to>1</to>
-			<read>1</read>
 			<pop/>
 			<push/>
 		</transition>
