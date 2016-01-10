@@ -271,7 +271,7 @@ public class PDABot extends JFrame implements Bot {
 
     	if( mActionList.size() > 0 )
     	{
-    		int action = mActionList.remove();
+    		int action = mActionList.poll();
 
     		switch( action )
     		{
@@ -357,7 +357,7 @@ public class PDABot extends JFrame implements Bot {
 	    		int index = (int)(Math.random() * (matches.size()-1));
 	    		Transition action = matches.get( index );
 
-	    		mWinOut.println( "\n\nPushing Command: " +action );
+	    		mWinOut.println( "\nPushing Command: " +action );
 	    		mWinOut.println( (matches.size() > 0?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
 
 	    		for( Character c : action.mRead )
