@@ -59,13 +59,45 @@
 
 \frame{\titlepage}
 
-\section[Outline]{}
 \frame{\tableofcontents}
 
 % -----------------------------------------------------------------------------------------
-\section{Overview}
+\frame{\frametitle{Aims \& Objectives}
+    \begin{itemize}
+        \item Automata underpin all of modern computing
+        \vspace{10pt}
+        <icons>
+
+        But they're also useful at a higher level
+    \end{itemize}
+}
+
+
+
+% -----------------------------------------------------------------------------------------
+\section{Automata in Use}
+\frame{\frametitle{Automata in the Real World}
+    \begin{itemize}
+    \end{itemize}
+}
+\frame{\frametitle{Industrial Control}
+    \begin{itemize}
+    \end{itemize}
+}
+\frame{\frametitle{Networking}
+    \begin{itemize}
+    \end{itemize}
+}
+\frame{\frametitle{Gaming \& AI}
+    \begin{itemize}
+    \end{itemize}
+}
+
+
+% -----------------------------------------------------------------------------------------
+\section{Maze Solving}
 \subsection{What is a Maze?}
-\frame{\frametitle{What is a Maze?}
+\frame{\frametitle{Know thy Enemy}
 \begin{columns} 
     \begin{column}[c]{5cm} 
 
@@ -86,8 +118,6 @@
 \end{column} 
 \end{columns}
 }
-
-
 
 \subsection{Types of Maze}
 \frame{\frametitle{Perfect}
@@ -128,16 +158,21 @@
 \end{center}
 }
 
-\subsection{Properties of Mazes}
-\frame{\frametitle{Properties of Mazes}
-\begin{itemize}
-    \item<1-> \textbf{Bias}---The tendency of a maze to have horizontal or vertical passages.  Makes it hard to go `against the grain'
-    \vspace{15pt}
-    \item<2-> \textbf{Run}---A long, straight, uninterrupted passage
-    \vspace{15pt}
-    \item<3-> \textbf{Elitism}---The ratio of the maze's shortest path against its total path length
-\end{itemize}
-}
+
+%\subsection{Properties of Mazes}
+%\frame{\frametitle{Properties of Mazes}
+%\begin{itemize}
+%    \item<1-> \textbf{Bias}---The tendency of a maze to have horizontal or vertical passages.  Makes it hard to go `against the grain'
+%    \vspace{15pt}
+%    \item<2-> \textbf{Run}---A long, straight, uninterrupted passage
+%    \vspace{15pt}
+%    \item<3-> \textbf{Elitism}---The ratio of the maze's shortest path against its total path length
+%\end{itemize}
+%}
+
+
+
+
 
 
 % -----------------------------------------------------------------------------------------
@@ -285,7 +320,7 @@
     \end{itemize}
 }
 
-\subsection{Limits to Computability}
+\subsection{Complexity}
 \frame{\frametitle{Complexity of Maze Solving}
     \begin{itemize}
         \item<1-> Algorithmically, the best solution to a maze is to choose the best right path each time:\\
@@ -293,7 +328,7 @@
         \vspace{10pt}
         \item<3-> The best case is thus equivalent to a binary search, plus the time needed to move
         \vspace{10pt}
-        \item<4-> This becomes $O(n log_2 n)$, where $n$ is the number of choices (plus a bit of time to travel from start to finish).
+        \item<4-> This becomes $O(n log_2 n)$, where $n$ is the number of choices.% (plus a bit of time to travel from start to finish).
     \end{itemize}
 }
 
@@ -319,42 +354,33 @@
 }
 \frame{\frametitle{The Life of a Bot}
     \begin{itemize}
-        \item<1-> Bots get restricted data:
+        \item<1-> Bots can only see one block ahead:
             \begin{itemize}
-                \item<2-> \textcolor<6->{red}{Their immediate surroundings (3x3 array around them)}
-                \item<3-> \textcolor<6->{gray}{Bot co-ordinates in the maze}
-                \item<4-> \textcolor<6->{gray}{Bot orientation}
-                \item<5-> \textcolor<6->{gray}{Finish point co-ordinates}
+                \item<2-> Their immediate surroundings (3x3 array around them)
             \end{itemize}\\
-            \visible<6->{\tiny (Technically, all that's needed is the red one, but the other things make it more fun)}
+    
+            
+        \vspace{5pt}
+        \begin{center}
+            \includegraphics[width=5cm]{context1}
+        \end{center}
+
         \vspace{7pt}
-        \item<7-> Bots can move only \textbf{one tile per `tick'}, and only \textbf{Left}, \textbf{Right}, \textbf{Forward} and \textbf{Back}
-        \vspace{7pt}
-        \item<8-> Each move has a time limit (bots are considered `stuck' if they hit this a lot)
+    \item<7-> Bots can move only \textbf{one tile per `tick'}, and only \textbf{\textcolor{red}{L}eft}, \textbf{\textcolor{red}{R}ight}, \textbf{\textcolor{red}{F}orward} and \textbf{\textcolor{red}{B}ack}
+        % \item<8-> Each move has a time limit (bots are considered `stuck' if they hit this a lot)
     \end{itemize}
 }
-\frame{\frametitle{Bot Classes}
+\frame{\frametitle{FSM Bots}
     \begin{itemize}
-        \item<1-> \textbf{Bot}\\
-            \begin{itemize}
-                \item<2-> Simplest API available
-                \item<3-> Maize calls \texttt{nextMove()} on every tick.
-                \item<4-> Simply return a direction to move.
-            \end{itemize}
-        
-        \vspace{6pt}
-        \item<5-> \textbf{AdvancedBot}\\
-            \begin{itemize}
-                \item<6-> Like \texttt{Bot}, but only requests a move when it has emptied its queue
-                \item<7-> Has a queue commands can be added to, and a more powerful high-level API (\texttt{moveLeft()}, \texttt{turnRight()} etc)
-            \end{itemize}
-        \vspace{6pt}
-        \item<8-> \textbf{AbsoluteBot}\\
-            \begin{itemize}
-                \item<9-> Moves North/South instead of Back/Forward
-                \item<10-> Always virtually points north, saves the effort of rotating the viewport
-            \end{itemize}
+        \item Four ``Special'' States: F, B, L, R.
+        \item Boolean expressions control each edge
+        \item Other states are ignored
     \end{itemize}
+
+    \vspace{5pt}
+    \begin{center}
+        \includegraphics[width=5cm]{botfsm1}
+    \end{center}
 }
 \subsection{Code Introduction}
 \frame{\frametitle{Demo, Code Rundown}
