@@ -13,12 +13,12 @@ import javax.swing.filechooser.*;
 import javax.xml.parsers.*;
 import javax.xml.parsers.*;
 
-public class JFlapBot extends JFrame implements Bot {
+public class PDABot extends JFrame implements Bot {
 
 	public class Graph {
 		public State mStart;
-		public ArrayList<State>       mFinish       = new ArrayList<>();
-		public TreeMap<Integer,State> mStates       = new TreeMap<>();
+		public ArrayList<State>        mFinish      = new ArrayList<>();
+		public TreeMap<Integer,State>  mStates      = new TreeMap<>();
 		public ArrayList<Transition>   mTransitions = new ArrayList<>();
 	}
 
@@ -32,7 +32,10 @@ public class JFlapBot extends JFrame implements Bot {
 		@Override
 		public String toString()
 		{
-			return "{" +mFrom.mName+ "}\t" +listJoin(mRead, "")+ "\t/\t" +listJoin(mPop, "")+ "\t/\t" +listJoin(mPush, "")+ "\t{" +mTo.mName+ "}";
+			return "{" +mFrom.mName+ "}\t"
+				+(mRead.size() == 0?"\u03BB":listJoin(mRead, ""))+ "\t/\t"
+				+(mPop.size() == 0?"\u03BB":listJoin(mPop, ""))+ "\t/\t"
+				+(mPush.size() == 0?"\u03BB":listJoin(mPush, ""))+ "\t{" +mTo.mName+ "}";
 		}
 	}
 
@@ -159,23 +162,52 @@ public class JFlapBot extends JFrame implements Bot {
 		return graph;
 	}
 
-	public JFlapBot()
+	/* UI variables */
+	private final ByteArrayOutputStream mWinBuffer;
+	private final PrintStream mWinOut;
+	private final JTextPane mWinLogPane;
+
+	private void updateWinLog( boolean append )
 	{
-		super( "JFlap Interpreter" );
+		mWinOut.flush();
+		String output = new String( mWinBuffer.toByteArray(), java.nio.charset.StandardCharsets.UTF_8 );
+
+		if( append )
+			output = mWinLogPane.getText() + output;
+
+		mWinLogPane.setText( output );
+		System.out.print( output );
+		mWinBuffer.reset();
+	}
+
+	public PDABot()
+	{
+		super( "PDA JFlap Interpreter" );
 		setLayout( new BorderLayout() );
+		setMinimumSize( new Dimension(640, 480) );
 		
+		// Buffers
+		mWinBuffer = new ByteArrayOutputStream();
+		mWinOut = new PrintStream( mWinBuffer, true );
+
+		// UI Elements
+		mWinLogPane = new JTextPane();
+		mWinLogPane.setFont( new Font(Font.MONOSPACED, Font.PLAIN, 10) );
+		mWinLogPane.setEditable( false );
+		add( mWinLogPane, BorderLayout.CENTER );
+
     	final JFileChooser fc = new JFileChooser();
-    	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff", "jflap" );
+    	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
     	fc.setFileFilter( filter );
 
-    	final JButton openBtn = new JButton( "Select JFlap Graph" );
+    	final JButton openBtn = new JButton( "Load JFlap File" );
     	openBtn.addActionListener( new ActionListener() {
     		public void actionPerformed(ActionEvent e) {
     			int returnVal = fc.showOpenDialog( null );
 		    	if (returnVal == JFileChooser.APPROVE_OPTION) {
 		            File file = fc.getSelectedFile();
 		            
-		            System.out.println( "Opening: " + file.getName() + ".\n" );
+		            mWinOut.println( "Opening: " + file.getName() + ".\n" );
 		            mCurrentGraph = loadJFlapFile( file );
 
 		            if( mCurrentGraph == null )
@@ -183,7 +215,7 @@ public class JFlapBot extends JFrame implements Bot {
 		        }
     		}
     	} );
-    	add( openBtn, BorderLayout.CENTER );
+    	add( openBtn, BorderLayout.NORTH );
 
         pack();
 		setVisible( true );
@@ -235,7 +267,7 @@ public class JFlapBot extends JFrame implements Bot {
      */
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
-    	System.out.println( "\n" );
+    	mWinOut.println( "\n" );
 
     	if( mActionList.size() > 0 )
     	{
@@ -243,11 +275,13 @@ public class JFlapBot extends JFrame implements Bot {
 
     		switch( action )
     		{
-    			case Direction.FORWARD: System.out.println( "Action: FORWARD" ); break;
-    			case Direction.BACK:    System.out.println( "Action: BACK" );    break;
-    			case Direction.LEFT:    System.out.println( "Action: LEFT" );    break;
-    			case Direction.RIGHT:   System.out.println( "Action: RIGHT" );   break;
+    			case Direction.FORWARD: mWinOut.println( "Action: FORWARD" ); break;
+    			case Direction.BACK:    mWinOut.println( "Action: BACK" );    break;
+    			case Direction.LEFT:    mWinOut.println( "Action: LEFT" );    break;
+    			case Direction.RIGHT:   mWinOut.println( "Action: RIGHT" );   break;
     		}
+
+    		updateWinLog( true );
 
     		return action;
     	}
@@ -270,21 +304,21 @@ public class JFlapBot extends JFrame implements Bot {
 	    	mStack = new Stack<>();
 
     		do {
-    			System.out.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
+    			mWinOut.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
 
-    			System.out.println( "STACK: " +listJoin(mStack, "") );
+    			mWinOut.println( "STACK: " +listJoin(mStack, "") );
 
-    			System.out.println( "TAPE:  " +listJoin(mInputTape, "") );
-    			System.out.print(   "       " );
+    			mWinOut.println( "TAPE:  " +listJoin(mInputTape, "") );
+    			mWinOut.print(   "       " );
     			for( int i=0; i<mInputCursor; i++ )
-    				System.out.print( " " );
-    			System.out.println( "^" );
+    				mWinOut.print( " " );
+    			mWinOut.println( "^" );
 
 	    		// Match any rules on this state //
 	    		ArrayList<Transition> matches = new ArrayList<>();
 	    		for( Transition t : mCurrentState.mArcs ) {
 
-	    			System.out.print( "\nMatching " + t );
+	    			mWinOut.print( "\nEvaluating " + t );
 
 	    			// Does this rule require a read?
 	    			if( t.mRead.size() > 0 )
@@ -315,22 +349,23 @@ public class JFlapBot extends JFrame implements Bot {
 	    					continue;
 	    			}
 
-	    			System.out.print( " <-- MATCH!" );
+	    			mWinOut.print( " <-- MATCH!" );
 	    			matches.add( t );
 	    		}
-	    		System.out.println( "" );
+	    		mWinOut.println( "" );
 
 	    		int index = (int)(Math.random() * (matches.size()-1));
 	    		Transition action = matches.get( index );
 
-	    		System.out.println( "Performing: " + action );
+	    		mWinOut.println( "\n\nPushing Command: " +action );
+	    		mWinOut.println( (matches.size() > 0?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
 
 	    		for( Character c : action.mRead )
 	    			readTape();
 
 	    		for( Character c : action.mPop ) {
 	    			if( !(""+c).equalsIgnoreCase( ""+mStack.peek()) )
-	    				System.out.println( "SANITY CHECK FAIL: " +c+ " IS NOT " + mStack.peek() );
+	    				mWinOut.println( "SANITY CHECK FAIL: " +c+ " IS NOT " + mStack.peek() );
 	    		}
 
 	    		for( Character c : action.mPush )
@@ -344,26 +379,26 @@ public class JFlapBot extends JFrame implements Bot {
 	    			{
 	    				case 'f':
 	    					mActionList.add( Direction.FORWARD );
-	    					System.out.print( " {FWD} " );
+	    					mWinOut.println( "Moving FOREWARD!" );
 	    					break;
 
 	    				case 'b':
 	    					mActionList.add( Direction.BACK );
-	    					System.out.print( " {BACK} " );
+	    					mWinOut.println( "Moving BACK!" );
 	    					break;
 
 	    				case 'l':
 	    					mActionList.add( Direction.LEFT );
-	    					System.out.print( " {LEFT} " );
+	    					mWinOut.println( "Moving LEFT!" );
 	    					break;
 
 	    				case 'r':
 	    					mActionList.add( Direction.RIGHT );
-	    					System.out.print( " {RIGHT} " );
+	    					mWinOut.println( "Moving RIGHT!" );
 	    					break;
 
 	    				default:
-	    					System.out.println( "Invalid action: '" +c+ "'" );
+	    					mWinOut.println( "Invalid action: '" +c+ "'" );
 	    			}
 	    		}
 
@@ -371,9 +406,10 @@ public class JFlapBot extends JFrame implements Bot {
 	    	} while( !mCurrentGraph.mFinish.contains( mCurrentState ) );
 	    	mCurrentState = mCurrentGraph.mStart;
 
-	    	System.out.println( "[FINISH]" );
+	    	mWinOut.println( "[FINISH]" );
+	    	updateWinLog( false );
     	}
-    	return Direction.FORWARD;
+    	return -1;
     }
 
     /** Implementation of the Bot interface.
