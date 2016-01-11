@@ -20,6 +20,7 @@ public class BotSources
     private final ArrayList<File> mSources;
     private final File            mRoot;
     private final String          mMainClass;
+    private final File            mMainFile;
     private final boolean         mIsSingleSource;
 
     public static List<BotSources> scanDirectory( File root ) throws IOException {
@@ -28,12 +29,17 @@ public class BotSources
 
         ArrayList<BotSources> detectedBots = new ArrayList<>();
 
-        for( File botDir : root.listFiles() ) {
-            detectedBots.add( new BotSources(botDir) );
+        for( File bot : root.listFiles() ) {
+            if( bot.isDirectory() || bot.getName().endsWith(".java") )
+                detectedBots.add( new BotSources(bot) );
         }
 
         return detectedBots;
     }
+
+    public File   getRoot()      { return mRoot;      }
+    public File   getMainFile()  { return mMainFile;  }
+    public String getMainClass() { return mMainClass; }
 
     public BotSources( File root ) throws IOException
     {
@@ -41,11 +47,13 @@ public class BotSources
         mSources = new ArrayList<>();
 
         if( mRoot.isDirectory() ) {
-            mMainClass = mRoot.getName();
+            mMainClass = "bots." +mRoot.getName()+ "." + mRoot.getName();
+            mMainFile = new File( mRoot.getAbsolutePath().replaceAll( "\\.java$", ".class" ) );
             mIsSingleSource = false;
             walkDirectory( mRoot );
         } else {
-            mMainClass = mRoot.getName().replaceAll( "\\.java$", "" );
+            mMainClass = "bots." +mRoot.getName().replaceAll( "\\.java$", "" );
+            mMainFile = new File( mRoot.getAbsolutePath().replaceAll( "\\.java$", ".class" ) );
             mSources.add( mRoot );
             mIsSingleSource = true;
         }
@@ -102,7 +110,17 @@ public class BotSources
 
     public Bot instantiate() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader parentClassLoader   = ClassReloader.class.getClassLoader();
-        ClassReloader classLoader       = new ClassReloader( parentClassLoader, mMainClass );
+        final ClassReloader classLoader;
+
+        if( mIsSingleSource ) {
+            classLoader = new ClassReloader(parentClassLoader, mMainClass);
+
+            Log.log( "Compiler", "Creating new " +mMainClass );
+        } else {
+            classLoader = new ClassReloader(parentClassLoader, mMainClass);
+
+            Log.log( "Compiler", "Creating new " +mMainClass );
+        }
 
         // Then load the desired bot with it
         Class botClass = classLoader.loadClass( mMainClass );

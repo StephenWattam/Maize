@@ -1,26 +1,32 @@
 package maize.compile;
-import javax.tools.*;
-import java.util.*;
-import java.io.*;
-import maize.*;
 
+import maize.Bot;
 import maize.log.*;
+
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 public abstract class BotCompilerHelper{
 
-    // Compileas and loads bots into a given mazeTest 
+    // Compiles and loads bots into a given mazeTest
     public static Vector<Bot> compileAndLoadBots(String packageName, String dirname){
         Log.log("Compiling bots...");
-        
+
         // Compile bots
-        Vector<String> bot_classes = BotCompilerHelper.compileAllBots(dirname);
-        Vector<Bot>           bots = new Vector<Bot>();
+        ArrayList<BotSources> bot_classes = BotCompilerHelper.compileAllBots(dirname);
+        Vector<Bot>           bots = new Vector<>();
 
         // Instantiate classes
-        for(String s: bot_classes){
+        for(BotSources source: bot_classes){
             try{ 
-                bots.add(BotCompilerHelper.loadBotClass(packageName + "." + s));
+                bots.add( source.instantiate() );
             }catch(Exception e){
-                Log.log("Error loading bot " + s);
+                Log.log("Error loading bot: " + source);
                 Log.logException(e);
                 System.out.println("Error loading bot class: " + e.getMessage());
                 e.printStackTrace();
@@ -32,34 +38,23 @@ public abstract class BotCompilerHelper{
 
 
     // returns a list of class files to load as bots
-    public static Vector<String> compileAllBots(String dirname){
+    public static ArrayList<BotSources> compileAllBots(String dirname){
+        ArrayList<BotSources> compiled_bots = new ArrayList<>();
 
-        // Filter all .java files from the filename
-        FilenameFilter filter = new FilenameFilter(){
-            public boolean accept(File dir, String name){
-                return name.endsWith(".java") && !name.startsWith(".");
-            }
-        };
+        try {
+            List<BotSources> botSource = BotSources.scanDirectory( new File(dirname) );
 
-        // Read the file listing
-        File pwd = new File(dirname);
-        String[] children = pwd.list(filter);
-        Vector<String> compiled_bots = new Vector<String>();
-
-        // check through the list and compile stuff
-        if(children == null){
-            Log.log("No bots found!");
-        }else{
-            for(int i=0; i<children.length; i++){
-                Log.log("Compiling bot " + children[i] + "...");
-                if(compile(dirname + java.io.File.separator + children[i])){
-                    Log.log(children[i] + " compiled successfully!");
-                    compiled_bots.add(classNameFromBaseName(children[i]));
-                    //compiled_bots.add(children[i].replaceAll(".java$", ".class"));
-                }else{
-                    Log.log("Failed to compile " + children[i]);
+            for( BotSources bot : botSource ) {
+                System.out.println(bot);
+                if( bot.compile() ) {
+                    Log.log("Compiler", "Compiled OK!");
+                    compiled_bots.add( bot );
                 }
+                else
+                    Log.log( "Compiler", "Compilation Failed!" );
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         // Return the list of class names

@@ -18,7 +18,33 @@ public class ClassReloader extends ClassLoader{
         this.className = className;
     }
 
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class loadClass( BotSources botSource ) throws ClassNotFoundException{
+        try {
+            FileInputStream fis = new FileInputStream( botSource.getMainFile() );
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+            int length = -1;
+            byte input[] = new byte[1024];
+            while( (length = fis.read(input)) > 0 )
+                buffer.write( input, 0, length );
+
+            return defineClass( botSource.getMainClass(), buffer.toByteArray(), 0, buffer.size() );
+
+        } catch (NoClassDefFoundError e) {
+            Log.log("Error forcing reload of bot class: " + botSource.getMainClass());
+            Log.logException(e);
+        } catch (MalformedURLException e) {
+            Log.log("Error forcing reload of bot class: " + botSource.getMainClass());
+            Log.logException(e);
+        } catch (IOException e) {
+            Log.log("Error forcing reload of bot class: " + botSource.getMainClass());
+            Log.logException(e);
+        }
+
+        return null;
+    }
+
+    /*public Class loadClass(String name) throws ClassNotFoundException {
 
 
         // Use the parent if it's not on our list of allowable classes
@@ -65,6 +91,6 @@ public class ClassReloader extends ClassLoader{
         }
 
         return null;
-    }
+    }*/
 
 }
