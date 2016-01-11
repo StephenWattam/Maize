@@ -153,9 +153,9 @@ public abstract class BotCompilerHelper{
         }
 
         // Compile, logging to stdout/stderr
-        int compilationResult = compiler.run(null, 
-                new LogOutputStream("<stdout> "), 
-                new LogOutputStream("<stderr> "), 
+        int compilationResult = compiler.run(null,
+                new LogOutputStream("<stdout> "),
+                new LogOutputStream("<stderr> "),
                 fname);
 
         // Return true if it worked.
