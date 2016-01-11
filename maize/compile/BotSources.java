@@ -110,16 +110,23 @@ public class BotSources
 
     public Bot instantiate() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         ClassLoader parentClassLoader   = ClassReloader.class.getClassLoader();
-        final ClassReloader classLoader;
+        ClassReloader classLoader;
 
         if( mIsSingleSource ) {
-            classLoader = new ClassReloader(parentClassLoader, mMainClass);
-
             Log.log( "Compiler", "Creating new " +mMainClass );
+            classLoader = new ClassReloader(parentClassLoader, mMainClass);
         } else {
-            classLoader = new ClassReloader(parentClassLoader, mMainClass);
+
+            /*for( File sourceFile : mSources ) {
+                String classFile = sourceFile.getPath().replaceAll("^\\.[\\/]?","").replaceAll( "\\.java$", "" ).replaceAll( "[\\/]", "." );
+
+                Log.log( "Reloading " +classFile );
+                classLoader = new ClassReloader(parentClassLoader, classFile);
+                classLoader.loadClass( classFile );
+            }*/
 
             Log.log( "Compiler", "Creating new " +mMainClass );
+            classLoader = new ClassReloader(parentClassLoader, mMainClass);
         }
 
         // Then load the desired bot with it
