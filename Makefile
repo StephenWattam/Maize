@@ -31,5 +31,5 @@ run:
 
 clean:
 	rm -rfv Docs
-	rm -rfv *.class maize/*.class maize/ui/*.class bots/*.class
+	rm -rfv *.class maize/*.class maize/ui/*.class bots/*.class bots/*/*.class
 	rm -fv Maize.jar
