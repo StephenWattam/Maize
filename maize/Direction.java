@@ -28,7 +28,7 @@ public abstract class Direction{
             case 2: return "RIGHT";
             case 3: return "LEFT"; 
         }
-        return null;
+        return "STOPPED";
     }
 
 }

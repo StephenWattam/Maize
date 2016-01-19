@@ -4,6 +4,7 @@ import maize.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 import java.util.*;
+import java.util.regex.*;
 import java.util.concurrent.*;
 import java.io.*;
 import java.awt.*;
@@ -14,7 +15,7 @@ import javax.swing.text.*;
 import javax.xml.parsers.*;
 import javax.xml.parsers.*;
 
-public class PDABot extends JFrame implements Bot {
+public class FSMBot extends JFrame implements Bot {
 
 	private static final String mAnimalNames[] = new String[]{ "Aardvark", "Albatross", "Alligator", "Alpaca", "Ant", "Anteater", "Antelope", "Ape", "Armadillo", "Donkey", "Baboon", "Badger", "Barracuda", "Bat", "Bear", "Beaver", "Bee", "Bison", "Boar", "Buffalo", "Butterfly", "Camel", "Capybara", "Caribou", "Cassowary", "Cat", "Caterpillar", "Cattle", "Chamois", "Cheetah", "Chicken", "Chimpanzee", "Chinchilla", "Clam", "Coati", "Cobra", "Cockroach", "Cod", "Cormorant", "Coyote", "Crab", "Crane", "Crocodile", "Crow", "Curlew", "Deer", "Dinosaur", "Dog", "Dogfish", "Dolphin", "Donkey", "Dotterel", "Dove", "Dragonfly", "Duck", "Dugong", "Dunlin", "Eagle", "Echidna", "Eel", "Eland", "Elephant", "Elk", "Emu", "Falcon", "Ferret", "Finch", "Fish", "Flamingo", "Fly", "Fox", "Frog", "Gaur", "Gazelle", "Gerbil", "Giraffe", "Gnat", "Gnu", "Goat", "Goose", "Goldfinch", "Goldfish", "Gorilla", "Goshawk", "Grasshopper", "Grouse", "Guanaco", "GuineaPig", "Gull", "Hamster", "Hare", "Hawk", "Hedgehog", "Heron", "Herring", "Hippopotamus", "Hornet", "Horse", "Hummingbird", "Hyena", "Ibex", "Ibis", "Jackal", "Jaguar", "Jay", "Jellyfish", "Kangaroo", "Kingfisher", "Kinkajou", "Koala", "Kookabura", "Kouprey", "Kudu", "Lapwing", "Lark", "Lemur", "Leopard", "Lion", "Llama", "Lobster", "Locust", "Loris", "Louse", "Lyrebird", "Magpie", "Mallard", "Manatee", "Mandrill", "Mantis", "Marten", "Meerkat", "Mink", "Mole", "Mongoose", "Monkey", "Moose", "Mouse", "Mosquito", "Mule", "Narwhal", "Newt", "Nightingale", "Octopus", "Okapi", "Opossum", "Oryx", "Ostrich", "Otter", "Owl", "Oyster", "Panther", "Parrot", "Panda", "Partridge", "Peafowl", "Pelican", "Penguin", "Pheasant", "Pig", "Pigeon", "PolarBear", "Pony", "Porcupine", "Porpoise", "PrairieDog", "Quail", "Quelea", "Quetzal", "Rabbit", "Raccoon", "Rail", "Ram", "Rat", "Raven", "Reindeer", "Rhinoceros", "Rook", "Salamander", "Salmon", "Sandpiper", "Sardine", "Scorpion", "Seahorse", "Seal", "Shark", "Sheep", "Shrew", "Skunk", "Sloth", "Snail", "Snake", "Sparrow", "Spider", "Spoonbill", "Squid", "Squirrel", "Starling", "Stingray", "Stinkbug", "Stork", "Swallow", "Swan", "Tapir", "Tarsier", "Termite", "Tiger", "Toad", "Trout", "Turkey", "Turtle", "Vicuna", "Viper", "Vulture", "Wallaby", "Walrus", "Wasp", "Weasel", "Whale", "Wildcat", "Wolf", "Wolverine", "Wombat", "Woodcock", "Woodpecker", "Worm", "Wren", "Yak", "Zebra" };
 	private static final String mColourNames[] = new String[]{ "White", "Silver", "Gray", "Black", "Navy", "Blue", "Cerulean", "Turquoise", "Azure", "Teal", "Cyan", "Green", "Lime", "Olive", "Yellow", "Gold", "Amber", "Orange", "Brown", "Red", "Maroon", "Rose", "Pink", "Magenta", "Purple", "Indigo", "Violet", "Peach", "Apricot", "Ochre", "Plum" };
@@ -39,17 +40,12 @@ public class PDABot extends JFrame implements Bot {
 	public class Transition {
 		State mFrom;
 		State mTo;
-		ArrayList<Character> mRead = new ArrayList<>();
-		ArrayList<Character> mPush = new ArrayList<>();
-		ArrayList<Character> mPop = new ArrayList<>();
+		String mRead;
 
 		@Override
 		public String toString()
 		{
-			return "{" +mFrom.mName+ "}\t"
-				+(mRead.size() == 0?"\u03BB":listJoin(mRead, ""))+ "\t/\t"
-				+(mPop.size() == 0?"\u03BB":listJoin(mPop, ""))+ "\t/\t"
-				+(mPush.size() == 0?"\u03BB":listJoin(mPush, ""))+ "\t{" +mTo.mName+ "}";
+			return "{" +mFrom.mName+ "}\t->\t" +(mRead == null?"\u03BB":mRead)+ "\t->\t{" +mTo.mName+ "}";
 		}
 	}
 
@@ -115,7 +111,7 @@ public class PDABot extends JFrame implements Bot {
 			String type = getNodeValue( doc, "structure.type", null );
 
 			// Only bother loading PDA type automata
-			if( type == null || !type.equalsIgnoreCase( "pda" ) )
+			if( type == null || !type.equalsIgnoreCase( "fa" ) )
 				return null;
 
 			NodeList states = doc.getElementsByTagName( "state" );
@@ -144,22 +140,10 @@ public class PDABot extends JFrame implements Bot {
 					Transition transition = new Transition();
 
 					transition.mTo   = graph.mStates.get( Integer.parseInt( getNodeValue( arcs.item(i), "to",   "-1" ) ) );
-
 					transition.mFrom = graph.mStates.get( Integer.parseInt( getNodeValue( arcs.item(i), "from", "-1" ) ) );
-
-					transition.mRead = new ArrayList<Character>();
-					for( char c : getNodeValue( arcs.item(i), "read", null ).toCharArray() )
-						transition.mRead.add( c );
+					transition.mRead = getNodeValue( arcs.item(i), "read", null );
 
 					transition.mFrom.mArcs.add( transition );
-
-					transition.mPush = new ArrayList<Character>();
-					for( char c : getNodeValue( arcs.item(i), "push", null ).toCharArray() )
-						transition.mPush.add( c );
-
-					transition.mPop = new ArrayList<Character>();
-					for( char c : getNodeValue( arcs.item(i), "pop", null ).toCharArray() )
-						transition.mPop.add( c );					
 
 					graph.mTransitions.add( transition );
 				}
@@ -195,13 +179,13 @@ public class PDABot extends JFrame implements Bot {
 		mWinBuffer.reset();
 	}
 
-	public PDABot()
+	public FSMBot()
 	{
-		super( "PDA JFlap Interpreter" );
+		super( "FSM JFlap Interpreter" );
 		setLayout( new BorderLayout() );
 		setMinimumSize( new Dimension(640, 480) );
 
-		setTitle( "PDA JFlap Interpreter (" +mInstanceName+ ")" );
+		setTitle( "FSM JFlap Interpreter (" +mInstanceName+ ")" );
 		
 		// Buffers
 		mWinBuffer = new ByteArrayOutputStream();
@@ -244,31 +228,8 @@ public class PDABot extends JFrame implements Bot {
 	// ///////////////////////// //
 	// ACTUAL BOT IMPLEMENTATION //
 	// ///////////////////////// //
-	ConcurrentLinkedQueue<Integer> mActionList = new ConcurrentLinkedQueue<Integer>();
 	Graph mCurrentGraph = null;
 	State mCurrentState = null;
-	Stack<Character> mStack = null;
-	ArrayList<Character> mInputTape = null;
-	int mInputCursor = 0;
-
-	private Character readTape()
-	{
-		if( mInputCursor > -1 && mInputCursor < mInputTape.size() )
-			return mInputTape.get(mInputCursor++);
-		return ' ';
-	}
-
-	private Character peekTape( int offset )
-	{
-		if( mInputCursor > -1 && mInputCursor < mInputTape.size() )
-			return mInputTape.get(mInputCursor+offset);
-		return ' ';
-	}
-
-	private int remainingTape()
-	{
-		return mInputTape.size() - mInputCursor;
-	}
 
 	/** Implementation of the Bot interface.
      * @see Bot
@@ -288,152 +249,126 @@ public class PDABot extends JFrame implements Bot {
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
     	mWinOut.println( "\n" );
 
-    	if( mActionList.size() > 0 )
-    	{
-    		int action = mActionList.poll();
+    	Pattern arcRegex = Pattern.compile( "^(!?)([FfBbLlRr][FfBbLlRr]?)$" );
 
-    		switch( action )
-    		{
-    			case Direction.FORWARD: mWinOut.println( "Action: FORWARD" ); break;
-    			case Direction.BACK:    mWinOut.println( "Action: BACK" );    break;
-    			case Direction.LEFT:    mWinOut.println( "Action: LEFT" );    break;
-    			case Direction.RIGHT:   mWinOut.println( "Action: RIGHT" );   break;
+    	if( mCurrentState == null )
+    	{
+    		mCurrentState = mCurrentGraph.mStart;
+    		mWinOut.println( "Restarted!" );
+    	}
+    	else
+    		mWinOut.println( "Continuing..." );
+
+		do {
+			mWinOut.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
+
+			// Catch corner case where state has no arcs
+			if( mCurrentState.mArcs.size() == 0 )
+			{
+				mWinOut.println( "Could not evaluate any arcs!" );
+				break;
+			}
+
+			// Match any rules on this state //
+    		ArrayList<Transition> matches = new ArrayList<>();
+    		for( Transition t : mCurrentState.mArcs ) {
+
+    			mWinOut.print( "\nEvaluating " + t );
+
+    			Matcher search = arcRegex.matcher( t.mRead );
+    			if( search.matches() ) // Is this a matching rule?
+    			{
+    				boolean sensorState = true;
+    				if( search.group(1).equalsIgnoreCase("!") )
+    					sensorState = false;
+
+    				String direction = search.group(2).toLowerCase();
+
+    				if( direction.equals("fl") && view[0][0] == sensorState )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("f") && view[1][0] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("fr") && view[2][0] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("r") && view[2][1] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("br") && view[2][2] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("b") && view[1][2] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("bl") && view[0][2] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    				else if( direction.equals("l") && view[0][1] == sensorState  )
+    				{
+    					mWinOut.print( " <-- MATCH!" );
+    					matches.add( t );
+    				}
+    			}
+    			else
+    			{
+    				mWinOut.println( "Rule was not matchable, could not do anything :(" );
+    			}
     		}
+    		mWinOut.println( "" );
+
+    		int index = (int)(Math.random() * (matches.size()-1));
+    		Transition action = matches.get( index );
+
+    		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
+    		mWinOut.println( "Chose: " + action.toString() );
 
     		updateWinLog( true );
 
-    		return action;
-    	}
+    		mCurrentState = action.mTo;
+    	} while( !mCurrentState.mName.matches("^[FfBbLlRr]$") );
+    	mWinOut.println( "" );
 
-    	if( mCurrentGraph != null )
-    	{
-    		// Load sensor data  - Note: These may need to be rearranged! //
-    		mInputTape = new ArrayList<>();
-    		mInputCursor = 0;
-    		mInputTape.add( (view[0][0]?'1':'0') );
-    		mInputTape.add( (view[1][0]?'1':'0') );
-    		mInputTape.add( (view[2][0]?'1':'0') );
-    		mInputTape.add( (view[2][1]?'1':'0') );
-    		mInputTape.add( (view[2][2]?'1':'0') );
-    		mInputTape.add( (view[1][2]?'1':'0') );
-    		mInputTape.add( (view[0][2]?'1':'0') );
-    		mInputTape.add( (view[0][1]?'1':'0') );
+    	int action = -1;
+		if( mCurrentState != null )
+		{
+	    	if( mCurrentState.mName.equalsIgnoreCase( "F" ) ) // Forward
+	    		action = Direction.FORWARD;
+	    	else if( mCurrentState.mName.equalsIgnoreCase( "B" ) ) // Backwards
+	    		action = Direction.BACK;
+	    	else if( mCurrentState.mName.equalsIgnoreCase( "L" ) ) // Turn left
+	    		action = Direction.LEFT;
+	    	else if( mCurrentState.mName.equalsIgnoreCase( "R" ) ) // Turn right
+	    		action = Direction.RIGHT;
+	    	else
+	    	{
+	    		mWinOut.println( "Got stuck! Could not path out of this point in the graph!" );
+	    		mWinOut.println( "The graph will restart from the START state." );
+	    		mCurrentGraph = null;
+	    	}
+	    }
 
-			// Reset stack //
-	    	mStack = new Stack<>();
+    	mWinOut.println( "Action: " +Direction.getName(action) );
 
-    		do {
-    			mWinOut.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
-
-    			mWinOut.println( "STACK: " +listJoin(mStack, "") );
-
-    			mWinOut.println( "TAPE:  " +listJoin(mInputTape, "") );
-    			mWinOut.print(   "       " );
-    			for( int i=0; i<mInputCursor; i++ )
-    				mWinOut.print( " " );
-    			mWinOut.println( "^" );
-
-	    		// Match any rules on this state //
-	    		ArrayList<Transition> matches = new ArrayList<>();
-	    		for( Transition t : mCurrentState.mArcs ) {
-
-	    			mWinOut.print( "\nEvaluating " + t );
-
-	    			// Does this rule require a read?
-	    			if( t.mRead.size() > 0 )
-	    			{
-	    				// Is there enough data to make this possible on the tape?
-		    			if( t.mRead.size() > remainingTape() )
-		    				continue;
-
-		    			// Does it all match?
-		    			boolean readOK = true;
-		    			for( int i=0; i<t.mRead.size(); i++ )
-		    			{
-		    				if( t.mRead.get(i) != '?' && (int)t.mRead.get(i) != (int)peekTape(i) )
-		    				{
-		    					readOK = false;
-		    					break;
-		    				}
-		    			}
-		    			if( !readOK )
-		    				continue;
-		    		}
-	    			
-	    			// Does this rule require a stack pop?
-	    			if( t.mPop.size() > 0 )
-	    			{
-	    				// Does the request fit?
-	    				if( t.mPop.size() > mStack.size() )
-	    					continue;
-
-	    				ListIterator<Character> stackIter = (ListIterator<Character>)mStack.listIterator();
-	    				for( Character c : t.mPop )
-	    					if( !(""+c).equalsIgnoreCase( ""+stackIter.next() ) )
-	    						continue;
-	    			}
-
-	    			mWinOut.print( " <-- MATCH!" );
-	    			matches.add( t );
-	    		}
-	    		mWinOut.println( "" );
-
-	    		int index = (int)(Math.random() * (matches.size()-1));
-	    		Transition action = matches.get( index );
-
-	    		mWinOut.println( "\nPushing Command: " +action );
-	    		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
-
-	    		for( Character c : action.mRead )
-	    			readTape();
-
-	    		for( Character c : action.mPop ) {
-	    			if( (""+c).equalsIgnoreCase( ""+mStack.pop()) )
-	    				mWinOut.println( "Bad stack pop, something is very wrong!" );
-	    		}
-
-	    		for( Character c : action.mPush )
-	    			mStack.push( c );
-
-	    		mCurrentState = action.mTo;
-	    	} while( !mCurrentGraph.mFinish.contains( mCurrentState ) );
-	    	mCurrentState = mCurrentGraph.mStart;
-
-	    	while( mStack.size() > 0 )
-    		{
-    			char c = Character.toLowerCase( mStack.pop() );
-
-    			switch( c )
-    			{
-    				case 'f':
-    					mActionList.add( Direction.FORWARD );
-    					mWinOut.println( "Moving FORWARD!" );
-    					break;
-
-    				case 'b':
-    					mActionList.add( Direction.BACK );
-    					mWinOut.println( "Moving BACK!" );
-    					break;
-
-    				case 'l':
-    					mActionList.add( Direction.LEFT );
-    					mWinOut.println( "Moving LEFT!" );
-    					break;
-
-    				case 'r':
-    					mActionList.add( Direction.RIGHT );
-    					mWinOut.println( "Moving RIGHT!" );
-    					break;
-
-    				default:
-    					//mWinOut.println( "Invalid action: '" +c+ "'" );
-    			}
-    		}
-
-	    	mWinOut.println( "[FINISH]" );
-	    	updateWinLog( false );
-    	}
-    	return -1;
+    	mWinOut.println( "[FINISH]" );
+    	updateWinLog( false );
+	
+    	return action;
     }
 
     /** Implementation of the Bot interface.
@@ -442,7 +377,7 @@ public class PDABot extends JFrame implements Bot {
      */
     @Override
     public String getName(){
-        return "PDABot - " +mInstanceName;
+        return "FSMBot - " +mInstanceName;
     }
 
     /** Implementation of the Bot interface.
