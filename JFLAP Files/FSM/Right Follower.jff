@@ -3,34 +3,62 @@
 	<automaton>
 		<!--The list of states.-->
 		<state id="0" name="F">
-			<x>196.0</x>
-			<y>133.0</y>
+			<x>175.0</x>
+			<y>58.0</y>
 			<initial/>
 		</state>
 		<state id="1" name="R">
-			<x>336.0</x>
-			<y>134.0</y>
+			<x>294.0</x>
+			<y>53.0</y>
+		</state>
+		<state id="3" name="L">
+			<x>41.0</x>
+			<y>42.0</y>
+		</state>
+		<state id="4" name="q4">
+			<x>176.0</x>
+			<y>175.0</y>
 		</state>
 		<!--The list of transitions.-->
 		<transition>
 			<from>0</from>
+			<to>4</to>
+			<read>f</read>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>0</to>
+			<read/>
+		</transition>
+		<transition>
+			<from>0</from>
 			<to>0</to>
 			<read>!f</read>
 		</transition>
 		<transition>
-			<from>1</from>
+			<from>0</from>
+			<to>3</to>
+			<read>!l</read>
+		</transition>
+		<transition>
+			<from>4</from>
 			<to>1</to>
 			<read>f</read>
 		</transition>
 		<transition>
 			<from>0</from>
 			<to>1</to>
-			<read>f</read>
+			<read>!r</read>
 		</transition>
 		<transition>
 			<from>1</from>
 			<to>0</to>
 			<read>!f</read>
+		</transition>
+		<transition>
+			<from>4</from>
+			<to>3</to>
+			<read>!l</read>
 		</transition>
 	</automaton>
 </structure>
