@@ -181,6 +181,7 @@ public class PDABot extends JFrame implements Bot {
 	private final ByteArrayOutputStream mWinBuffer;
 	private final PrintStream mWinOut;
 	private final JTextPane mWinLogPane;
+	private final JLabel      mStatusLabel;
 
 	private void updateWinLog( boolean append )
 	{
@@ -213,7 +214,13 @@ public class PDABot extends JFrame implements Bot {
 		mWinLogPane.setEditable( false );
 		DefaultCaret caret = (DefaultCaret)mWinLogPane.getCaret();
 		caret.setUpdatePolicy( DefaultCaret.ALWAYS_UPDATE );
-		add( mWinLogPane, BorderLayout.CENTER );
+
+		JScrollPane scrollPane = new JScrollPane( mWinLogPane );
+		scrollPane.setVerticalScrollBarPolicy( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+		add( scrollPane, BorderLayout.CENTER );
+
+		mStatusLabel = new JLabel("Waiting...");
+		add( mStatusLabel, BorderLayout.SOUTH );
 
     	final JFileChooser fc = new JFileChooser();
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
@@ -230,7 +237,12 @@ public class PDABot extends JFrame implements Bot {
 		            mCurrentGraph = loadJFlapFile( file );
 
 		            if( mCurrentGraph == null )
+		            {
 		            	JOptionPane.showMessageDialog(null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE);
+		            	mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
+		            }
+		            else
+		            	mStatusLabel.setText( "Using: " +file.getName() );
 		        }
     		}
     	} );

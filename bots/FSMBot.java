@@ -164,7 +164,10 @@ public class FSMBot extends JFrame implements Bot {
 	private final String mInstanceName = getNewRandomName();
 	private final ByteArrayOutputStream mWinBuffer;
 	private final PrintStream mWinOut;
-	private final JTextPane mWinLogPane;
+	private final JTextPane   mWinLogPane;
+	private final JLabel      mStatusLabel;
+
+	private void clearWinLog() { mWinLogPane.setText(""); }
 
 	private void updateWinLog( boolean append )
 	{
@@ -197,7 +200,13 @@ public class FSMBot extends JFrame implements Bot {
 		mWinLogPane.setEditable( false );
 		DefaultCaret caret = (DefaultCaret)mWinLogPane.getCaret();
 		caret.setUpdatePolicy( DefaultCaret.ALWAYS_UPDATE );
-		add( mWinLogPane, BorderLayout.CENTER );
+		
+		JScrollPane scrollPane = new JScrollPane( mWinLogPane );
+		scrollPane.setVerticalScrollBarPolicy( ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS );
+		add( scrollPane, BorderLayout.CENTER );
+
+		mStatusLabel = new JLabel("Waiting...");
+		add( mStatusLabel, BorderLayout.SOUTH );
 
     	final JFileChooser fc = new JFileChooser();
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
@@ -214,7 +223,12 @@ public class FSMBot extends JFrame implements Bot {
 		            mCurrentGraph = loadJFlapFile( file );
 
 		            if( mCurrentGraph == null )
+		            {
 		            	JOptionPane.showMessageDialog(null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE);
+		            	mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
+		            }
+		            else
+		            	mStatusLabel.setText( "Using: " +file.getName() );
 		        }
     		}
     	} );
@@ -247,11 +261,11 @@ public class FSMBot extends JFrame implements Bot {
      */
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
-    	mWinOut.println( "\n" );
+    	clearWinLog();
 
     	Pattern arcRegex = Pattern.compile( "^(!?)([FfBbLlRr][FfBbLlRr]?)$" );
 
-    	if( mCurrentState == null )
+    	if( mCurrentState == null || mCurrentState.mArcs.size() == 0 )
     	{
     		mCurrentState = mCurrentGraph.mStart;
     		mWinOut.println( "Restarted!" );
@@ -337,6 +351,8 @@ public class FSMBot extends JFrame implements Bot {
 
     		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
     		mWinOut.println( "Chose: " + action.toString() );
+
+    		updateWinLog( true );
 
     		mCurrentState = action.mTo;
     	} while( !mCurrentState.mName.matches("^[FfBbLlRr]$") );
