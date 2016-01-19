@@ -338,8 +338,6 @@ public class FSMBot extends JFrame implements Bot {
     		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
     		mWinOut.println( "Chose: " + action.toString() );
 
-    		updateWinLog( true );
-
     		mCurrentState = action.mTo;
     	} while( !mCurrentState.mName.matches("^[FfBbLlRr]$") );
     	mWinOut.println( "" );
