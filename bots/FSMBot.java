@@ -177,6 +177,7 @@ public class FSMBot extends JFrame implements Bot {
 	private final PrintStream mWinOut;
 	private final JTextPane   mWinLogPane;
 	private final JLabel      mStatusLabel;
+	private       File        mCurrentFile = null;
 
 	private void clearWinLog() { mWinLogPane.setText(""); }
 
@@ -223,31 +224,67 @@ public class FSMBot extends JFrame implements Bot {
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
     	fc.setFileFilter( filter );
 
+		JPanel toolbar = new JPanel( new FlowLayout(FlowLayout.LEFT) );
+		add( toolbar, BorderLayout.NORTH );
+
     	final JButton openBtn = new JButton( "Load JFlap File" );
     	openBtn.addActionListener( new ActionListener() {
     		public void actionPerformed(ActionEvent e) {
     			int returnVal = fc.showOpenDialog( null );
 		    	if (returnVal == JFileChooser.APPROVE_OPTION) {
 		            File file = fc.getSelectedFile();
-		            
-		            mWinOut.println( "Opening: " + file.getName() + ".\n" );
-		            mCurrentGraph = loadJFlapFile( file );
+					mCurrentFile = file;
 
-		            if( mCurrentGraph == null )
-		            {
-		            	JOptionPane.showMessageDialog( null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE );
-		            	mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
-		            }
-		            else
-		            	mStatusLabel.setText( "Using: " +file.getName() );
+					uiLoadFile( file );
 		        }
     		}
     	} );
-    	add( openBtn, BorderLayout.NORTH );
+		toolbar.add( openBtn );
+
+		final JButton reloadGraphBtn = new JButton( "Reload JFlap File" );
+		reloadGraphBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if( mCurrentFile == null ) {
+					mWinOut.println( "No current file to reload!" );
+					updateWinLog( true );
+				} else {
+					uiLoadFile( mCurrentFile );
+				}
+
+			}
+		});
+		toolbar.add( reloadGraphBtn );
+
 
         pack();
 		setVisible( true );
 		repaint();
+	}
+
+	private void uiLoadFile( File file ) {
+		mWinOut.println( "Opening: " + file.getName() + ".\n" );
+		updateWinLog( true );
+		mCurrentGraph = loadJFlapFile( file );
+
+		if( mCurrentGraph == null )
+		{
+			JOptionPane.showMessageDialog( null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE );
+			mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
+			mWinOut.println( "Parsing Error! Check you have the correct file!" );
+			updateWinLog( true );
+		}
+		else
+		{
+			mStatusLabel.setText("Using: " + file.getName());
+			mWinOut.println( "Loaded '" +file.getName()+ "' successfully!" );
+
+			mWinOut.printf( "\tStates: %d\n\tEdges: %d\n",
+					mCurrentGraph.mStates.size(),
+					mCurrentGraph.mTransitions.size() );
+
+			updateWinLog( true );
+		}
 	}
 
 
@@ -273,17 +310,17 @@ public class FSMBot extends JFrame implements Bot {
      */
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
-    	if( mCurrentState == null || mCurrentState.mArcs.size() == 0 )
-    	{
-			clearWinLog();
-    		mCurrentState = mCurrentGraph.mStart;
-    		mWinOut.println( "Restarted!" );
-    	}
-    	else
-    		mWinOut.println( "Continuing..." );
+		clearWinLog();
 
 		int maxLoops = 30;
 		do {
+			if( mCurrentState == null || mCurrentState.mArcs.size() == 0 )
+			{
+				mCurrentState = mCurrentGraph.mStart;
+				mWinOut.println( "Restarted!" );
+				break;
+			}
+
 			mWinOut.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
 
 			// Match any rules on this state //
@@ -358,7 +395,7 @@ public class FSMBot extends JFrame implements Bot {
 				if( mCurrentState.mArcs.size() == 0 ) {
 					mWinOut.println("Got stuck! Could not path out of this point in the graph!");
 					mWinOut.println("The graph will restart from the START state.");
-					mCurrentGraph = null;
+					mCurrentState = null;
 				} else
 					mWinOut.println( "Nothing to do..." );
 	    	}
@@ -393,9 +430,7 @@ public class FSMBot extends JFrame implements Bot {
 
     @Override
     public void start(){
-    	if( mCurrentGraph != null ) {
-    		mCurrentState = mCurrentGraph.mStart;
-    	}
+		mCurrentState = null;
     }
 
     @Override
