@@ -182,6 +182,7 @@ public class PDABot extends JFrame implements Bot {
 	private final PrintStream mWinOut;
 	private final JTextPane mWinLogPane;
 	private final JLabel      mStatusLabel;
+	private       File        mCurrentFile = null;
 
 	private void updateWinLog( boolean append )
 	{
@@ -226,31 +227,66 @@ public class PDABot extends JFrame implements Bot {
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
     	fc.setFileFilter( filter );
 
-    	final JButton openBtn = new JButton( "Load JFlap File" );
-    	openBtn.addActionListener( new ActionListener() {
-    		public void actionPerformed(ActionEvent e) {
-    			int returnVal = fc.showOpenDialog( null );
-		    	if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = fc.getSelectedFile();
-		            
-		            mWinOut.println( "Opening: " + file.getName() + ".\n" );
-		            mCurrentGraph = loadJFlapFile( file );
+		JPanel toolbar = new JPanel( new FlowLayout(FlowLayout.LEFT) );
+		add( toolbar, BorderLayout.NORTH );
 
-		            if( mCurrentGraph == null )
-		            {
-		            	JOptionPane.showMessageDialog(null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE);
-		            	mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
-		            }
-		            else
-		            	mStatusLabel.setText( "Using: " +file.getName() );
-		        }
-    		}
-    	} );
-    	add( openBtn, BorderLayout.NORTH );
+		final JButton openBtn = new JButton( "Load PDA" );
+		openBtn.addActionListener( new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int returnVal = fc.showOpenDialog( null );
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+					File file = fc.getSelectedFile();
+					mCurrentFile = file;
+
+					uiLoadFile( file );
+				}
+			}
+		} );
+		toolbar.add( openBtn );
+
+		final JButton reloadGraphBtn = new JButton( "Reload PDA" );
+		reloadGraphBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if( mCurrentFile == null ) {
+					mWinOut.println( "No current file to reload!" );
+					updateWinLog( true );
+				} else {
+					uiLoadFile( mCurrentFile );
+				}
+
+			}
+		});
+		toolbar.add( reloadGraphBtn );
 
         pack();
 		setVisible( true );
 		repaint();
+	}
+
+	private void uiLoadFile( File file ) {
+		mWinOut.println( "Opening: " + file.getName() + ".\n" );
+		updateWinLog( true );
+		mCurrentGraph = loadJFlapFile( file );
+
+		if( mCurrentGraph == null )
+		{
+			JOptionPane.showMessageDialog( null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE );
+			mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
+			mWinOut.println( "Parsing Error! Check you have the correct file!" );
+			updateWinLog( true );
+		}
+		else
+		{
+			mStatusLabel.setText("Using: " + file.getName());
+			mWinOut.println( "Loaded '" +file.getName()+ "' successfully!" );
+
+			mWinOut.printf( "\tStates: %d\n\tEdges: %d\n",
+					mCurrentGraph.mStates.size(),
+					mCurrentGraph.mTransitions.size() );
+
+			updateWinLog( true );
+		}
 	}
 
 

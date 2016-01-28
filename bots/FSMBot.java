@@ -227,7 +227,7 @@ public class FSMBot extends JFrame implements Bot {
 		JPanel toolbar = new JPanel( new FlowLayout(FlowLayout.LEFT) );
 		add( toolbar, BorderLayout.NORTH );
 
-    	final JButton openBtn = new JButton( "Load JFlap File" );
+    	final JButton openBtn = new JButton( "Load FSM" );
     	openBtn.addActionListener( new ActionListener() {
     		public void actionPerformed(ActionEvent e) {
     			int returnVal = fc.showOpenDialog( null );
@@ -241,7 +241,7 @@ public class FSMBot extends JFrame implements Bot {
     	} );
 		toolbar.add( openBtn );
 
-		final JButton reloadGraphBtn = new JButton( "Reload JFlap File" );
+		final JButton reloadGraphBtn = new JButton( "Reload FSM" );
 		reloadGraphBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
