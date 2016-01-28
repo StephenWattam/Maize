@@ -38,6 +38,10 @@ public class RunMazeUI{
         mt.factories.add( new PrimMazeFactory() );
         mt.factories.add( new RandomScatterMazeFactory() );
         mt.factories.add( new ScatterMazeFactory() );
+        mt.factories.add( new Q1aMazeFactory() );
+        mt.factories.add( new Q1bMazeFactory() );
+        mt.factories.add( new Q3iMazeFactory() );
+        mt.factories.add( new Q3iiMazeFactory() );
 
         //mt.factories.add( new ());
         mt.factories.add( new RandomTransformMazeFactory( new BaffleMazeFactory() ) );
