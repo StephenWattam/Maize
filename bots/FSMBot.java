@@ -1,19 +1,30 @@
 package bots;
-import maize.*;
+import maize.Bot;
+import maize.Direction;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
-import org.w3c.dom.*;
-import org.xml.sax.*;
-import java.util.*;
-import java.util.regex.*;
-import java.util.concurrent.*;
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.swing.*;
-import javax.swing.filechooser.*;
-import javax.swing.text.*;
-import javax.xml.parsers.*;
-import javax.xml.parsers.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultCaret;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class FSMBot extends JFrame implements Bot {
 
@@ -224,7 +235,7 @@ public class FSMBot extends JFrame implements Bot {
 
 		            if( mCurrentGraph == null )
 		            {
-		            	JOptionPane.showMessageDialog(null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE);
+		            	JOptionPane.showMessageDialog( null, "Sorry! I didn't understand that file!", "Parsing Error", JOptionPane.ERROR_MESSAGE );
 		            	mStatusLabel.setText( "Parsing Error! Check you have the correct file!" );
 		            }
 		            else
@@ -236,6 +247,7 @@ public class FSMBot extends JFrame implements Bot {
 
         pack();
 		setVisible( true );
+		repaint();
 	}
 
 
@@ -261,128 +273,103 @@ public class FSMBot extends JFrame implements Bot {
      */
     @Override
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
-    	clearWinLog();
-
-    	Pattern arcRegex = Pattern.compile( "^(!?)([FfBbLlRr][FfBbLlRr]?)$" );
-
     	if( mCurrentState == null || mCurrentState.mArcs.size() == 0 )
     	{
+			clearWinLog();
     		mCurrentState = mCurrentGraph.mStart;
     		mWinOut.println( "Restarted!" );
     	}
     	else
     		mWinOut.println( "Continuing..." );
 
+		int maxLoops = 30;
 		do {
 			mWinOut.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
-
-			// Catch corner case where state has no arcs
-			if( mCurrentState.mArcs.size() == 0 )
-			{
-				mWinOut.println( "Could not evaluate any arcs!" );
-				break;
-			}
 
 			// Match any rules on this state //
     		ArrayList<Transition> matches = new ArrayList<>();
     		for( Transition t : mCurrentState.mArcs ) {
 
-    			mWinOut.print( "\nEvaluating " + t );
+				mWinOut.print("\nEvaluating " + t);
 
-    			Matcher search = arcRegex.matcher( t.mRead );
-    			if( search.matches() ) // Is this a matching rule?
-    			{
-    				boolean sensorState = true;
-    				if( search.group(1).equalsIgnoreCase("!") )
-    					sensorState = false;
+				if (t.mRead == null || t.mRead.length() == 0 ) {
+					mWinOut.print( " <-- MATCH!" );
+					matches.add( t );
+				} else {
+					try {
+						// This is probably a terrible way of doing it, but it's unclear
+						ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName( "JavaScript" );
+						String sensors[] = {
+								"FrontLeft = "  +!view[0][0],
+								"Front = "      +!view[1][0],
+								"FrontRight = " +!view[2][0],
+								"Right = "      +!view[2][1],
+								"BackRight = "  +!view[2][2],
+								"Back = "       +!view[1][2],
+								"BackLeft = "   +!view[0][2],
+								"Left = "       +!view[0][1]
+						};
+						for ( String sensor : sensors )
+							scriptEngine.eval(sensor);
 
-    				String direction = search.group(2).toLowerCase();
+						if( (boolean)scriptEngine.eval(t.mRead) == true ) {
+							mWinOut.print( " <-- MATCH!" );
+							matches.add( t );
+						}
 
-    				if( direction.equals("fl") && view[0][0] == sensorState )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("f") && view[1][0] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("fr") && view[2][0] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("r") && view[2][1] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("br") && view[2][2] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("b") && view[1][2] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("bl") && view[0][2] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    				else if( direction.equals("l") && view[0][1] == sensorState  )
-    				{
-    					mWinOut.print( " <-- MATCH!" );
-    					matches.add( t );
-    				}
-    			}
-    			else
-    			{
-    				mWinOut.println( "Rule was not matchable, could not do anything :(" );
-    			}
+					} catch (ScriptException e) {
+						e.printStackTrace();
+						mWinOut.print( " <-- " );
+						mWinOut.print( e.getMessage() );
+					}
+				}
+
     		}
     		mWinOut.println( "" );
 
-    		int index = (int)(Math.random() * (matches.size()-1));
+    		int index = ThreadLocalRandom.current().nextInt(matches.size());
     		Transition action = matches.get( index );
 
     		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
     		mWinOut.println( "Chose: " + action.toString() );
 
-    		updateWinLog( true );
+    		//updateWinLog( true );
 
     		mCurrentState = action.mTo;
-    	} while( !mCurrentState.mName.matches("^[FfBbLlRr]$") );
+    	} while( maxLoops-- > 0 && !mCurrentState.mName.matches("^[FfBbLlRr]$") && mCurrentState.mArcs.size() != 0 );
     	mWinOut.println( "" );
 
-    	int action = -1;
+		if( maxLoops < 1 )
+			mWinOut.println( "Reaching maximum loop count, breakout of of this iteration! (will continue next tick)" );
+
+    	int movement = -1;
 		if( mCurrentState != null )
 		{
 	    	if( mCurrentState.mName.equalsIgnoreCase( "F" ) ) // Forward
-	    		action = Direction.FORWARD;
+				movement = Direction.FORWARD;
 	    	else if( mCurrentState.mName.equalsIgnoreCase( "B" ) ) // Backwards
-	    		action = Direction.BACK;
+				movement = Direction.BACK;
 	    	else if( mCurrentState.mName.equalsIgnoreCase( "L" ) ) // Turn left
-	    		action = Direction.LEFT;
+				movement = Direction.LEFT;
 	    	else if( mCurrentState.mName.equalsIgnoreCase( "R" ) ) // Turn right
-	    		action = Direction.RIGHT;
+				movement = Direction.RIGHT;
 	    	else
 	    	{
-	    		mWinOut.println( "Got stuck! Could not path out of this point in the graph!" );
-	    		mWinOut.println( "The graph will restart from the START state." );
-	    		mCurrentGraph = null;
+				if( mCurrentState.mArcs.size() == 0 ) {
+					mWinOut.println("Got stuck! Could not path out of this point in the graph!");
+					mWinOut.println("The graph will restart from the START state.");
+					mCurrentGraph = null;
+				} else
+					mWinOut.println( "Nothing to do..." );
 	    	}
 	    }
 
-    	mWinOut.println( "Action: " +Direction.getName(action) );
+    	mWinOut.println( "Action: " +Direction.getName(movement) );
 
     	mWinOut.println( "[FINISH]" );
     	updateWinLog( false );
 	
-    	return action;
+    	return movement;
     }
 
     /** Implementation of the Bot interface.
