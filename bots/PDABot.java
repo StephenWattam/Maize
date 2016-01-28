@@ -437,7 +437,8 @@ public class PDABot extends JFrame implements Bot {
 	    			readTape();
 
 	    		for( Character c : action.mPop ) {
-	    			if( (""+c).equalsIgnoreCase( ""+mStack.pop()) )
+					mWinOut.println( "Expects '" +c+ "' got '" +mStack.peek()+ "'" );
+	    			if( !(""+c).equalsIgnoreCase( ""+mStack.pop()) )
 	    				mWinOut.println( "Bad stack pop, something is very wrong!" );
 	    		}
 
