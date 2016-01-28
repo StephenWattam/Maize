@@ -385,6 +385,7 @@ public class PDABot extends JFrame implements Bot {
 	    		// Match any rules on this state //
 	    		ArrayList<Transition> matches = new ArrayList<>();
 	    		for( Transition t : mCurrentState.mArcs ) {
+					boolean isMatch = true;
 
 	    			mWinOut.print( "\nEvaluating " + t );
 
@@ -393,7 +394,7 @@ public class PDABot extends JFrame implements Bot {
 	    			{
 	    				// Is there enough data to make this possible on the tape?
 		    			if( t.mRead.size() > remainingTape() )
-		    				continue;
+							isMatch = false;
 
 		    			// Does it all match?
 		    			boolean readOK = true;
@@ -406,7 +407,7 @@ public class PDABot extends JFrame implements Bot {
 		    				}
 		    			}
 		    			if( !readOK )
-		    				continue;
+							isMatch = false;
 		    		}
 	    			
 	    			// Does this rule require a stack pop?
@@ -414,16 +415,21 @@ public class PDABot extends JFrame implements Bot {
 	    			{
 	    				// Does the request fit?
 	    				if( t.mPop.size() > mStack.size() )
-	    					continue;
+							isMatch = false;
 
 	    				ListIterator<Character> stackIter = (ListIterator<Character>)mStack.listIterator();
-	    				for( Character c : t.mPop )
-	    					if( !(""+c).equalsIgnoreCase( ""+stackIter.next() ) )
-	    						continue;
+	    				for( Character c : t.mPop ) {
+							if (("" + c).equals("Z") && !mStack.isEmpty())
+								isMatch = false;
+							if (!("" + c).equalsIgnoreCase("" + stackIter.next()))
+								isMatch = false;
+						}
 	    			}
 
-	    			mWinOut.print( " <-- MATCH!" );
-	    			matches.add( t );
+					if( isMatch ) {
+						mWinOut.print(" <-- MATCH!");
+						matches.add(t);
+					}
 	    		}
 	    		mWinOut.println( "" );
 
@@ -438,8 +444,11 @@ public class PDABot extends JFrame implements Bot {
 
 	    		for( Character c : action.mPop ) {
 					mWinOut.println( "Expects '" +c+ "' got '" +mStack.peek()+ "'" );
-	    			if( !(""+c).equalsIgnoreCase( ""+mStack.pop()) )
-	    				mWinOut.println( "Bad stack pop, something is very wrong!" );
+					if (("" + c).equals("Z") && !mStack.isEmpty())
+						mWinOut.println( "Bad stack pop, something is very wrong! Stack was not empty!" );
+					if( !(""+c).equals("Z") )
+	    				if( !(""+c).equalsIgnoreCase( ""+mStack.pop()) )
+	    					mWinOut.println( "Bad stack pop, something is very wrong!" );
 	    		}
 
 	    		for( Character c : action.mPush )
