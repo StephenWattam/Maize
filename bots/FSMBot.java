@@ -327,15 +327,15 @@ public class FSMBot extends JFrame implements Bot {
     		}
     		mWinOut.println( "" );
 
-    		int index = ThreadLocalRandom.current().nextInt(matches.size());
-    		Transition action = matches.get( index );
+			if( matches.size() > 0 ) {
+				int index = ThreadLocalRandom.current().nextInt(matches.size());
+				Transition action = matches.get(index);
 
-    		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
-    		mWinOut.println( "Chose: " + action.toString() );
+				mWinOut.println((matches.size() > 1 ? "Deterministic     [ ]\nNon Deterministic [X]\n" : "Deterministic     [X]\nNon Deterministic [ ]\n"));
+				mWinOut.println("Chose: " + action.toString());
 
-    		//updateWinLog( true );
-
-    		mCurrentState = action.mTo;
+    			mCurrentState = action.mTo;
+			}
     	} while( maxLoops-- > 0 && !mCurrentState.mName.matches("^[FfBbLlRr]$") && mCurrentState.mArcs.size() != 0 );
     	mWinOut.println( "" );
 
