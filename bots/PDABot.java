@@ -250,6 +250,7 @@ public class PDABot extends JFrame implements Bot {
 
         pack();
 		setVisible( true );
+		repaint();
 	}
 
 
