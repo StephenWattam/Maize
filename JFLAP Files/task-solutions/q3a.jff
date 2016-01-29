@@ -2,44 +2,30 @@
 	<type>pda</type>
 	<automaton>
 		<!--The list of states.-->
-		<state id="0" name="S">
-			<x>91.0</x>
-			<y>198.0</y>
+		<state id="0" name="q0">
+			<x>109.0</x>
+			<y>391.0</y>
 			<initial/>
 		</state>
 		<state id="1" name="q1">
-			<x>266.0</x>
-			<y>202.0</y>
+			<x>241.0</x>
+			<y>391.0</y>
 		</state>
 		<state id="2" name="q2">
-			<x>595.0</x>
-			<y>131.0</y>
-		</state>
-		<state id="3" name="F">
-			<x>831.0</x>
-			<y>201.0</y>
+			<x>482.0</x>
+			<y>391.0</y>
 			<final/>
 		</state>
+		<state id="3" name="q3">
+			<x>324.0</x>
+			<y>521.0</y>
+		</state>
 		<state id="4" name="q4">
-			<x>453.0</x>
-			<y>131.0</y>
+			<x>426.0</x>
+			<y>516.0</y>
 		</state>
 		<!--The list of transitions.-->
 		<transition>
-			<from>4</from>
-			<to>2</to>
-			<read>0</read>
-			<pop/>
-			<push/>
-		</transition>
-		<transition>
-			<from>4</from>
-			<to>2</to>
-			<read>1</read>
-			<pop/>
-			<push/>
-		</transition>
-		<transition>
 			<from>0</from>
 			<to>1</to>
 			<read>0</read>
@@ -54,32 +40,46 @@
 			<push/>
 		</transition>
 		<transition>
-			<from>2</from>
-			<to>3</to>
+			<from>4</from>
+			<to>2</to>
 			<read>0</read>
-			<pop/>
-			<push>RF</push>
+			<pop>L</pop>
+			<push>R</push>
 		</transition>
 		<transition>
 			<from>1</from>
+			<to>3</to>
+			<read>1</read>
+			<pop/>
+			<push>L</push>
+		</transition>
+		<transition>
+			<from>3</from>
+			<to>4</to>
+			<read>1</read>
+			<pop/>
+			<push/>
+		</transition>
+		<transition>
+			<from>3</from>
 			<to>4</to>
 			<read>0</read>
 			<pop/>
 			<push/>
 		</transition>
 		<transition>
-			<from>2</from>
-			<to>3</to>
+			<from>4</from>
+			<to>2</to>
 			<read>1</read>
+			<pop/>
+			<push/>
+		</transition>
+		<transition>
+			<from>1</from>
+			<to>2</to>
+			<read>0</read>
 			<pop/>
 			<push>F</push>
-		</transition>
-		<transition>
-			<from>1</from>
-			<to>4</to>
-			<read>1</read>
-			<pop/>
-			<push/>
 		</transition>
 	</automaton>
 </structure>
