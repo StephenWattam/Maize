@@ -223,7 +223,7 @@ public class PDABot extends JFrame implements Bot {
 		mStatusLabel = new JLabel("Waiting...");
 		add( mStatusLabel, BorderLayout.SOUTH );
 
-    	final JFileChooser fc = new JFileChooser();
+    	final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
     	fc.setFileFilter( filter );
 
