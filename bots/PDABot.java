@@ -337,6 +337,8 @@ public class PDABot extends JFrame implements Bot {
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
     	mWinOut.println( "\n" );
 
+		mWinOut.println( "==============================" );
+
     	if( mActionList.size() > 0 )
     	{
     		int action = mActionList.poll();

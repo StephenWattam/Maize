@@ -312,6 +312,8 @@ public class FSMBot extends JFrame implements Bot {
     public int nextMove(boolean[][] view, int x, int y, int o, int fx, int fy) {
 		clearWinLog();
 
+		mWinOut.println( "==============================" );
+
 		int maxLoops = 30;
 		do {
 			if( mCurrentState == null || mCurrentState.mArcs.size() == 0 )
