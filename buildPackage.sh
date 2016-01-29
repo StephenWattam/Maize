@@ -1,18 +1,28 @@
 #!/bin/bash
 
-PKGNAME=MaizePkg.zip
+VERSION=
+PKGNAME=Maize
 
-FILES=$(find . -type f -printf "%p\n" | grep -v "\\.java" | grep -v ".git*\|.idea\|Presentation\|JFLAP Files\|Makefile\|.sh\|Maize.mf" )
+STAGING=$(mktemp -d)
+BOTS=$(find . -type f -printf "%p\n" | grep "^./bots/.*\.java")
 
-rm -f maize.zip
+# Make the project
+echo "Making project..."
+make clean
+make
 
-for file in $FILES; do
-	zip -g "$PKGNAME" "$file"
+# Create staging dir
+mkdir "$STAGING/$PKGNAME"
+
+
+cp -v Maize.jar maize.cfg runUI.{bat,sh} "$STAGING/$PKGNAME"
+cp -rv lib imgres "$STAGING/$PKGNAME"
+for file in $BOTS; do
+    cp --parents -v "$file" "$STAGING/$PKGNAME"
 done
 
-for file in $(find ./bots -type f -printf "%p\n"); do
-	zip -g "$PKGNAME" "$file"
-done
+# Move, zip, move back (better way of doing this, fo' sho)
+echo Zipping $STAGING/$PKGNAME from $STAGING...
+(cd "$STAGING" && zip -r - "$PKGNAME") > "$PKGNAME.zip"
+echo Package left in $PKGNAME.zip
 
-zip -g "$PKGNAME" "runUI.sh"
-zip -g "$PKGNAME" "runTest.sh"
