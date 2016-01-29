@@ -371,6 +371,7 @@ public class PDABot extends JFrame implements Bot {
 			// Reset stack //
 	    	mStack = new Stack<>();
 
+			int maxIter = 200;
     		do {
     			mWinOut.println( "STATE: " +mCurrentState.mName + "(" +mCurrentState.mID+ ")" );
 
@@ -413,16 +414,24 @@ public class PDABot extends JFrame implements Bot {
 	    			// Does this rule require a stack pop?
 	    			if( t.mPop.size() > 0 )
 	    			{
-	    				// Does the request fit?
-	    				if( t.mPop.size() > mStack.size() )
-							isMatch = false;
+						// Temporary stack to try the rule on.
+						Stack<Character> testStack = new Stack<>();
+						testStack.addAll( mStack );
 
-	    				ListIterator<Character> stackIter = (ListIterator<Character>)mStack.listIterator();
 	    				for( Character c : t.mPop ) {
-							if (("" + c).equals("Z") && !mStack.isEmpty())
-								isMatch = false;
-							if (!("" + c).equalsIgnoreCase("" + stackIter.next()))
-								isMatch = false;
+							if( testStack.isEmpty() ) {
+								if( !("" + c).equals("Z") ) {
+									isMatch = false;
+									break;
+								}
+							}
+							else {
+								if ( !(""+c).equals( ""+testStack.peek() ) ) {
+									isMatch = false;
+									break;
+								}
+								testStack.pop();
+							}
 						}
 	    			}
 
@@ -433,29 +442,32 @@ public class PDABot extends JFrame implements Bot {
 	    		}
 	    		mWinOut.println( "" );
 
-	    		int index = (int)(Math.random() * (matches.size()-1));
-	    		Transition action = matches.get( index );
+				if( !matches.isEmpty() ) {
+					int index = (int) (Math.random() * (matches.size() - 1));
+					Transition action = matches.get(index);
 
-	    		mWinOut.println( "\nPushing Command: " +action );
-	    		mWinOut.println( (matches.size() > 1?"Deterministic     [ ]\nNon Deterministic [X]\n":"Deterministic     [X]\nNon Deterministic [ ]\n") );
+					mWinOut.println("\nPushing Command: " + action);
+					mWinOut.println((matches.size() > 1 ? "Deterministic     [ ]\nNon Deterministic [X]\n" : "Deterministic     [X]\nNon Deterministic [ ]\n"));
 
-	    		for( Character c : action.mRead )
-	    			readTape();
+					for (Character c : action.mRead)
+						readTape();
 
-	    		for( Character c : action.mPop ) {
-					mWinOut.println( "Expects '" +c+ "' got '" +mStack.peek()+ "'" );
-					if (("" + c).equals("Z") && !mStack.isEmpty())
-						mWinOut.println( "Bad stack pop, something is very wrong! Stack was not empty!" );
-					if( !(""+c).equals("Z") )
-	    				if( !(""+c).equalsIgnoreCase( ""+mStack.pop()) )
-	    					mWinOut.println( "Bad stack pop, something is very wrong!" );
-	    		}
+					for (Character c : action.mPop) {
+						if (("" + c).equals("Z")) {
+							if (!mStack.isEmpty())
+								mWinOut.println("Bad stack pop, something is very wrong! Stack was not empty!");
+						} else {
+							if (!("" + c).equals("" + mStack.pop()))
+								mWinOut.println("Bad stack pop, something is very wrong!");
+						}
+					}
 
-	    		for( Character c : action.mPush )
-	    			mStack.push( c );
+					for (Character c : action.mPush)
+						mStack.push(c);
 
-	    		mCurrentState = action.mTo;
-	    	} while( !mCurrentGraph.mFinish.contains( mCurrentState ) );
+					mCurrentState = action.mTo;
+				}
+	    	} while( maxIter-- > 0 && !mCurrentGraph.mFinish.contains( mCurrentState ) );
 	    	mCurrentState = mCurrentGraph.mStart;
 
 	    	while( mStack.size() > 0 )
@@ -476,16 +488,16 @@ public class PDABot extends JFrame implements Bot {
 
     				case 'l':
     					mActionList.add( Direction.LEFT );
-    					mWinOut.println( "Moving LEFT!" );
+    					mWinOut.println( "Turning LEFT!" );
     					break;
 
     				case 'r':
     					mActionList.add( Direction.RIGHT );
-    					mWinOut.println( "Moving RIGHT!" );
+    					mWinOut.println( "Turning RIGHT!" );
     					break;
 
     				default:
-    					//mWinOut.println( "Invalid action: '" +c+ "'" );
+    					mWinOut.println( "Invalid action: '" +c+ "'" );
     			}
     		}
 
