@@ -121,7 +121,7 @@ public class FSMBot extends JFrame implements Bot {
 
 			String type = getNodeValue( doc, "structure.type", null );
 
-			// Only bother loading PDA type automata
+			// Only bother loading FSM type automata
 			if( type == null || !type.equalsIgnoreCase( "fa" ) )
 				return null;
 
