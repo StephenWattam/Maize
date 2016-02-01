@@ -1,5 +1,5 @@
 
-\documentclass[xcolor=x11names,compress,handout]{beamer} % handout to disable transitions
+\documentclass[xcolor=x11names,xcolor=table,compress,handout]{beamer} % handout to disable transitions
 %\documentclass[xcolor=x11names,compress]{beamer}
 
 % Many thanks to http://cameron.bracken.bz/beamer-template
@@ -50,7 +50,7 @@
  % \pgfpagesuselayout{2 on 1 with notes landscape}[a4paper,border shrink=5mm]
 % ---------------------------------------------------------------------------------------
 
-\title{Automata for Fun and Profit}
+\title{Automata in the Real World (ish)}
 \author{Dr. Steve Wattam \& John Vidler}
 \institute[2016]{Lancaster University}
 \date{\tiny Jan 2016}
@@ -64,6 +64,21 @@
 % -----------------------------------------------------------------------------------------
 \frame{\frametitle{Aims \& Objectives}
     \begin{itemize}
+        \item Context around automata theory
+        \vspace{24pt}
+        \item<1-> Some experience applying FSMs to algorithmics
+    \end{itemize}
+}
+% tunny: https://c2.staticflickr.com/8/7364/13938027089_6fdd75dd04_b.jpg
+%
+
+
+% -----------------------------------------------------------------------------------------
+\section{Automata in Use}
+\subsection{Overview}
+\frame{\frametitle{Automata in the Real World}
+    \begin{itemize}
+
         \item Automata underpin all of modern computing
 
         % Without them you'd have specific-use machines
@@ -79,19 +94,7 @@
         
         \vspace{10pt}
 
-        \item<2-> But they're also useful at a higher level
-    \end{itemize}
-}
-% tunny: https://c2.staticflickr.com/8/7364/13938027089_6fdd75dd04_b.jpg
-%
-
-
-% -----------------------------------------------------------------------------------------
-\section{Automata in Use}
-\frame{\frametitle{Automata in the Real World}
-    \begin{itemize}
-        \item Higher-level uses of automata: model the world
-
+        \item<1-> But they're also useful at a higher level
         % Images for
         %  - biology
         %  - financial analysis
@@ -102,31 +105,85 @@
         
     \end{itemize}
 }
-\frame{\frametitle{Embedded and SCADA}
-    \begin{itemize}
-        \item Changes observed (stream of information)
-        
-        % Measure-model-control
-        % Show world modelling diagram
-        %
-        % http://playground.arduino.cc/Code/FiniteStateMachine
-        % 
 
+\subsection{Cells}
+\frame{\frametitle{Cellular Models}
+    \begin{itemize}
+        \item<1-> Simple rules to model emergent behaviour
+        % \item<2-> Lead to chaos theory (Lorenz, Mandelbrot)
     \end{itemize}
+
+    \begin{center}
+        \begin{tabular}{|r|c|c|c|c|c|c|c|c|}
+            \hline
+            \rowcolor[HTML]{EFEFEF} 
+            Input                          & 111 & 110 & 101 & 100 & 011 & 010 & 001 & 000 \\ \hline
+            \cellcolor[HTML]{EFEFEF}Output & 0   & 1   & 0   & 1   & 1   & 0   & 1   & 0   \\ \hline
+        \end{tabular}
+    \end{center}
+
+
+    \begin{center}
+        \includegraphics<1>[height=4cm]{lsystem1}
+        \includegraphics<2>[height=4cm]{rule90}
+        \includegraphics<3->[height=4cm]{lshell}
+    \end{center}
 }
+
+\subsection{Networking}
 \frame{\frametitle{Networking}
     \begin{itemize}
 
+        \item Protocol design heavily uses FSMs
+        \item BGP routing:
+
     \end{itemize}
+    
+
+    \begin{center}
+        \includegraphics<1>[width=8cm]{bgpfsm}
+        \includegraphics<2->[width=8cm]{bgpfsm2}
+    \end{center}
+
+    % https://en.wikipedia.org/wiki/Border_Gateway_Protocol#Finite-state_machines
+    % Connect state:
+    %     - Waits for successful TCP negotiation with peer.
+    %     - BGP does not spend much time in this state if the TCP session has been successfully established.
+    %     - Sends Open message to peer and changes state to OpenSent.
+    %     - If an error occurs, BGP moves to the Active state. Errors are:
+    %         - TCP port 179 is not open.
+    %         - A random TCP port over 1023 is not open.
+    %         - Peer address configured incorrectly on either router.
+    %         - AS number configured incorrectly on either router.
+    %
 }
+\frame{\frametitle{Networking}
+    \begin{center}
+        \includegraphics[width=5cm]{tcpfsm}
+    \end{center}
+
+    {\small \texttt{http://www.tcpipguide.com}}
+}
+
+\subsection{Gaming}
 \frame{\frametitle{Gaming \& AI}
     \begin{itemize}
 
-        % The door problem
-        % Show common libs
+        \item Games are essentially one big state machine
 
+        \item Useful for world state and AI
+        % The door problem
+        % Many libraries for unity, processing etc
+        % Fits very well with object-oriented design
 
     \end{itemize}
+
+    \begin{center}
+        \includegraphics<1>[height=4cm]{state-flowchart}
+        \includegraphics<2->[height=4cm]{fsm_ant_brain}
+    \end{center}
+    {\small \texttt{http://gameprogrammingpatterns.com/state.html\\
+    http://gamedevelopment.tutsplus.com}}
 }
 
 
@@ -319,7 +376,6 @@
         \item<1-> Display how the world \textbf{is}, based on how it \textbf{has changed}
         \item<2-> Can be interrogated without needing new sensor data
         \item<3-> Make transitions between states based on arbitrary, even probabalistic, rules
-        \item<4-> Underpin all of computing!
     \end{itemize}
 
 \begin{center}
@@ -347,11 +403,11 @@
         \end{itemize}
 
         \vspace{10pt}
-        \item<5-> Stateful vs. Stateless
+        \item<3-> Stateful vs. Stateless
         \begin{itemize}
-            \item<6-> LeftStateBot is stateful, remembers a long sequence of actions
-            \item<6-> LeftBot is not
-            \item<6-> GraphBot is \textbf{very} stateful
+            \item<4-> LeftStateBot is stateful, remembers a long sequence of actions
+            \item<4-> LeftBot is not
+            \item<4-> GraphBot is \textbf{very} stateful
         \end{itemize}
     \end{itemize}
 }
@@ -415,7 +471,7 @@
 
     \vspace{5pt}
     \begin{center}
-        \includegraphics[width=5cm]{botfsm1}
+        \includegraphics[width=8cm,height=4cm]{botfsm1}
     \end{center}
 }
 \subsection{Code Introduction}
