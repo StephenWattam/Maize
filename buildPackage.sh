@@ -15,7 +15,7 @@ make
 mkdir "$STAGING/$PKGNAME"
 
 
-cp -v Maize.jar maize.cfg "$STAGING/$PKGNAME"
+cp -v Maize.jar maize.cfg runUI.{sh,bat} run_in_labs.bat "$STAGING/$PKGNAME"
 cp -rv lib imgres "$STAGING/$PKGNAME"
 for file in $BOTS; do
     cp --parents -v "$file" "$STAGING/$PKGNAME"
