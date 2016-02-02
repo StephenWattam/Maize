@@ -140,8 +140,12 @@ public class FSMBot extends JFrame implements Bot {
 					graph.mStates.put( newState.mID, newState );
 					System.out.println( "State(" +newState.mID+ ")" );
 
-					if( getNodeValue(states.item(i), "initial", null ) != null )
+					if( getNodeValue(states.item(i), "initial", null ) != null ) {
 						graph.mStart = newState;
+
+						// Also check if the start has a label, use that as the name
+						setName( getNodeValue( states.item(i), "label", mInstanceName ) );
+					}
 
 					if( getNodeValue(states.item(i), "final", null ) != null )
 						graph.mFinish.add( newState );
@@ -172,7 +176,7 @@ public class FSMBot extends JFrame implements Bot {
 	}
 
 	/* UI variables */
-	private final String mInstanceName = getNewRandomName();
+	private String mInstanceName = getNewRandomName();
 	private final ByteArrayOutputStream mWinBuffer;
 	private final PrintStream mWinOut;
 	private final JTextPane   mWinLogPane;
@@ -194,13 +198,18 @@ public class FSMBot extends JFrame implements Bot {
 		mWinBuffer.reset();
 	}
 
+	public void setName( String name ) {
+		mInstanceName = name;
+		setTitle( "FSM JFlap Interpreter (" +name+ ")" );
+		mWinOut.println( "Bot is called '" +name+ "'" );
+		updateWinLog( true );
+	}
+
 	public FSMBot()
 	{
 		super( "FSM JFlap Interpreter" );
 		setLayout( new BorderLayout() );
 		setMinimumSize( new Dimension(640, 480) );
-
-		setTitle( "FSM JFlap Interpreter (" +mInstanceName+ ")" );
 		
 		// Buffers
 		mWinBuffer = new ByteArrayOutputStream();
@@ -219,6 +228,8 @@ public class FSMBot extends JFrame implements Bot {
 
 		mStatusLabel = new JLabel("Waiting...");
 		add( mStatusLabel, BorderLayout.SOUTH );
+
+		setName( mInstanceName );
 
 		final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
@@ -293,6 +304,7 @@ public class FSMBot extends JFrame implements Bot {
 	// ///////////////////////// //
 	Graph mCurrentGraph = null;
 	State mCurrentState = null;
+	ScriptEngine mScriptEngine = new ScriptEngineManager().getEngineByName( "JavaScript" );
 
 	/** Implementation of the Bot interface.
      * @see Bot
@@ -314,7 +326,10 @@ public class FSMBot extends JFrame implements Bot {
 
 		mWinOut.println( "==============================" );
 
-		int maxLoops = 30;
+		if( mCurrentState == null )
+			mWinOut.println( "BOT RESET" );
+
+		int maxLoops = 10;
 		do {
 			if( mCurrentState == null || mCurrentState.mArcs.size() == 0 )
 			{
@@ -336,8 +351,6 @@ public class FSMBot extends JFrame implements Bot {
 					matches.add( t );
 				} else {
 					try {
-						// This is probably a terrible way of doing it, but it's unclear
-						ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName( "JavaScript" );
 						String sensors[] = {
 								"FL = " + view[0][0],
 								"F = "  + view[1][0],
@@ -358,9 +371,9 @@ public class FSMBot extends JFrame implements Bot {
 								"Left = "       + view[0][1]
 						};
 						for ( String sensor : sensors )
-							scriptEngine.eval(sensor);
+							mScriptEngine.eval(sensor);
 
-						if( (boolean)scriptEngine.eval(t.mRead) == true ) {
+						if( (boolean) mScriptEngine.eval(t.mRead) == true ) {
 							mWinOut.print( " <-- MATCH!" );
 							matches.add( t );
 						}
@@ -426,6 +439,7 @@ public class FSMBot extends JFrame implements Bot {
      */
     @Override
     public String getName(){
+
         return "FSMBot - " +mInstanceName;
     }
 
@@ -435,9 +449,8 @@ public class FSMBot extends JFrame implements Bot {
      */
     @Override
     public String getDescription(){
-        return mInstanceName + ", a bot using logic from a JFlap graph";
+        return mInstanceName + ", a bot using logic from an FSM JFlap graph";
     }
-
 
     @Override
     public void start(){

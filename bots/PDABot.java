@@ -133,8 +133,12 @@ public class PDABot extends JFrame implements Bot {
 					graph.mStates.put( newState.mID, newState );
 					System.out.println( "State(" +newState.mID+ ")" );
 
-					if( getNodeValue(states.item(i), "initial", null ) != null )
+					if( getNodeValue(states.item(i), "initial", null ) != null ) {
 						graph.mStart = newState;
+
+						// Also check if the start has a label, use that as the name
+						setName( getNodeValue( states.item(i), "label", mInstanceName ) );
+					}
 
 					if( getNodeValue(states.item(i), "final", null ) != null )
 						graph.mFinish.add( newState );
@@ -177,7 +181,7 @@ public class PDABot extends JFrame implements Bot {
 	}
 
 	/* UI variables */
-	private final String mInstanceName = getNewRandomName();
+	private String mInstanceName = getNewRandomName();
 	private final ByteArrayOutputStream mWinBuffer;
 	private final PrintStream mWinOut;
 	private final JTextPane mWinLogPane;
@@ -197,13 +201,18 @@ public class PDABot extends JFrame implements Bot {
 		mWinBuffer.reset();
 	}
 
+	public void setName( String name ) {
+		mInstanceName = name;
+		setTitle( "FSM JFlap Interpreter (" +name+ ")" );
+		mWinOut.println( "Bot is called '" +name+ "'" );
+		updateWinLog( true );
+	}
+
 	public PDABot()
 	{
 		super( "PDA JFlap Interpreter" );
 		setLayout( new BorderLayout() );
 		setMinimumSize( new Dimension(640, 480) );
-
-		setTitle( "PDA JFlap Interpreter (" +mInstanceName+ ")" );
 		
 		// Buffers
 		mWinBuffer = new ByteArrayOutputStream();
@@ -222,6 +231,8 @@ public class PDABot extends JFrame implements Bot {
 
 		mStatusLabel = new JLabel("Waiting...");
 		add( mStatusLabel, BorderLayout.SOUTH );
+
+		setName( mInstanceName );
 
     	final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
     	FileNameExtensionFilter filter = new FileNameExtensionFilter( "JFlap File", "jff" );
@@ -524,7 +535,7 @@ public class PDABot extends JFrame implements Bot {
      */
     @Override
     public String getDescription(){
-        return mInstanceName + ", a bot using logic from a JFlap graph";
+        return mInstanceName + ", a bot using logic from a PDA JFlap graph";
     }
 
 
