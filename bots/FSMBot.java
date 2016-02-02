@@ -339,23 +339,23 @@ public class FSMBot extends JFrame implements Bot {
 						// This is probably a terrible way of doing it, but it's unclear
 						ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName( "JavaScript" );
 						String sensors[] = {
-								"FL = "  +!view[0][0],
-								"F = "      +!view[1][0],
-								"FR = " +!view[2][0],
-								"R = "      +!view[2][1],
-								"BR = "  +!view[2][2],
-								"B = "       +!view[1][2],
-								"BL = "   +!view[0][2],
-								"L = "       +!view[0][1],
+								"FL = " + view[0][0],
+								"F = "  + view[1][0],
+								"FR = " + view[2][0],
+								"R = "  + view[2][1],
+								"BR = " + view[2][2],
+								"B = "  + view[1][2],
+								"BL = " + view[0][2],
+								"L = "  + view[0][1],
 
-								"FrontLeft = "  +!view[0][0],
-								"Front = "      +!view[1][0],
-								"FrontRight = " +!view[2][0],
-								"Right = "      +!view[2][1],
-								"BackRight = "  +!view[2][2],
-								"Back = "       +!view[1][2],
-								"BackLeft = "   +!view[0][2],
-								"Left = "       +!view[0][1]
+								"FrontLeft = "  + view[0][0],
+								"Front = "      + view[1][0],
+								"FrontRight = " + view[2][0],
+								"Right = "      + view[2][1],
+								"BackRight = "  + view[2][2],
+								"Back = "       + view[1][2],
+								"BackLeft = "   + view[0][2],
+								"Left = "       + view[0][1]
 						};
 						for ( String sensor : sensors )
 							scriptEngine.eval(sensor);

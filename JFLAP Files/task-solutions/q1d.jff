@@ -3,20 +3,20 @@
 	<automaton>
 		<!--The list of states.-->
 		<state id="0" name="F">
-			<x>267.0</x>
-			<y>344.0</y>
+			<x>440.0</x>
+			<y>168.0</y>
 		</state>
 		<state id="1" name="R">
-			<x>421.0</x>
-			<y>256.0</y>
+			<x>559.0</x>
+			<y>281.0</y>
 		</state>
 		<state id="2" name="L">
-			<x>556.0</x>
-			<y>368.0</y>
+			<x>311.0</x>
+			<y>270.0</y>
 		</state>
 		<state id="3" name="B">
-			<x>400.0</x>
-			<y>446.0</y>
+			<x>429.0</x>
+			<y>386.0</y>
 			<initial/>
 		</state>
 		<!--The list of transitions.-->

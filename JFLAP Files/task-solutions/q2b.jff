@@ -19,17 +19,12 @@
 		<transition>
 			<from>2</from>
 			<to>1</to>
-			<read>Front</read>
+			<read>!F</read>
 		</transition>
 		<transition>
 			<from>2</from>
 			<to>0</to>
-			<read>!Front</read>
-		</transition>
-		<transition>
-			<from>2</from>
-			<to>1</to>
-			<read>!Left</read>
+			<read>F</read>
 		</transition>
 		<transition>
 			<from>0</from>
@@ -40,6 +35,11 @@
 			<from>1</from>
 			<to>0</to>
 			<read/>
+		</transition>
+		<transition>
+			<from>2</from>
+			<to>1</to>
+			<read>L</read>
 		</transition>
 	</automaton>
 </structure>
