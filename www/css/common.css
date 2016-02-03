@@ -1,0 +1,282 @@
+/* ------------ Main content styling ---------------- */
+
+/* Require fonts */
+@import url('/res/fonts.css');
+
+a{
+    color: #076c8e;
+}
+
+a:visited{
+    color: #8e1d07;
+}
+
+a:hover{
+    -webkit-transition: all .2s;
+    -moz-transition: all .2s;
+    color: #084a61;
+}
+a img:hover{
+    -webkit-transition: all .2s;
+    -moz-transition: all .2s;
+    box-shadow: 0 0 10px #333;
+}
+
+h3,h4,h5{
+    padding-left: 0.5em;
+}
+
+p,dl,ul,pre{
+    margin-left: 1.5em;
+    /*width: 40em;*/
+}
+
+form{
+    margin-left: 1.5em;
+}
+
+h4{
+    width: 80%;
+    border-bottom: solid 1px #aaa;
+    font-family: 'Rosarivo', Georgia, serif;
+}
+
+h3{
+    font-size: 1.2em;
+    clear: both;
+    border-bottom: solid 1px #333;
+    font-family: 'Rosarivo', Georgia, serif;
+    /*border-left: solid 5px #333;*/
+}
+
+h3.noclear{
+    clear: none;
+}
+
+h3.short{
+    width: 80%;
+}
+
+strong{
+    letter-spacing: -1px;
+}
+
+strong a{
+    text-decoration: none;
+}
+
+img{
+    margin: 1em;
+    border: solid 1px #333;
+}
+
+/* 
+ * Right-aligned images.
+ *
+ * This is a fallback rule for browsers that do not
+ * support the media selectors below.
+ */
+img.rightimg{
+    float: right;
+    clear: right;
+    max-width: 98%;
+}
+/* For images below 600px, set them to be full-width,
+ * with the same margins as default, and inline with
+ * the text.
+ */
+@media (min-width: 0px){
+    img.rightimg{
+        float: none;
+        display: block;
+        position: static;
+        clear: none;
+        margin: 1em auto;
+    }
+}
+/* Above 600px set them to float to the right, as in
+ * the fallback rule.
+ */
+@media (min-width: 600px){
+    img.rightimg{
+        /* Undo previous selector */
+        margin: 1em;
+        position: float;
+        /* Apply new style */
+        
+        float: right;
+        clear: right;
+    }
+}
+
+/* Image centred on page */
+img.centreimg{
+    margin: 0 auto;
+}
+
+/* Clear any floating elements */
+div.clear{
+    clear: both;
+}
+
+/* Centre any content in div 
+ * including images
+ * */
+div.centre{
+    margin: 1em 0;
+    width: 100%;
+    text-align: center;
+}
+div.centre img{
+    margin: 0 auto;
+}
+
+/* Display an element without a border,
+ * Normally used on images.
+ * */
+.noborder{
+    border: none;
+}
+
+
+/* A nice quote with large quote marks */
+blockquote, pre.quote{
+    /*border: solid 1px #333;*/
+    width: 90%;
+    padding: 0.25em 1em;
+    /*background: #eee;*/
+    box-shadow: 1px 1px 4px #333;
+    background-image: url('../images/openq.png');/* for non-css3 compliant browsers */
+    background-position: top-left;
+    background-repeat: no-repeat;
+    
+    background-image: url('../images/openq.png'), url('../images/closeq.png'); /* for the good ones */
+    background-position: top left, bottom right;
+    background-repeat: no-repeat, no-repeat;
+}
+
+/* Block code */
+pre.boxycode{
+    border: solid 1px #ddd;
+    border-radius: 2px;
+    width: 90%;
+    padding: 1em;
+    background-color: rgba(222,222,222,0.4);
+    overflow-x: auto;
+    /*background: #eee;*/
+}
+pre.boxycode:hover{
+    background-color: white; 
+    -webkit-transition: all .25s;
+    -moz-transition: all .25s;
+}
+
+/* Inline code */
+code{
+    border: solid 1px transparent;
+    margin: 0 0.1em;
+    padding: 0 0.1em;
+}
+code:hover{
+    border: solid 1px #ddd;
+    border-radius: 2px;
+    box-shadow: 0px 0px 4px #333;
+    -webkit-transition: all .25s;
+    -moz-transition: all .25s;
+}
+
+/* Make dictionary lists more sane */
+dt{ 
+    font-weight: bold; 
+    margin-top: 0.1em;
+    padding: 0;
+    letter-spacing: -1px;
+    line-height: 0.9em;
+}
+dd{ 
+    margin-bottom: .5em; 
+    padding: 0;
+}
+
+/* Text style variations */
+.superscript{
+    vertical-align: super;
+}
+.subscript{
+    vertical-align: sub;
+}
+.superscript, .subscript{
+    font-size: 70%;
+}
+
+
+/* ------------ Tables ---------------- */
+table{
+    border-bottom: solid 2px #333;
+    border-collapse: collapse;
+    margin-left: 1.5em;
+    background: white; /* for primitive browsers */
+    background: rgba(255,255,255,0.7);
+}
+
+/* Table with no default left-margin */
+table.noshift{
+    margin-left: 0;
+}
+
+/* Table with monospace fonts */
+table.monospace{
+  font-family: 'Cousine', monospace;
+}
+
+
+/* Default table content styles */
+
+/* Bold styling for head/foot of tables */
+thead tr, tfoot tr{
+    font-weight: bold;
+    /*font-size: 120%;*/
+}
+thead tr th, tfoot tr td{
+    border-top: solid 2px #333;
+    border-bottom: solid 2px #333;
+    padding: 0.2em;
+}
+
+table tr td{
+    padding: 0.15em 0.8em;
+}
+
+
+/* Table content variations */
+
+/* Align table contents right/left/centre */
+td.alright{
+    text-align: right;
+}
+td.alcentre{
+    text-align: center;
+}
+td.alleft{
+    text-align: left;
+}
+
+
+
+
+/* ------- Selection colours ----- */
+::-moz-selection{
+    background: #b4c0cf;
+    /* color:#000 */
+}
+::selection{
+    background: #b4c0cf;
+    /* color:#000 */
+}
+a::-moz-selection{
+    color: blue;
+}
+a::selection{
+    color: blue;
+}
+

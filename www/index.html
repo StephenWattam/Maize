@@ -1,0 +1,82 @@
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="css/mainstyle.css" />
+	<link rel="stylesheet" type="text/css" href="css/common.css" />
+</head>
+<body>
+<!--#include virtual="../../res/htmlhead.inc"--><!--#include virtual="../../res/banner.inc"-->
+<!-- Tweak image style for this page only -->
+<style>
+	img { border: none; }
+
+	div.caption { margin-top: -1em; font-size:smaller; }
+
+	div.center{ text-align: center; }
+</style>
+
+<!--<a href="images/fsmbot.png"><img src="images/fsmbot.png" width="320px" class="rightimg" alt=""/></a>-->
+
+<h2>JFlap Bots in Maize</h2>
+
+<h3>Additional UI Elements in Maize</h3>
+<p>When Maize is loaded with JFlap compatible bots, two additional windows will be opened alongside the main Maize UI, one for Push Down Automata (PDABot) and the other for Finite State Machines (FSMBot).<br />Each window will have it's title set to the name of the bot it controls - a randomly generated [adjective] [colour] [animal] combination, these can be matched with the bot instance in Maize's UI to run the bot in various mazes.</p>
+
+<div class="center">
+	<a href="images/maize-ui.png">
+		<img src="images/maize-ui.png" alt="The Maize UI Bot List, showing a bot named PDABot - Nervous Maroon Butterfly"/>
+	</a>
+	<div class="caption">Maize's bot list, with a PDABot selected</div>
+</div>
+
+<p>The random names are used to identify which bot instance in Maize matches to which window, and are mainly useful for pitting two bots of the same type against each other with different JFlap graphs (PDABot vs PDABot, for example).</p>
+
+<h3>Running Graphs in Maize</h3>
+
+<p>When started, each bot in the current application instance will open a new window.<br />The two buttons at the top of each of these windows allow you to load or reload graphs designed in JFlap.</p>
+
+<div class="center">
+	<a href="images/botwindow.png">
+		<img src="images/botwindow.png" width="320px" alt="An annotated partial screen capture with buttons and areas labelled"/>
+	</a>
+	<div class="caption">A PDABot window, annotated</div>
+</div>
+
+<p>To get the bots running, fire up JFlap and lay out your bot logic, then launch Maize and find the correct bot type for your graph.</p>
+
+<ul>
+	<li>Push Down Automata should be loaded into a PDABot</li>
+	<li>Finite State Machines should be loaded into a FSMBot</li>
+</ul>
+
+<p>If you see a message complaining that the bot doesn't understand the graph type you have chosen, make sure you're using the right bot with the right graph.</p>
+
+<div class="center">
+	<a href="images/selectingbots.png">
+		<img src="images/selectingbots.png" width="480px" alt="The 'Run Tests' tab in Maize, showing a selected bot and maze"/>
+	</a>
+	<div class="caption">The "Run Tests" tab, annotated</div>
+</div>
+
+<p>Next, choose the "Run Tests" tab in Maize, find the bot you're using in the left hand list and pick a maze for it to solve from the right-hand list</p>
+
+<p>Select "New Test" to load a new test into Maize with the bot(s) and maze you selected, and press "(Re)Start" to start the test.</p>
+
+<div class="center">
+	<a href="images/botlog.png">
+		<img src="images/botlog.png" width="480px" alt="A PDABot running with a graph, showing log messages"/>
+	</a>
+	<div class="caption">Log messages from a Push Down Automata running in PDABot</div>
+</div>
+
+<p>Messages from PDABot or FSMBot will be shown in the output log in their windows, and show what the bot evaluated during it's turn, including:</p>
+<ul>
+	<li>The node the bot started at and any subsequent nodes it went through this turn</li>
+	<li>The rules the bot evaluated at each node</li>
+	<li>Which rule the bot <i>actually</i> took (in the case of nondeterministic options)</li>
+	<li>What actions the bot has performed (Forward, Back, Left or Right, if any)</li>
+</ul>
+
+<p>The window only shows the last update from the bots, but messages are also written to the console/terminal, so if you're having trouble getting a bot to do what you want, it might be worth running Maize from the command line and going through the log messages</p>
+
+
+</body></html>

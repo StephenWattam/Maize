@@ -1,0 +1,125 @@
+/* ------------ Banner and background ---------------- */
+
+/* Require fonts */
+@import url('/res/fonts.css');
+
+
+html, body{
+    margin: 0;
+    padding: 0;
+
+
+    font-family: 'Rosarivo', Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+    line-height: 1.5em;
+    font-size: 97%;
+
+    /* bg pics */
+    background-color: #f9fafb;
+    background-image: url('../images/sierslight.png');
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+
+div#banner__{
+    padding-top: 0.2em;
+    border-bottom: solid 3px #076c8e;
+
+    /* bg pics */
+    background-image: url('../images/bannerbg.png');
+    background-color: #bababa;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+div#banner__ h1{
+    font-family: 'Rosarivo', 'Georgia', serif;
+    /*font-family: monospace sans-serif;*/
+    font-size: 1.8em;
+    line-height: 1.4em;
+    padding: 0.1em;
+    margin: 0.1em 0.5em;
+    
+    text-shadow: #fff 0 0 10px;
+}
+
+div#banner__ h1 a{
+    text-decoration: none;
+    color: black;
+}
+
+div#banner__ h1 a:hover{
+    text-shadow: #fff 0 0 5px;
+    -webkit-transition: all .5s;
+    -moz-transition: all .5s;
+}
+
+h2{
+    position: absolute;
+    right: 0.1em;
+    top: 0.1em;
+    font-size: 0.8em;
+    font-family: 'Rosarivo', 'Georgia', serif;
+    padding: 0.1em;
+    margin: 0 0.5em;
+    color: black;
+    font-weight: 50%;
+}
+
+div#banner__ ul{
+    list-style-type: none;
+    margin: 0;
+    width: 100%;
+    padding: 0;
+    margin-bottom: 0.3em;
+}
+
+div#banner__ ul li{
+    font-family: 'Rosarivo', 'Georgia', serif;
+    display: inline-block;
+    padding-top: 0.1em; /* Padding to offset font v-position */
+    border-left: solid 1px transparent;
+    border-right: solid 1px transparent;
+}
+
+div#banner__ div.righticons{
+    float: right;
+    padding-top: 0.2em;
+    padding-right: 0.4em;
+    vertical-align: bottom;
+}
+
+div#banner__ div.righticons a{
+    padding: 0 0.1em;
+}
+
+div#banner__ div.righticons a img{
+    height: 1.0em;
+    padding: 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+}
+
+
+div#banner__ ul li:hover{
+    /*background: url('../images/whitetransbg.png');*/
+    background-color: rgba(255,255,255,0.6);
+    box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    border-radius: 0.2em;
+  /*  -webkit-transition: all 1.5s ease-in;
+    -webkit-transform: rotate(1080deg);*/
+    -moz-transition: all .15s;
+    -webkit-transition: all .15s;
+    
+    /*border-left: solid 1px #333;
+    border-right: solid 1px #333;*/
+}
+
+div#banner__ ul li a{
+    text-decoration: none;
+    padding: 0.1em 0.5em;
+    color: black;
+}
+
+
